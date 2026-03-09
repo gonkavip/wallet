@@ -1,0 +1,62 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Flutter/Dart
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+.pub-cache/
+.pub/
+/build/
+
+# Android
+/android/.gradle/
+/android/.idea/
+/android/.kotlin/
+/android/app/build/
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/build/
+/android/local.properties
+/android/key.properties
+/android/app/*.jks
+/android/app/*.keystore
+
+# iOS
+/ios/Pods/
+/ios/.symlinks/
+/ios/Flutter/ephemeral/
+/ios/Flutter/flutter_export_environment.sh
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/.last_build_id
+
+# Symbolication
+app.*.symbols
+
+# Obfuscation
+app.*.map.json
+
+# Coverage
+coverage/
