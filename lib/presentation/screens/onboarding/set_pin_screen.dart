@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class SetPinScreen extends ConsumerStatefulWidget {
   final String mnemonic;
@@ -139,7 +140,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
       appBar: AppBar(title: const Text('Set PIN')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
+          : ResponsiveCenter(
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
@@ -173,7 +174,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
                     ),
                   ],
                   const Spacer(),
-                  _buildNumPad(),
+                  Center(child: SizedBox(width: 320, child: _buildNumPad())),
                   const SizedBox(height: 32),
                 ],
               ),

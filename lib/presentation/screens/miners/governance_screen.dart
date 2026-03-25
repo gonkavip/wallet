@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/network/node_client.dart';
 import '../../../state/providers/governance_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class GovernanceScreen extends ConsumerWidget {
   const GovernanceScreen({super.key});
@@ -34,7 +35,7 @@ class GovernanceScreen extends ConsumerWidget {
             ],
           ),
         ),
-        body: proposalsAsync.when(
+        body: ResponsiveCenter(child: proposalsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(
             child: Column(
@@ -75,7 +76,7 @@ class GovernanceScreen extends ConsumerWidget {
               ],
             );
           },
-        ),
+        )),
       ),
     );
   }

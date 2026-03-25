@@ -5,7 +5,6 @@ import 'api_endpoints.dart';
 import 'node_client.dart';
 
 const List<String> _initialNodeHosts = [
-  '185.216.21.98',
   'node1.gonka.ai',
   'node2.gonka.ai',
   'node3.gonka.ai',

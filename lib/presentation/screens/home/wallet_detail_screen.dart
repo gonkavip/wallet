@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
@@ -11,6 +12,7 @@ import '../../../state/providers/balance_provider.dart';
 import '../../../state/providers/tx_history_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/balance_card.dart';
+import '../../widgets/responsive_center.dart';
 import '../../../data/services/device_security_service.dart';
 
 class WalletDetailScreen extends ConsumerStatefulWidget {
@@ -81,7 +83,7 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
+      body: ResponsiveCenter(child: RefreshIndicator(
         onRefresh: () async {
           await ref.read(balanceProvider.notifier).refresh();
           ref.invalidate(txHistoryProvider(wallet.address));
@@ -196,7 +198,7 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -356,12 +358,24 @@ class _TxHistoryTile extends StatelessWidget {
     final isUnjail = tx.isUnjail;
     final isVote = tx.isVote;
 
-    if (isVote) {
+    final isContract = tx.isContract;
+    final isContractWithdraw = tx.type == TxType.contractWithdraw;
+
+    if (isContract) {
+      final action = tx.memo.isNotEmpty ? tx.memo[0].toUpperCase() + tx.memo.substring(1) : 'Contract';
+      icon = isContractWithdraw ? Icons.arrow_downward : Icons.rocket_launch;
+      color = isContractWithdraw ? Colors.green : Colors.deepOrange;
+      title = action;
+      final addr = tx.toAddress;
+      subtitle = addr.length > 20
+          ? '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}'
+          : addr;
+    } else if (isVote) {
       final voteOption = VoteOption.fromString(tx.memo);
       icon = Icons.how_to_vote;
       color = Colors.blue;
       title = 'Vote: ${voteOption?.displayName ?? tx.memo}';
-      subtitle = tx.toAddress; // "Proposal #N"
+      subtitle = tx.toAddress;
     } else if (isUnjail) {
       icon = Icons.lock_open;
       color = Colors.amber;
@@ -431,7 +445,7 @@ class _TxHistoryTile extends StatelessWidget {
         trailing: isGrant || isUnjail || isVote
             ? null
             : Text(
-                '${isCollateral ? '' : (isReceive ? '+' : '-')}${formatGnk(tx.amountNgonka)} GNK',
+                '${isContractWithdraw ? '+' : (isCollateral || isContract ? '-' : (isReceive ? '+' : '-'))}${formatGnk(tx.amountNgonka)} GNK',
                 style: TextStyle(color: color, fontWeight: FontWeight.w600),
               ),
         isThreeLine: true,
@@ -447,9 +461,13 @@ class _TxHistoryTile extends StatelessWidget {
     final isGrant = tx.isGrant;
     final isUnjail = tx.isUnjail;
     final isVoteTx = tx.isVote;
+    final isContractTx = tx.isContract;
 
     final String sheetTitle;
-    if (isVoteTx) {
+    if (isContractTx) {
+      final action = tx.memo.isNotEmpty ? tx.memo[0].toUpperCase() + tx.memo.substring(1) : 'Contract';
+      sheetTitle = action;
+    } else if (isVoteTx) {
       sheetTitle = 'Vote';
     } else if (isUnjail) {
       sheetTitle = 'Unjail Validator';
@@ -467,7 +485,9 @@ class _TxHistoryTile extends StatelessWidget {
 
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => Padding(
+      constraints: const BoxConstraints(maxWidth: 600),
+      isScrollControlled: true,
+      builder: (ctx) => SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -475,21 +495,30 @@ class _TxHistoryTile extends StatelessWidget {
           children: [
             Text(sheetTitle, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            if (isVoteTx) ...[
+            if (isContractTx) ...[
+              _detailRow('Type', tx.memo.isNotEmpty ? tx.memo[0].toUpperCase() + tx.memo.substring(1) : 'Contract'),
+              _detailRow('Status', tx.success ? 'Success' : 'Failed'),
+              _detailRow('Amount', '${formatGnk(tx.amountNgonka)} GNK'),
+              _detailRow('From', tx.fromAddress),
+              _detailRow('Contract', tx.toAddress),
+              _detailRow('Height', tx.height.toString()),
+              _detailRow('Time', tx.timestamp.toLocal().toString()),
+              _detailRow('Hash', tx.txhash, ctx: context),
+            ] else if (isVoteTx) ...[
               _detailRow('Type', 'Vote'),
               _detailRow('Status', tx.success ? 'Success' : 'Failed'),
               _detailRow('Proposal', tx.toAddress),
               _detailRow('Option', VoteOption.fromString(tx.memo)?.displayName ?? tx.memo),
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ] else if (isUnjail) ...[
               _detailRow('Type', 'Unjail'),
               _detailRow('Status', tx.success ? 'Success' : 'Failed'),
               _detailRow('Validator', tx.fromAddress),
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ] else if (isGrant) ...[
               _detailRow('Type', 'Grant Permissions'),
               _detailRow('Status', tx.success ? 'Success' : 'Failed'),
@@ -497,7 +526,7 @@ class _TxHistoryTile extends StatelessWidget {
               _detailRow('Grantee', tx.toAddress),
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ] else if (isCollateral) ...[
               _detailRow('Type', tx.type == TxType.collateralDeposit
                   ? 'Collateral Deposit'
@@ -507,7 +536,7 @@ class _TxHistoryTile extends StatelessWidget {
               _detailRow('Address', tx.fromAddress),
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ] else if (isVesting) ...[
               _detailRow('Type', 'Vesting Reward'),
               _detailRow('Status', tx.success ? 'Success' : 'Failed'),
@@ -516,7 +545,7 @@ class _TxHistoryTile extends StatelessWidget {
               _detailRow('Amount', '${formatGnk(tx.amountNgonka)} GNK'),
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ] else ...[
               _detailRow('Status', tx.success ? 'Success' : 'Failed'),
               _detailRow(
@@ -527,7 +556,7 @@ class _TxHistoryTile extends StatelessWidget {
               _detailRow('Height', tx.height.toString()),
               _detailRow('Time', tx.timestamp.toLocal().toString()),
               if (tx.memo.isNotEmpty) _detailRow('Memo', tx.memo),
-              _detailRow('Hash', tx.txhash),
+              _detailRow('Hash', tx.txhash, ctx: context),
             ],
             const SizedBox(height: 16),
           ],
@@ -536,7 +565,7 @@ class _TxHistoryTile extends StatelessWidget {
     );
   }
 
-  Widget _detailRow(String label, String value) {
+  Widget _detailRow(String label, String value, {BuildContext? ctx}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -552,6 +581,8 @@ class _TxHistoryTile extends StatelessWidget {
             child: Text(value,
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
           ),
+          if (label == 'Hash' && ctx != null)
+            _CopyButton(value: value),
         ],
       ),
     );
@@ -570,5 +601,40 @@ class _TxHistoryTile extends StatelessWidget {
     return '${local.day.toString().padLeft(2, '0')}.'
         '${local.month.toString().padLeft(2, '0')}.'
         '${local.year}';
+  }
+}
+
+class _CopyButton extends StatefulWidget {
+  final String value;
+  const _CopyButton({required this.value});
+
+  @override
+  State<_CopyButton> createState() => _CopyButtonState();
+}
+
+class _CopyButtonState extends State<_CopyButton> {
+  bool _copied = false;
+
+  void _onTap() {
+    Clipboard.setData(ClipboardData(text: widget.value));
+    setState(() => _copied = true);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 4),
+        child: Icon(
+          _copied ? Icons.check : Icons.copy,
+          size: 16,
+          color: _copied ? Colors.green : Colors.grey,
+        ),
+      ),
+    );
   }
 }

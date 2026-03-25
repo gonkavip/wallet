@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../widgets/responsive_center.dart';
 
 class MinersScreen extends StatelessWidget {
   const MinersScreen({super.key});
@@ -20,7 +22,7 @@ class MinersScreen extends StatelessWidget {
           },
         ),
       ),
-      body: ListView(
+      body: ResponsiveCenter(child: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.shield_outlined),
@@ -50,8 +52,15 @@ class MinersScreen extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/miners/governance'),
           ),
+          ListTile(
+            leading: const Icon(Icons.track_changes_outlined),
+            title: const Text('Tracker'),
+            subtitle: const Text('Professional Dashboard'),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => launchUrl(Uri.parse('https://tracker.gonka.vip/'), mode: LaunchMode.externalApplication),
+          ),
         ],
-      ),
+      )),
     );
   }
 }

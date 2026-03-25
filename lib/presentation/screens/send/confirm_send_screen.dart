@@ -6,6 +6,7 @@ import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/send_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/amount_display.dart';
+import '../../widgets/responsive_center.dart';
 
 class ConfirmSendScreen extends ConsumerStatefulWidget {
   final String toAddress;
@@ -91,7 +92,7 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

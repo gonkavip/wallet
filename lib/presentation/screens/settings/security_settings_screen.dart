@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class SecuritySettingsScreen extends ConsumerStatefulWidget {
   const SecuritySettingsScreen({super.key});
@@ -56,7 +57,7 @@ class _SecuritySettingsScreenState
           },
         ),
       ),
-      body: ListView(
+      body: ResponsiveCenter(child: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.pin),
@@ -80,7 +81,7 @@ class _SecuritySettingsScreenState
             onChanged: _toggleWipe,
           ),
         ],
-      ),
+      )),
     );
   }
 

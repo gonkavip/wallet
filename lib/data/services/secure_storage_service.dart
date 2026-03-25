@@ -7,6 +7,7 @@ class SecureStorageService {
       : _storage = const FlutterSecureStorage(
           aOptions: AndroidOptions(encryptedSharedPreferences: true),
           iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+          mOptions: MacOsOptions(useDataProtectionKeyChain: false),
         );
 
   Future<void> saveMnemonic(String walletId, String mnemonic) =>
@@ -50,7 +51,7 @@ class SecureStorageService {
 
   Future<bool> isWipeOnFailedAttempts() async {
     final value = await _storage.read(key: 'wipe_on_failed_attempts');
-    return value != 'false'; // default true
+    return value != 'false';
   }
 
   Future<void> setBiometricEnabled(bool enabled) =>

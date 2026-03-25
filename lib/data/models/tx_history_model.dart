@@ -1,4 +1,4 @@
-enum TxType { send, receive, vestingReward, collateralDeposit, collateralWithdraw, grantPermissions, unjail, vote }
+enum TxType { send, receive, vestingReward, collateralDeposit, collateralWithdraw, grantPermissions, unjail, vote, contractDeposit, contractWithdraw }
 
 class TxHistoryItem {
   final String txhash;
@@ -36,11 +36,23 @@ class TxHistoryItem {
 
   bool get isVote => type == TxType.vote;
 
+  bool get isContract => type == TxType.contractDeposit || type == TxType.contractWithdraw;
+
   bool isReceive(String myAddress) =>
       type == TxType.vestingReward || toAddress == myAddress;
 
   factory TxHistoryItem.fromTxResponse(
       Map<String, dynamic> tx, Map<String, dynamic> txResponse) {
+    try {
+      final messages = tx['body']?['messages'] as List? ?? [];
+      if (messages.isNotEmpty) {
+        final typeUrl = messages[0]['@type']?.toString() ?? '';
+        if (typeUrl.contains('MsgExecuteContract')) {
+          return TxHistoryItem.fromContractTx(tx, txResponse);
+        }
+      }
+    } catch (_) {}
+
     final txhash = txResponse['txhash']?.toString() ?? '';
     final code = txResponse['code'] ?? 0;
     final height = int.tryParse(txResponse['height']?.toString() ?? '0') ?? 0;
@@ -309,6 +321,64 @@ class TxHistoryItem {
       success: code == 0,
       memo: option,
       type: TxType.vote,
+    );
+  }
+
+  factory TxHistoryItem.fromContractTx(
+      Map<String, dynamic> tx, Map<String, dynamic> txResponse) {
+    final txhash = txResponse['txhash']?.toString() ?? '';
+    final code = txResponse['code'] ?? 0;
+    final height =
+        int.tryParse(txResponse['height']?.toString() ?? '0') ?? 0;
+    final timestampStr = txResponse['timestamp']?.toString() ?? '';
+    final timestamp = DateTime.tryParse(timestampStr) ?? DateTime.now();
+
+    String sender = '';
+    String contract = '';
+    BigInt amount = BigInt.zero;
+    String action = '';
+
+    try {
+      final body = tx['body'];
+      if (body != null) {
+        final messages = body['messages'] as List? ?? [];
+        if (messages.isNotEmpty) {
+          final msg = messages[0];
+          sender = msg['sender']?.toString() ?? '';
+          contract = msg['contract']?.toString() ?? '';
+          final funds = msg['funds'] as List? ?? [];
+          if (funds.isNotEmpty) {
+            amount =
+                BigInt.tryParse(funds[0]['amount']?.toString() ?? '0') ??
+                    BigInt.zero;
+          }
+          final msgBody = msg['msg'];
+          if (msgBody is Map) {
+            action = msgBody.keys.first.toString();
+            if (amount == BigInt.zero) {
+              final actionBody = msgBody[action];
+              if (actionBody is Map) {
+                final innerAmount = actionBody['amount']?.toString();
+                if (innerAmount != null) {
+                  amount = BigInt.tryParse(innerAmount) ?? BigInt.zero;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (_) {}
+
+    return TxHistoryItem(
+      txhash: txhash,
+      fromAddress: sender,
+      toAddress: contract,
+      amountNgonka: amount,
+      timestamp: timestamp,
+      height: height,
+      success: code == 0,
+      memo: action,
+      type: action == 'withdraw' ? TxType.contractWithdraw : TxType.contractDeposit,
     );
   }
 }

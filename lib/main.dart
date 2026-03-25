@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app.dart' show GonkaWalletApp, appRouter;
+import 'core/platform_util.dart';
 import 'data/repositories/wallet_repository.dart';
 import 'data/repositories/node_repository.dart';
 import 'data/services/secure_storage_service.dart';
@@ -108,7 +109,11 @@ class _AppInitializerState extends ConsumerState<_AppInitializer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
+    final triggerState = PlatformUtil.isDesktop
+        ? AppLifecycleState.hidden
+        : AppLifecycleState.paused;
+
+    if (state == triggerState) {
       _wasPaused = true;
     } else if (state == AppLifecycleState.resumed && _wasPaused) {
       _wasPaused = false;

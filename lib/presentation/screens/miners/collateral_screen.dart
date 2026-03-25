@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
 import '../../../state/providers/collateral_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class CollateralScreen extends ConsumerStatefulWidget {
   const CollateralScreen({super.key});
@@ -46,7 +47,7 @@ class _CollateralScreenState extends ConsumerState<CollateralScreen> {
           },
         ),
       ),
-      body: RefreshIndicator(
+      body: ResponsiveCenter(child: RefreshIndicator(
         onRefresh: () async => _loadCollateral(),
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -143,7 +144,7 @@ class _CollateralScreenState extends ConsumerState<CollateralScreen> {
               ),
           ],
         ),
-      ),
+      )),
     );
   }
 }

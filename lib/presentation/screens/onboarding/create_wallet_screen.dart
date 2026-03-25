@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../widgets/responsive_center.dart';
 
 class CreateWalletScreen extends StatelessWidget {
   const CreateWalletScreen({super.key});
@@ -20,7 +22,7 @@ class CreateWalletScreen extends StatelessWidget {
             )
           : null,
       body: SafeArea(
-        child: Padding(
+        child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +70,31 @@ class CreateWalletScreen extends StatelessWidget {
                   child: const Text('Import Existing Wallet'),
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => launchUrl(Uri.parse('https://gonka.vip/terms/'), mode: LaunchMode.externalApplication),
+                    child: Text(
+                      'Terms of Use',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500], decoration: TextDecoration.underline),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('|', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  ),
+                  GestureDetector(
+                    onTap: () => launchUrl(Uri.parse('https://gonka.vip/privacy/'), mode: LaunchMode.externalApplication),
+                    child: Text(
+                      'Privacy Policy',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500], decoration: TextDecoration.underline),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

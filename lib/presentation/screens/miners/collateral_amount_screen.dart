@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
+import '../../../core/platform_util.dart';
 import '../../../state/providers/balance_provider.dart';
 import '../../../state/providers/collateral_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class CollateralAmountScreen extends ConsumerStatefulWidget {
   final bool isDeposit;
@@ -37,7 +39,7 @@ class _CollateralAmountScreenState
           _amountController.text = formatGnk(ngonka);
         } else {
           final ngonka = parseGnk(input);
-          _amountController.text = ngonka.toString();
+          _amountController.text = formatNgonka(ngonka);
         }
       } catch (_) {}
     }
@@ -51,7 +53,7 @@ class _CollateralAmountScreenState
         if (_useGnk) {
           _amountController.text = formatGnk(balance.spendable);
         } else {
-          _amountController.text = balance.spendable.toString();
+          _amountController.text = formatNgonka(balance.spendable);
         }
       });
     } else {
@@ -60,7 +62,7 @@ class _CollateralAmountScreenState
       if (_useGnk) {
         _amountController.text = formatGnk(current);
       } else {
-        _amountController.text = current.toString();
+        _amountController.text = formatNgonka(current);
       }
     }
   }
@@ -68,7 +70,7 @@ class _CollateralAmountScreenState
   String? _validateAmount(String input) {
     if (input.isEmpty) return 'Enter amount';
     try {
-      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input);
+      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input.replaceAll(',', ''));
       if (ngonka <= BigInt.zero) return 'Amount must be positive';
       if (widget.isDeposit) {
         final balanceAsync = ref.read(balanceProvider);
@@ -95,7 +97,7 @@ class _CollateralAmountScreenState
 
     final ngonka = _useGnk
         ? parseGnk(_amountController.text.trim())
-        : BigInt.parse(_amountController.text.trim());
+        : BigInt.parse(_amountController.text.trim().replaceAll(',', ''));
 
     context.push('/miners/collateral/confirm', extra: {
       'amountNgonka': ngonka.toString(),
@@ -123,7 +125,7 @@ class _CollateralAmountScreenState
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,8 +145,9 @@ class _CollateralAmountScreenState
                 Expanded(
                   child: TextField(
                     controller: _amountController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: PlatformUtil.isDesktop
+                        ? null
+                        : const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       labelText: 'Amount',
                       errorText: _amountError,

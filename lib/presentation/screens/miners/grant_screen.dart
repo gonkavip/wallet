@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/crypto/address_service.dart';
+import '../../../core/platform_util.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class GrantScreen extends ConsumerStatefulWidget {
   const GrantScreen({super.key});
@@ -23,6 +26,13 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
   }
 
   void _scanQr() async {
+    if (PlatformUtil.isDesktop) {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (data?.text != null && data!.text!.isNotEmpty) {
+        _addressController.text = data.text!.trim();
+      }
+      return;
+    }
     final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => const _QrScanPage()),
@@ -68,7 +78,7 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +112,9 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
                 errorText: _addressError,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
+                  icon: Icon(PlatformUtil.isDesktop
+                      ? Icons.content_paste
+                      : Icons.qr_code_scanner),
                   onPressed: _scanQr,
                 ),
               ),

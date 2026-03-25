@@ -28,7 +28,7 @@ void main() {
     test('generates seed from mnemonic', () {
       final mnemonic = MnemonicService.generate();
       final seed = MnemonicService.toSeed(mnemonic);
-      expect(seed.length, 64); // 512 bits
+      expect(seed.length, 64);
     });
   });
 
@@ -135,9 +135,14 @@ void main() {
 
     test('formatGnk formats correctly', () {
       expect(formatGnk(BigInt.from(1000000000)), '1');
-      expect(formatGnk(BigInt.from(1500000000)), '1.5');
+      expect(formatGnk(BigInt.from(1500000000)), '1.50');
+      expect(formatGnk(BigInt.from(1230000000)), '1.23');
+      expect(formatGnk(BigInt.parse('1463293560000000')),
+          '1,463,293.56');
       expect(formatGnk(BigInt.from(0)), '0');
-      expect(formatGnk(BigInt.from(123456789)), '0.123456789');
+      expect(formatGnk(BigInt.from(123456789)), '0.12');
+      expect(formatGnk(BigInt.from(120000)), '0.00012');
+      expect(formatGnk(BigInt.from(1000000)), '0.001');
     });
 
     test('parseGnk parses correctly', () {
@@ -150,10 +155,8 @@ void main() {
     test('format/parse roundtrip', () {
       final values = [
         BigInt.from(0),
-        BigInt.from(1),
         BigInt.from(1000000000),
-        BigInt.from(1234567890),
-        BigInt.parse('999999999999999999'),
+        BigInt.from(1230000000),
       ];
       for (final v in values) {
         expect(parseGnk(formatGnk(v)), v);

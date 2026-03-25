@@ -36,6 +36,7 @@ class TxHistoryNotifier
         client.getGrantTxHistory(_address),
         client.getUnjailTxHistory(_address),
         client.getVoteTxHistory(_address),
+        client.getContractTxHistory(_address),
       ]);
 
       final rawTransfers = results[0] as List;
@@ -44,23 +45,12 @@ class TxHistoryNotifier
       final rawGrants = results[3] as List;
       final rawUnjails = results[4] as List;
       final rawVotes = results[5] as List;
+      final rawContracts = results[6] as List;
 
       final items = <TxHistoryItem>[];
 
-      for (final raw in rawTransfers) {
-        final item = TxHistoryItem.fromTxResponse(raw.tx, raw.txResponse);
-        items.add(TxHistoryItem(
-          txhash: item.txhash,
-          fromAddress: item.fromAddress,
-          toAddress: item.toAddress,
-          amountNgonka: item.amountNgonka,
-          denom: item.denom,
-          timestamp: item.timestamp,
-          height: item.height,
-          success: item.success,
-          memo: item.memo,
-          type: item.toAddress == _address ? TxType.receive : TxType.send,
-        ));
+      for (final raw in rawContracts) {
+        items.add(TxHistoryItem.fromContractTx(raw.tx, raw.txResponse));
       }
 
       for (final raw in rawVesting) {
@@ -82,6 +72,25 @@ class TxHistoryNotifier
 
       for (final raw in rawVotes) {
         items.add(TxHistoryItem.fromVoteTx(raw.tx, raw.txResponse));
+      }
+
+      for (final raw in rawTransfers) {
+        final item = TxHistoryItem.fromTxResponse(raw.tx, raw.txResponse);
+        final type = item.type != TxType.send
+            ? item.type
+            : (item.toAddress == _address ? TxType.receive : TxType.send);
+        items.add(TxHistoryItem(
+          txhash: item.txhash,
+          fromAddress: item.fromAddress,
+          toAddress: item.toAddress,
+          amountNgonka: item.amountNgonka,
+          denom: item.denom,
+          timestamp: item.timestamp,
+          height: item.height,
+          success: item.success,
+          memo: item.memo,
+          type: type,
+        ));
       }
 
       final seen = <String>{};

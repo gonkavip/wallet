@@ -21,7 +21,7 @@ class AmountDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = useGnk
         ? (exact ? formatGnk(amountNgonka) : formatGnkShort(amountNgonka))
-        : amountNgonka.toString();
+        : formatNgonka(amountNgonka);
     final denom = useGnk ? GonkaConstants.displayDenom : GonkaConstants.baseDenom;
 
     return Text(

@@ -1,29 +1,59 @@
 # Gonka Wallet
 
-Mobile wallet for the Gonka blockchain. Built with Flutter for Android and iOS.
+Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS, Android, macOS, and Windows.
+
+<p align="center">
+  <a href="https://wallet.gonka.vip/">
+    <img src="https://img.shields.io/badge/Website-wallet.gonka.vip-3b82f6?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Website">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/us/app/gonka-wallet/id6760277065">
+    <img src="https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white" alt="App Store">
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.dutiap.gonkawallet">
+    <img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white" alt="Google Play">
+  </a>
+  <a href="https://wallet.gonka.vip/download/GonkaWallet.dmg">
+    <img src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS">
+  </a>
+  <a href="https://wallet.gonka.vip/download/GonkaWallet.exe">
+    <img src="https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
+  </a>
+</p>
 
 ## Features
 
 ### Wallet Management
 - Create new wallets with 24-word BIP39 mnemonic generation
-- Import existing wallets from seed phrase with autocomplete
+- Import existing wallets from seed phrase (word-by-word or paste full phrase)
 - Multiple wallets support with switching between them
 - Rename and delete wallets
 - Backup seed phrase display with screenshot protection
 
 ### Send & Receive
 - Send GNK tokens to any gonka1... address
-- QR code scanner for recipient address input
+- QR code scanner for recipient address input (clipboard paste on desktop)
 - QR code generation for receiving tokens
 - Amount input in GNK or ngonka with denomination toggle
+- Thousands separator formatting for all amounts
+- Smart GNK display: 2 decimal digits for whole amounts, variable precision for fractional
 - Transaction confirmation screen with full details
-- Transaction history with all types (send, receive, vesting rewards, collateral, grants, unjail, votes)
+- Transaction history with all types: send, receive, vesting rewards, collateral, grants, unjail, votes, smart contract interactions
+- Copy-to-clipboard for transaction hashes
+
+### Smart Contract Support
+- Automatic detection of MsgExecuteContract transactions
+- Contract deposit and withdraw history tracking
+- Detailed contract interaction view with action type, contract address, and amounts
 
 ### Host Operations
 - **Collateral** — deposit and withdraw collateral for node operators
 - **Grant Permissions** — grant 27 ML operation permissions to an operational key (authz MsgGrant)
 - **Unjail** — unjail a validator with jail status detection
 - **Governance** — view proposals, tally results, and cast votes (Yes / No / Abstain / No with Veto)
+- **Tracker** — link to professional dashboard at tracker.gonka.vip
 
 ### Node Management
 - Auto-discovery of network nodes from seed node participant lists
@@ -37,10 +67,21 @@ Mobile wallet for the Gonka blockchain. Built with Flutter for Android and iOS.
 - Biometric authentication (Face ID / fingerprint)
 - Auto-wipe after 5 failed PIN attempts (configurable)
 - Cooldown period on failed attempts
-- Root/jailbreak detection
-- Screenshot and screen recording prevention for sensitive screens
+- Root/jailbreak detection (mobile)
+- Screenshot and screen recording prevention for sensitive screens (mobile)
 - Clipboard auto-clear after 60 seconds
 - Private key zeroing after use
+
+### Desktop Support
+- Native macOS and Windows builds
+- Responsive layout with max-width constraint for wide displays
+- Desktop-adapted PIN entry with text field input
+- Clipboard paste instead of QR scanner on desktop
+- Platform-aware lifecycle management
+- macOS Keychain integration for secure storage
+
+### Legal
+- Terms of Use and Privacy Policy links on onboarding and settings screens
 
 ## Technical Details
 
@@ -61,6 +102,7 @@ lib/
     crypto/       BIP39, BIP32, secp256k1, bech32
     network/      Node client, node manager, API endpoints
     transaction/  Protobuf encoding, tx builder, message types
+    platform_util Platform detection (desktop vs mobile)
   data/
     models/       Wallet, balance, node, tx history models
     repositories/ Wallet and node persistence (Hive)
@@ -69,7 +111,7 @@ lib/
     providers/    Riverpod state management
   presentation/
     screens/      All UI screens
-    widgets/      Reusable widgets
+    widgets/      Reusable widgets (responsive_center, etc.)
 ```
 
 ## Build
@@ -77,6 +119,22 @@ lib/
 ```bash
 flutter pub get
 flutter run
+```
+
+### Platform-specific builds
+
+```bash
+# iOS
+flutter build ios
+
+# Android
+flutter build apk
+
+# macOS
+flutter build macos
+
+# Windows
+flutter build windows
 ```
 
 ### Run tests
@@ -89,7 +147,7 @@ flutter test
 
 - Flutter SDK ^3.8.1
 - Dart SDK ^3.8.1
-- Android SDK / Xcode for platform builds
+- Android SDK / Xcode / Visual Studio for platform builds
 
 ## License
 

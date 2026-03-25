@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../config/constants.dart';
 import '../../../core/crypto/address_service.dart';
-import '../../../state/providers/wallet_provider.dart';
+import '../../../core/platform_util.dart';
 import '../../../state/providers/balance_provider.dart';
+import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class SendScreen extends ConsumerStatefulWidget {
   const SendScreen({super.key});
@@ -29,6 +32,13 @@ class _SendScreenState extends ConsumerState<SendScreen> {
   }
 
   void _scanQr() async {
+    if (PlatformUtil.isDesktop) {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (data?.text != null && data!.text!.isNotEmpty) {
+        _addressController.text = data.text!.trim();
+      }
+      return;
+    }
     final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => const _QrScanPage()),
@@ -48,7 +58,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
           _amountController.text = formatGnk(ngonka);
         } else {
           final ngonka = parseGnk(input);
-          _amountController.text = ngonka.toString();
+          _amountController.text = formatNgonka(ngonka);
         }
       } catch (_) {}
     }
@@ -61,7 +71,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
       if (_useGnk) {
         _amountController.text = formatGnk(balance.spendable);
       } else {
-        _amountController.text = balance.spendable.toString();
+        _amountController.text = formatNgonka(balance.spendable);
       }
     });
   }
@@ -79,7 +89,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
   String? _validateAmount(String input) {
     if (input.isEmpty) return 'Enter amount';
     try {
-      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input);
+      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input.replaceAll(',', ''));
       if (ngonka <= BigInt.zero) return 'Amount must be positive';
       final balanceAsync = ref.read(balanceProvider);
       return balanceAsync.whenOrNull(data: (balance) {
@@ -102,7 +112,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
 
     final ngonka = _useGnk
         ? parseGnk(_amountController.text.trim())
-        : BigInt.parse(_amountController.text.trim());
+        : BigInt.parse(_amountController.text.trim().replaceAll(',', ''));
 
     context.push('/send/confirm', extra: {
       'toAddress': _addressController.text.trim(),
@@ -126,7 +136,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +148,9 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                 errorText: _addressError,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.qr_code_scanner),
+                  icon: Icon(PlatformUtil.isDesktop
+                      ? Icons.content_paste
+                      : Icons.qr_code_scanner),
                   onPressed: _scanQr,
                 ),
               ),
@@ -150,8 +162,9 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                 Expanded(
                   child: TextField(
                     controller: _amountController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
+                    keyboardType: PlatformUtil.isDesktop
+                        ? null
+                        : const TextInputType.numberWithOptions(decimal: true),
                     decoration: InputDecoration(
                       labelText: 'Amount',
                       errorText: _amountError,

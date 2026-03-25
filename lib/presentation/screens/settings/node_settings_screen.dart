@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/models/node_model.dart';
 import '../../../state/providers/node_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class NodeSettingsScreen extends ConsumerStatefulWidget {
   const NodeSettingsScreen({super.key});
@@ -51,7 +52,7 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
             ),
         ],
       ),
-      body: ListView(
+      body: ResponsiveCenter(child: ListView(
         children: [
           ...nodes.asMap().entries.map((entry) {
             final i = entry.key;
@@ -110,7 +111,7 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
             onTap: _addNode,
           ),
         ],
-      ),
+      )),
     );
   }
 

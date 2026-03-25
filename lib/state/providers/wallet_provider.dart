@@ -77,7 +77,7 @@ class WalletsNotifier extends StateNotifier<List<WalletModel>> {
 
   void setActive(String id) {
     _repo.setActiveWallet(id);
-    state = [...state]; // trigger rebuild
+    state = [...state];
   }
 
   Future<String?> getMnemonic(String walletId) =>

@@ -17,6 +17,8 @@ PODS:
   - root_jailbreak_sniffer (1.1.4):
     - Flutter
     - IOSSecuritySuite (~> 1.9.10)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -26,6 +28,7 @@ DEPENDENCIES:
   - no_screenshot (from `.symlinks/plugins/no_screenshot/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - root_jailbreak_sniffer (from `.symlinks/plugins/root_jailbreak_sniffer/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -46,6 +49,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   root_jailbreak_sniffer:
     :path: ".symlinks/plugins/root_jailbreak_sniffer/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
@@ -56,6 +61,7 @@ SPEC CHECKSUMS:
   no_screenshot: 5e345998c43ffcad5d6834f249590483fcc037bd
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   root_jailbreak_sniffer: ddaf19e879b5042d74ea446cac763feb35925204
+  url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
 PODFILE CHECKSUM: 14f5a135664605e194776c37c55398d4b73b358d
 

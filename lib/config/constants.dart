@@ -28,27 +28,52 @@ class GonkaConstants {
 
 BigInt get denomMultiplier => BigInt.from(10).pow(GonkaConstants.denomExponent);
 
+String _addCommas(String intStr) {
+  final negative = intStr.startsWith('-');
+  final digits = negative ? intStr.substring(1) : intStr;
+  final buf = StringBuffer();
+  for (var i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 == 0) buf.write(',');
+    buf.write(digits[i]);
+  }
+  return negative ? '-${buf.toString()}' : buf.toString();
+}
+
+String formatNgonka(BigInt ngonka) {
+  return _addCommas(ngonka.toString());
+}
+
 String formatGnk(BigInt ngonka) {
   final whole = ngonka ~/ denomMultiplier;
   final fraction = (ngonka % denomMultiplier).abs();
   final fractionStr = fraction.toString().padLeft(GonkaConstants.denomExponent, '0');
-  final trimmed = fractionStr.replaceAll(RegExp(r'0+$'), '');
-  if (trimmed.isEmpty) return '$whole';
-  return '$whole.$trimmed';
+  final wholeFormatted = _addCommas(whole.toString());
+
+  if (whole.abs() >= BigInt.one) {
+    final twoDigits = fractionStr.substring(0, 2);
+    final trimmed = twoDigits.replaceAll(RegExp(r'0+$'), '');
+    if (trimmed.isEmpty) return wholeFormatted;
+    return '$wholeFormatted.$twoDigits';
+  } else {
+    final trimmedAll = fractionStr.replaceAll(RegExp(r'0+$'), '');
+    if (trimmedAll.isEmpty) return '0';
+    var firstNonZero = 0;
+    while (firstNonZero < fractionStr.length && fractionStr[firstNonZero] == '0') {
+      firstNonZero++;
+    }
+    final end = (firstNonZero + 2).clamp(0, fractionStr.length);
+    final significant = fractionStr.substring(0, end).replaceAll(RegExp(r'0+$'), '');
+    return '0.$significant';
+  }
 }
 
 String formatGnkShort(BigInt ngonka) {
-  final whole = ngonka ~/ denomMultiplier;
-  final fraction = (ngonka % denomMultiplier).abs();
-  final fractionStr = fraction.toString().padLeft(GonkaConstants.denomExponent, '0');
-  final truncated = fractionStr.substring(0, 4);
-  final trimmed = truncated.replaceAll(RegExp(r'0+$'), '');
-  if (trimmed.isEmpty) return '$whole';
-  return '$whole.$trimmed';
+  return formatGnk(ngonka);
 }
 
 BigInt parseGnk(String gnkAmount) {
-  final parts = gnkAmount.split('.');
+  final cleaned = gnkAmount.replaceAll(',', '');
+  final parts = cleaned.split('.');
   final whole = BigInt.parse(parts[0]) * denomMultiplier;
   if (parts.length == 1) return whole;
   final fractionStr = parts[1].padRight(GonkaConstants.denomExponent, '0');

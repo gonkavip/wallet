@@ -5,6 +5,7 @@ import '../../../data/models/balance_model.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/node_provider.dart';
 import '../../../config/constants.dart';
+import '../../widgets/responsive_center.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -25,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: wallets.isEmpty
+      body: ResponsiveCenter(child: wallets.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +119,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
+            )),
     );
   }
 }

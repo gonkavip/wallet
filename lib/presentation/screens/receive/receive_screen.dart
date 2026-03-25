@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/qr_code_widget.dart';
+import '../../widgets/responsive_center.dart';
 
 class ReceiveScreen extends ConsumerWidget {
   const ReceiveScreen({super.key});
@@ -30,10 +31,9 @@ class ReceiveScreen extends ConsumerWidget {
           },
         ),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
+      body: ResponsiveCenter(
+        padding: const EdgeInsets.all(24),
+        child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -67,7 +67,6 @@ class ReceiveScreen extends ConsumerWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

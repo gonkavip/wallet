@@ -259,6 +259,21 @@ class NodeClient {
     }
   }
 
+  Future<List<TxSearchItem>> getContractTxHistory(String address,
+      {int limit = 50}) async {
+    try {
+      final url =
+          '$_restBase${ApiEndpoints.txSearch}'
+          '?query=message.action%3D%27/cosmwasm.wasm.v1.MsgExecuteContract%27%20AND%20message.sender%3D%27$address%27'
+          '&order_by=ORDER_BY_DESC'
+          '&pagination.limit=$limit';
+      final response = await _dio.get(url);
+      return _parseTxSearchResponse(response.data);
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<List<TxSearchItem>> getVoteTxHistory(String address,
       {int limit = 50}) async {
     try {

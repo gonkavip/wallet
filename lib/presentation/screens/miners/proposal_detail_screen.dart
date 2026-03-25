@@ -7,6 +7,7 @@ import '../../../core/transaction/msg_vote.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/governance_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 class ProposalDetailScreen extends ConsumerStatefulWidget {
   final String proposalId;
@@ -110,7 +111,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           },
         ),
       ),
-      body: _done
+      body: ResponsiveCenter(child: _done
           ? _buildResult(context)
           : proposalAsync.when(
               loading: () =>
@@ -124,7 +125,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 }
                 return _buildDetail(context, proposal);
               },
-            ),
+            )),
     );
   }
 

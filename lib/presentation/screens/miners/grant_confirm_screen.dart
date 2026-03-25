@@ -5,6 +5,7 @@ import '../../../state/providers/grant_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../widgets/address_display.dart';
+import '../../widgets/responsive_center.dart';
 
 class GrantConfirmScreen extends ConsumerStatefulWidget {
   final String granteeAddress;
@@ -89,7 +90,7 @@ class _GrantConfirmScreenState extends ConsumerState<GrantConfirmScreen> {
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

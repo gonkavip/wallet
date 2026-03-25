@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
+import '../../../core/platform_util.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/responsive_center.dart';
 
 enum PinMode { login, verify, change }
 
@@ -23,6 +26,9 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   bool _enteringNew = false;
   String _currentPin = '';
 
+  final _desktopController = TextEditingController();
+  final _desktopFocusNode = FocusNode();
+
   String get _title {
     if (widget.mode == PinMode.change) {
       return _enteringNew ? 'Enter New PIN' : 'Enter Current PIN';
@@ -36,6 +42,13 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
     if (widget.mode == PinMode.login) {
       _tryBiometric();
     }
+  }
+
+  @override
+  void dispose() {
+    _desktopController.dispose();
+    _desktopFocusNode.dispose();
+    super.dispose();
   }
 
   Future<void> _tryBiometric() async {
@@ -103,6 +116,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
         return;
       }
       final cooldown = auth.remainingCooldownSeconds;
+      _desktopController.clear();
       setState(() {
         _pin = '';
         _error = cooldown > 0
@@ -120,6 +134,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
       setState(() => _loading = false);
 
       if (success) {
+        _desktopController.clear();
         setState(() {
           _currentPin = _pin;
           _pin = '';
@@ -128,6 +143,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
         });
       } else {
         final cooldown = auth.remainingCooldownSeconds;
+        _desktopController.clear();
         setState(() {
           _pin = '';
           _error = cooldown > 0
@@ -162,7 +178,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
             )
           : null,
       body: SafeArea(
-        child: Padding(
+        child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
@@ -179,22 +195,25 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(GonkaConstants.pinLength, (i) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: i < _pin.length
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey.shade300,
-                    ),
-                  );
-                }),
-              ),
+              if (PlatformUtil.isDesktop)
+                _buildDesktopPinInput()
+              else
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(GonkaConstants.pinLength, (i) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: i < _pin.length
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey.shade300,
+                      ),
+                    );
+                  }),
+                ),
               if (_error != null) ...[
                 const SizedBox(height: 16),
                 Text(_error!, style: TextStyle(color: Colors.red.shade700)),
@@ -204,11 +223,42 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
                 const CircularProgressIndicator(),
               ],
               const Spacer(),
-              _buildNumPad(),
+              if (!PlatformUtil.isDesktop)
+                Center(child: SizedBox(width: 320, child: _buildNumPad())),
               const SizedBox(height: 32),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopPinInput() {
+    return SizedBox(
+      width: 200,
+      child: TextField(
+        controller: _desktopController,
+        focusNode: _desktopFocusNode,
+        autofocus: true,
+        obscureText: true,
+        textAlign: TextAlign.center,
+        maxLength: GonkaConstants.pinLength,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          hintText: 'Enter PIN',
+          counterText: '',
+          border: OutlineInputBorder(),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _pin = value;
+            _error = null;
+          });
+          if (value.length == GonkaConstants.pinLength) {
+            _onPinComplete();
+          }
+        },
       ),
     );
   }

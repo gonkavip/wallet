@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../widgets/responsive_center.dart';
 
 class NameWalletScreen extends ConsumerStatefulWidget {
   final String mnemonic;
@@ -25,7 +26,7 @@ class _NameWalletScreenState extends ConsumerState<NameWalletScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Name Your Wallet')),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,

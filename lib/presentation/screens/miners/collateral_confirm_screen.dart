@@ -6,6 +6,7 @@ import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/amount_display.dart';
+import '../../widgets/responsive_center.dart';
 
 class CollateralConfirmScreen extends ConsumerStatefulWidget {
   final String amountNgonka;
@@ -104,7 +105,7 @@ class _CollateralConfirmScreenState
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

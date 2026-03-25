@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../widgets/responsive_center.dart';
 
 class CollateralResultScreen extends StatelessWidget {
   final bool success;
@@ -22,7 +23,7 @@ class CollateralResultScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

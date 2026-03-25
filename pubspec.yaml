@@ -1,7 +1,7 @@
 name: gonka_wallet
 description: "Gonka blockchain wallet"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+4
 
 environment:
   sdk: ^3.8.1
@@ -39,6 +39,7 @@ dependencies:
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.0.0
   flutter_svg: ^2.2.4
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -47,10 +48,16 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons:
-  ios: true
-  android: true
+  ios: false
+  android: false
+  macos:
+    generate: true
+    image_path: "assets/icon.png"
+  windows:
+    generate: true
+    image_path: "assets/icon.png"
+    icon_size: 48
   image_path: "assets/icon.png"
-  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true

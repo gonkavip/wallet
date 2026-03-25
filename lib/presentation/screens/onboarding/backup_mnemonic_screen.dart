@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/crypto/mnemonic_service.dart';
 import '../../../data/services/device_security_service.dart';
+import '../../widgets/responsive_center.dart';
 
 final _tempMnemonicProvider = StateProvider<String>((ref) => '');
 
@@ -67,7 +68,7 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
     if (_verifying) {
       return Scaffold(
         appBar: AppBar(title: const Text('Verify Backup')),
-        body: Padding(
+        body: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +117,7 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
           },
         ),
       ),
-      body: Padding(
+      body: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
