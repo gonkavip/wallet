@@ -1,7 +1,7 @@
 name: gonka_wallet
 description: "Gonka blockchain wallet"
 publish_to: 'none'
-version: 1.1.0+4
+version: 1.2.0+5
 
 environment:
   sdk: ^3.8.1
@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
   cupertino_icons: ^1.0.8
 
@@ -61,5 +64,6 @@ flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/logo.svg

@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/design_tokens.dart';
+import '../../l10n/app_localizations.dart';
 import '../../state/providers/wallet_provider.dart';
 import '../../state/providers/auth_provider.dart';
+import '../widgets/gonka_widgets.dart';
+
+enum _SplashStatus { loading, checkingNodes }
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -13,7 +18,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  String _status = 'Loading...';
+  _SplashStatus _status = _SplashStatus.loading;
 
   @override
   void initState() {
@@ -26,7 +31,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final authService = ref.read(authServiceProvider);
     final router = GoRouter.of(context);
 
-    setState(() => _status = 'Checking nodes...');
+    setState(() => _status = _SplashStatus.checkingNodes);
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
 
@@ -44,35 +49,45 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final statusText = switch (_status) {
+      _SplashStatus.loading => l10n.splashLoading,
+      _SplashStatus.checkingNodes => l10n.splashCheckingNodes,
+    };
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/logo.svg',
-              width: 80,
-              height: 80,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.primary,
-                BlendMode.srcIn,
+            GlowBackground(
+              size: 220,
+              child: SvgPicture.asset(
+                'assets/logo.svg',
+                width: 80,
+                height: 80,
+                colorFilter: const ColorFilter.mode(
+                  GonkaColors.accentBlue,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Gonka Wallet',
+            GradientText(
+              l10n.appTitle,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1,
                   ),
             ),
             const SizedBox(height: 32),
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
             Text(
-              _status,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
-                  ),
+              statusText,
+              style: const TextStyle(
+                color: GonkaColors.textMuted,
+                fontSize: 12,
+              ),
             ),
           ],
         ),

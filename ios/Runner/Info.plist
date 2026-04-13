@@ -6,6 +6,14 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ru</string>
+		<string>es</string>
+		<string>pt</string>
+		<string>zh-Hans</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Gonka Wallet</string>
 	<key>CFBundleExecutable</key>

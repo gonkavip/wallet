@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/qr_code_widget.dart';
@@ -11,15 +13,16 @@ class ReceiveScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final wallet = ref.watch(activeWalletProvider);
 
     if (wallet == null) {
-      return const Scaffold(body: Center(child: Text('No wallet')));
+      return Scaffold(body: Center(child: Text(l10n.receiveNoWallet)));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receive'),
+        title: Text(l10n.receiveTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -38,31 +41,40 @@ class ReceiveScreen extends ConsumerWidget {
             children: [
               Text(
                 wallet.name,
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: GonkaColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
+                  borderRadius: BorderRadius.circular(GonkaRadius.lg),
+                  border: Border.all(
+                      color: GonkaColors.accentBlue.withValues(alpha: 0.3),
+                      width: 1),
+                  boxShadow: const [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
+                      color: Color(0x403B82F6),
+                      blurRadius: 32,
+                      spreadRadius: 0,
+                      offset: Offset(0, 8),
                     ),
                   ],
                 ),
                 child: QrCodeWidget(data: wallet.address, size: 220),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               AddressDisplay(address: wallet.address, compact: false),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
-                'Tap address to copy',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey,
-                    ),
+                l10n.receiveTapToCopy,
+                style: const TextStyle(
+                  color: GonkaColors.textMuted,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

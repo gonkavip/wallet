@@ -2,9 +2,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/crypto/mnemonic_service.dart';
 import '../../../data/services/device_security_service.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
+import 'onboarding_secret.dart';
 
 final _tempMnemonicProvider = StateProvider<String>((ref) => '');
 
@@ -23,7 +27,7 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
   bool _verifying = false;
   int _verifyIndex = 0;
   final _verifyController = TextEditingController();
-  String? _verifyError;
+  bool _showVerifyError = false;
 
   @override
   void initState() {
@@ -48,33 +52,38 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
       _verifying = true;
       _verifyIndex = Random.secure().nextInt(_words.length);
       _verifyController.clear();
-      _verifyError = null;
+      _showVerifyError = false;
     });
   }
 
   void _checkVerification() {
     if (_verifyController.text.trim().toLowerCase() ==
         _words[_verifyIndex].toLowerCase()) {
-      context.push('/onboarding/name', extra: _mnemonic);
+      context.push('/onboarding/name',
+          extra: OnboardingSecret.mnemonic(_mnemonic));
     } else {
       setState(() {
-        _verifyError = 'Incorrect word. Please try again.';
+        _showVerifyError = true;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_verifying) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Verify Backup')),
-        body: ResponsiveCenter(
+        appBar: AppBar(title: Text(l10n.onboardingBackupVerifyTitle)),
+        body: SafeArea(
+          top: false,
+          minimum: const EdgeInsets.only(bottom: 16),
+          child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'What is word #${_verifyIndex + 1}?',
+                l10n.onboardingBackupVerifyPrompt(_verifyIndex + 1),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 24),
@@ -82,30 +91,32 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
                 controller: _verifyController,
                 autofocus: true,
                 decoration: InputDecoration(
-                  labelText: 'Enter word #${_verifyIndex + 1}',
-                  errorText: _verifyError,
-                  border: const OutlineInputBorder(),
+                  labelText:
+                      l10n.onboardingBackupVerifyHint(_verifyIndex + 1),
+                  errorText: _showVerifyError
+                      ? l10n.onboardingBackupVerifyError
+                      : null,
                 ),
                 onSubmitted: (_) => _checkVerification(),
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                height: 56,
                 child: FilledButton(
                   onPressed: _checkVerification,
-                  child: const Text('Verify'),
+                  child: Text(l10n.onboardingBackupVerifyButton),
                 ),
               ),
             ],
           ),
+        ),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Back Up Seed Phrase'),
+        title: Text(l10n.onboardingBackupTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -117,30 +128,17 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.orange.shade200),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.warning_amber, color: Colors.orange.shade700),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Write down these 24 words in order. Never share them. Anyone with this phrase can access your funds.',
-                      style: TextStyle(color: Colors.orange.shade900),
-                    ),
-                  ),
-                ],
-              ),
+            InfoBanner(
+              variant: InfoBannerVariant.warning,
+              message: l10n.onboardingBackupWarning,
             ),
             const SizedBox(height: 24),
             Expanded(
@@ -157,25 +155,30 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
+                      color: GonkaColors.bgCard,
+                      borderRadius: BorderRadius.circular(GonkaRadius.sm),
+                      border: Border.all(
+                          color: GonkaColors.borderSubtle, width: 1),
                     ),
                     child: Row(
                       children: [
                         Text(
                           '${index + 1}.',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey,
-                                  ),
+                          style: const TextStyle(
+                            color: GonkaColors.textMuted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             _words[index],
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: const TextStyle(
+                              color: GonkaColors.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -192,21 +195,21 @@ class _BackupMnemonicScreenState extends ConsumerState<BackupMnemonicScreen> {
                     setState(() => _confirmed = true);
                   }
                 },
-                title: const Text('I have written down the seed phrase'),
+                title: Text(l10n.onboardingBackupCheckbox),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
             ],
             if (_confirmed)
               SizedBox(
                 width: double.infinity,
-                height: 56,
                 child: FilledButton(
                   onPressed: _startVerification,
-                  child: const Text('Continue'),
+                  child: Text(l10n.onboardingBackupContinue),
                 ),
               ),
           ],
         ),
+      ),
       ),
     );
   }

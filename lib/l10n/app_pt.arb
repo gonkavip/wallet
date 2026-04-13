@@ -1,0 +1,381 @@
+{
+  "@@locale": "pt",
+
+  "appTitle": "Gonka Wallet",
+
+  "splashLoading": "Carregando...",
+  "splashCheckingNodes": "Verificando nós...",
+
+  "onboardingCreateTitle": "Gonka Wallet",
+  "onboardingCreateSubtitle": "Carteira segura para a blockchain Gonka",
+  "onboardingCreateNewWallet": "Criar nova carteira",
+  "onboardingCreateImportWallet": "Importar carteira existente",
+  "onboardingCreateTerms": "Termos de uso",
+  "onboardingCreatePrivacy": "Política de privacidade",
+
+  "onboardingBackupTitle": "Backup da frase semente",
+  "onboardingBackupWarning": "Anote estas 24 palavras em ordem. Nunca as compartilhe. Qualquer pessoa com esta frase pode acessar seus fundos.",
+  "onboardingBackupCheckbox": "Anotei a frase semente",
+  "onboardingBackupContinue": "Continuar",
+  "onboardingBackupVerifyTitle": "Verificar backup",
+  "onboardingBackupVerifyPrompt": "Qual é a palavra nº {index}?",
+  "@onboardingBackupVerifyPrompt": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyHint": "Digite a palavra nº {index}",
+  "@onboardingBackupVerifyHint": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyButton": "Verificar",
+  "onboardingBackupVerifyError": "Palavra incorreta. Tente novamente.",
+
+  "onboardingImportTitle": "Importar carteira",
+  "onboardingImportWordByWord": "Palavra por palavra",
+  "onboardingImportPastePhrase": "Colar frase",
+  "onboardingImportHint": "Cole aqui sua frase semente de 24 palavras...",
+  "onboardingImportButton": "Importar",
+  "onboardingImportErrorWordCount": "A frase semente deve ter exatamente 24 palavras (há {count})",
+  "@onboardingImportErrorWordCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "onboardingImportErrorFillAll": "Preencha todas as 24 palavras",
+  "onboardingImportErrorInvalid": "Frase semente inválida",
+  "onboardingImportPrivateKey": "Chave privada",
+  "onboardingImportPrivateKeyHint": "Cole sua chave privada (64 caracteres hex)",
+  "onboardingImportPrivateKeyErrorInvalid": "Chave privada inválida. Esperados 64 caracteres hex.",
+
+  "onboardingNameTitle": "Nomeie sua carteira",
+  "onboardingNameHeading": "Dê um nome à sua carteira",
+  "onboardingNameSubtext": "É apenas para sua referência.",
+  "onboardingNameLabel": "Nome da carteira",
+  "onboardingNameValidationEmpty": "Digite um nome",
+  "onboardingNameDefault": "Minha carteira",
+  "onboardingNameContinue": "Continuar",
+
+  "onboardingPinTitle": "Definir PIN",
+  "onboardingPinCreateHeading": "Crie um PIN de 6 dígitos",
+  "onboardingPinConfirmHeading": "Confirme seu PIN",
+  "onboardingPinMismatch": "Os PINs não coincidem. Tente novamente.",
+  "onboardingPinBiometricTitle": "Ativar biometria?",
+  "onboardingPinBiometricBody": "Usar Face ID / impressão digital para desbloquear sua carteira?",
+  "onboardingPinBiometricSkip": "Pular",
+  "onboardingPinBiometricEnable": "Ativar",
+
+  "authEnterPin": "Digite o PIN",
+  "authEnterCurrentPin": "Digite o PIN atual",
+  "authEnterNewPin": "Digite o novo PIN",
+  "authWrongPin": "PIN incorreto. Restam {remaining} tentativas.",
+  "@authWrongPin": {
+    "placeholders": { "remaining": { "type": "int" } }
+  },
+  "authCooldown": "Muitas tentativas. Aguarde {seconds} s.",
+  "@authCooldown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+
+  "homeTitle": "Gonka Wallet",
+  "homeEmpty": "Nenhuma carteira ainda",
+  "homeCreateWallet": "Criar carteira",
+  "homeAddWallet": "Adicionar carteira",
+
+  "walletDetailTitle": "Carteira",
+  "walletDetailNotFound": "Carteira não encontrada",
+  "walletDetailShowSeed": "Mostrar frase semente",
+  "walletDetailExportPk": "Exportar chave privada",
+  "walletDetailExportPkDialogTitle": "Chave privada",
+  "walletDetailExportPkWarning": "Qualquer pessoa com esta chave pode acessar seus fundos. Nunca a compartilhe.",
+  "walletDetailExportPkCopied": "Chave privada copiada",
+  "walletDetailRename": "Renomear carteira",
+  "walletDetailDelete": "Excluir carteira",
+  "walletDetailSend": "Enviar",
+  "walletDetailReceive": "Receber",
+  "walletDetailHostTools": "Ferramentas de host",
+  "walletDetailTxHistory": "Histórico de transações",
+  "walletDetailNoTx": "Nenhuma transação ainda",
+  "walletDetailTxError": "Falha ao carregar histórico",
+  "walletDetailBalanceError": "Falha ao carregar saldo: {error}",
+  "@walletDetailBalanceError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "walletDetailSeedDialogTitle": "Frase semente",
+  "walletDetailRenameDialogTitle": "Renomear carteira",
+  "walletDetailRenameLabel": "Nome",
+  "walletDetailDeleteDialogBody": "Tem certeza de que deseja excluir \"{name}\"?\n\nIsso removerá a carteira e sua frase semente deste dispositivo. Certifique-se de ter um backup da frase semente!",
+  "@walletDetailDeleteDialogBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "commonCancel": "Cancelar",
+  "commonSave": "Salvar",
+  "commonDelete": "Excluir",
+  "commonRetry": "Tentar novamente",
+  "commonDone": "Concluído",
+  "commonClose": "Fechar",
+  "commonCopy": "Copiar",
+  "commonFrom": "De",
+  "commonTo": "Para",
+  "commonAmount": "Quantia",
+  "commonFee": "Taxa",
+  "commonFeeZero": "0 GNK",
+  "commonAddress": "Endereço",
+  "commonAction": "Ação",
+  "commonStatus": "Status",
+  "commonType": "Tipo",
+  "commonHash": "Hash",
+  "commonHeight": "Bloco",
+  "commonTime": "Hora",
+  "commonMemo": "Memo",
+  "commonSuccess": "Sucesso",
+  "commonFailed": "Falha",
+  "commonContract": "Contrato",
+  "commonValidator": "Validador",
+  "commonGranter": "Concedente",
+  "commonGrantee": "Beneficiário",
+  "commonProposal": "Proposta",
+  "commonOption": "Opção",
+  "commonEpoch": "Época",
+
+  "balanceTotal": "Saldo total",
+  "balanceAvailable": "Disponível",
+  "balanceVesting": "Em vesting",
+
+  "authBiometricReason": "Autentique-se para acessar sua carteira",
+
+  "errorNoActiveNode": "Sem nó ativo",
+  "errorMnemonicNotFound": "Frase semente não encontrada",
+  "errorInvalidMnemonic": "Frase semente inválida",
+  "errorGeneric": "Algo deu errado",
+
+  "txTypeReceived": "Recebido",
+  "txTypeSent": "Enviado",
+  "txTypeContract": "Contrato",
+  "txTypeContractDeposit": "Depósito",
+  "txTypeContractWithdraw": "Saque",
+  "txTypeUnjail": "Liberar validador",
+  "txTypeGrant": "Conceder permissões",
+  "txTypeCollateralDeposit": "Depósito de garantia",
+  "txTypeCollateralWithdraw": "Saque de garantia",
+  "txTypeVestingReward": "Recompensa de vesting",
+  "txTypeEpochReward": "Recompensa da época {epoch}",
+  "@txTypeEpochReward": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "txTypeVote": "Voto: {option}",
+  "@txTypeVote": {
+    "placeholders": { "option": { "type": "String" } }
+  },
+  "txTimeJustNow": "Agora mesmo",
+  "txTimeMinutesAgo": "há {minutes} min",
+  "@txTimeMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "txTimeHoursAgo": "há {hours} h",
+  "@txTimeHoursAgo": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "txTimeDaysAgo": "há {days} d",
+  "@txTimeDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "sendTitle": "Enviar",
+  "sendRecipientLabel": "Endereço do destinatário",
+  "sendAmountLabel": "Quantia",
+  "sendMaxButton": "MÁX",
+  "sendUnitGnk": "GNK",
+  "sendUnitNgonka": "ngonka",
+  "sendContinue": "Continuar",
+  "sendErrorEnterAddress": "Digite o endereço do destinatário",
+  "sendErrorInvalidAddress": "Endereço Gonka inválido",
+  "sendErrorSelfSend": "Não é possível enviar para si mesmo",
+  "sendErrorEnterAmount": "Digite a quantia",
+  "sendErrorAmountPositive": "A quantia deve ser positiva",
+  "sendErrorInsufficient": "Saldo insuficiente",
+  "sendErrorInvalidAmount": "Quantia inválida",
+  "sendScanQr": "Escanear código QR",
+
+  "confirmSendTitle": "Confirmar envio",
+  "confirmSendButton": "Confirmar e enviar",
+  "confirmSendAuthenticating": "Autenticando...",
+  "sendResultSuccess": "Transação enviada!",
+  "sendResultFailed": "Falha na transação",
+
+  "receiveTitle": "Receber",
+  "receiveNoWallet": "Sem carteira",
+  "receiveTapToCopy": "Toque no endereço para copiar",
+
+  "minersTitle": "Ferramentas de host",
+  "minersPubKey": "Minha chave pública",
+  "minersPubKeySubtitle": "Ver e copiar sua chave pública",
+  "minersPubKeyCopied": "Chave pública copiada",
+  "minersCollateral": "Garantia",
+  "minersCollateralSubtitle": "Gerencie sua garantia de mineração",
+  "minersGrant": "Conceder permissões",
+  "minersGrantSubtitle": "Conceder permissões à chave operacional de ML",
+  "minersUnjail": "Liberar validador",
+  "minersUnjailSubtitle": "Libere seu validador",
+  "minersGovernance": "Governança",
+  "minersGovernanceSubtitle": "Votar em propostas",
+  "minersTracker": "Monitor",
+  "minersTrackerSubtitle": "Painel profissional",
+
+  "collateralTitle": "Garantia",
+  "collateralCurrent": "Garantia atual",
+  "collateralDeposit": "Depositar",
+  "collateralWithdraw": "Sacar",
+  "collateralUnbonding": "Desvinculação",
+  "collateralCompletionEpoch": "Época de conclusão: {epoch}",
+  "@collateralCompletionEpoch": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "collateralEmpty": "Ainda sem garantia",
+  "collateralDepositTitle": "Depositar garantia",
+  "collateralWithdrawTitle": "Sacar garantia",
+  "collateralCurrentInfo": "Garantia atual: {amount} GNK",
+  "@collateralCurrentInfo": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "collateralErrorExceeds": "Excede a garantia atual",
+  "collateralConfirmDeposit": "Confirmar depósito",
+  "collateralConfirmWithdraw": "Confirmar saque",
+  "collateralConfirmDepositButton": "Confirmar e depositar",
+  "collateralConfirmWithdrawButton": "Confirmar e sacar",
+  "collateralResultDepositSuccess": "Depósito realizado!",
+  "collateralResultWithdrawSuccess": "Saque realizado!",
+  "collateralResultDepositFailed": "Falha no depósito",
+  "collateralResultWithdrawFailed": "Falha no saque",
+
+  "grantTitle": "Conceder permissões",
+  "grantInfo": "Conceda à sua chave operacional de ML permissão para realizar inferência, treinamento e outras operações de ML em seu nome. Isso não concede acesso aos seus fundos.",
+  "grantOpKeyLabel": "Endereço da chave operacional",
+  "grantOpKeyHint": "gonka1...",
+  "grantErrorEnterAddress": "Digite o endereço da chave operacional",
+  "grantErrorInvalidAddress": "Endereço Gonka inválido",
+  "grantErrorSelf": "Não é possível conceder permissões a si mesmo",
+  "grantContinue": "Continuar",
+  "grantScanQr": "Escanear código QR",
+  "grantConfirmTitle": "Confirmar concessão",
+  "grantConfirmAction": "Conceder permissões de ML",
+  "grantConfirmExpiration": "Expiração",
+  "grantConfirmExpirationValue": "2 anos",
+  "grantConfirmPermissions": "Permissões",
+  "grantConfirmPermissionsValue": "27 operações de ML",
+  "grantConfirmButton": "Confirmar e conceder",
+  "grantResultSuccess": "Permissões concedidas!",
+  "grantResultFailed": "Falha na concessão",
+
+  "unjailTitle": "Liberar validador",
+  "unjailWarningJailed": "Seu validador está preso. Envie uma transação de liberação para retomar as operações.",
+  "unjailInfoNotJailed": "Seu validador não está preso. Nenhuma ação necessária.",
+  "unjailInfoNotFound": "Validador não encontrado na cadeia. Certifique-se de que seu validador foi criado.",
+  "unjailAction": "Liberar validador",
+  "unjailValidatorAddress": "Endereço do validador",
+  "unjailConfirmButton": "Confirmar e liberar",
+  "unjailResultSuccess": "Liberação bem-sucedida",
+  "unjailResultFailed": "Falha na liberação",
+
+  "governanceTitle": "Governança",
+  "governanceTabAll": "Todas",
+  "governanceTabActive": "Ativas",
+  "governanceTabClosed": "Encerradas",
+  "governanceErrorLoad": "Falha ao carregar propostas: {error}",
+  "@governanceErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "governanceEmptyAll": "Nenhuma proposta encontrada",
+  "governanceEmptyActive": "Nenhuma proposta ativa",
+  "governanceEmptyClosed": "Nenhuma proposta encerrada",
+  "governanceStatusActive": "Ativa",
+  "governanceStatusPassed": "Aprovada",
+  "governanceStatusRejected": "Rejeitada",
+  "governanceEndingSoon": "Terminando em breve",
+  "governanceEndsInDays": "Termina em {days} d {hours} h",
+  "@governanceEndsInDays": {
+    "placeholders": { "days": { "type": "int" }, "hours": { "type": "int" } }
+  },
+  "governanceEndsInHours": "Termina em {hours} h {minutes} min",
+  "@governanceEndsInHours": {
+    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "governanceEndsInMinutes": "Termina em {minutes} min",
+  "@governanceEndsInMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "governanceEndedDaysAgo": "Encerrada há {days} d",
+  "@governanceEndedDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "governanceEndedOn": "Encerrada em {date}",
+  "@governanceEndedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "proposalDetailTitle": "Proposta #{id}",
+  "@proposalDetailTitle": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "proposalDetailErrorLoad": "Falha ao carregar proposta: {error}",
+  "@proposalDetailErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "proposalDetailNotFound": "Proposta não encontrada",
+  "proposalDetailSummary": "Resumo",
+  "proposalDetailProposer": "Proponente",
+  "proposalDetailVotingPeriod": "Período de votação",
+  "proposalDetailTally": "Resultados da votação",
+  "proposalVoteYes": "Sim",
+  "proposalVoteAbstain": "Abstenção",
+  "proposalVoteNo": "Não",
+  "proposalVoteNoWithVeto": "Não com veto",
+  "proposalCastYourVote": "Dê seu voto",
+  "proposalSubmitVote": "Enviar voto",
+  "proposalVotingEnded": "A votação desta proposta foi encerrada.",
+  "proposalVoteSubmitted": "Voto enviado",
+  "proposalVoteFailed": "Falha no voto",
+
+  "settingsTitle": "Configurações",
+  "settingsNodeSettings": "Configurações do nó",
+  "settingsSecurity": "Segurança",
+  "settingsSecuritySubtitle": "PIN e biometria",
+  "settingsTerms": "Termos de uso",
+  "settingsPrivacy": "Política de privacidade",
+
+  "securityTitle": "Segurança",
+  "securityChangePin": "Alterar PIN",
+  "securityBiometric": "Autenticação biométrica",
+  "securityWipe": "Apagar carteiras após PIN inválido",
+  "securityWipeSubtitle": "Excluir todas as carteiras após {max} tentativas incorretas",
+  "@securityWipeSubtitle": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "securityPinChanged": "PIN alterado",
+  "securityPinNotChanged": "PIN não alterado",
+
+  "nodeSettingsTitle": "Configurações do nó",
+  "nodeSettingsRefresh": "Atualizar nós",
+  "nodeStatusChecking": "Verificando...",
+  "nodeStatusSyncing": "Sincronizando...",
+  "nodeStatusNotSynced": "Não sincronizado",
+  "nodeStatusOffline": "Offline",
+  "nodeStatusLatency": "{ms} ms",
+  "@nodeStatusLatency": {
+    "placeholders": { "ms": { "type": "int" } }
+  },
+  "nodeActive": "Ativo",
+  "nodeAdd": "Adicionar nó",
+  "nodeUrlLabel": "URL do nó",
+  "nodeUrlHint": "https://node.example.com:8000",
+  "nodeLabelLabel": "Rótulo",
+  "nodeProxyMode": "Modo proxy",
+  "nodeProxyModeSubtitle": "/chain-api/ + /chain-rpc/",
+  "nodeDefaultLabel": "Nó personalizado",
+  "nodeAddButton": "Adicionar",
+
+  "securityWarningTitle": "Aviso de segurança",
+  "securityWarningBody": "Este dispositivo parece ter root ou jailbreak. Executar um app de carteira em um dispositivo comprometido coloca seus fundos em risco.",
+  "securityWarningAck": "Eu entendo os riscos",
+
+  "widgetHashCopied": "Hash copiado",
+  "widgetAddressCopied": "Endereço copiado",
+  "widgetTxHash": "Hash da transação"
+}

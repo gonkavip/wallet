@@ -4,6 +4,7 @@ import 'package:gonka_wallet/core/crypto/hd_key_service.dart';
 import 'package:gonka_wallet/core/crypto/address_service.dart';
 import 'package:gonka_wallet/core/crypto/tx_signer.dart';
 import 'package:gonka_wallet/config/constants.dart';
+import 'package:hex/hex.dart';
 import 'dart:typed_data';
 
 void main() {
@@ -64,6 +65,35 @@ void main() {
       final key = HDKeyService.derivePrivateKey(mnemonic);
       HDKeyService.zeroKey(key);
       expect(key.every((b) => b == 0), true);
+    });
+
+    test('addressFromPrivateKeyHex roundtrips with mnemonic-derived address',
+        () {
+      final priv = HDKeyService.derivePrivateKey(mnemonic);
+      final hex = HEX.encode(priv);
+      final addrFromHex = HDKeyService.addressFromPrivateKeyHex(hex);
+      final addrFromMnemonic = AddressService.fromMnemonic(mnemonic);
+      expect(addrFromHex, addrFromMnemonic);
+    });
+
+    test('addressFromPrivateKeyHex strips 0x prefix and is case-insensitive',
+        () {
+      final priv = HDKeyService.derivePrivateKey(mnemonic);
+      final hex = HEX.encode(priv);
+      final withPrefix =
+          HDKeyService.addressFromPrivateKeyHex('0x${hex.toUpperCase()}');
+      final plain = HDKeyService.addressFromPrivateKeyHex(hex);
+      expect(withPrefix, plain);
+    });
+
+    test('addressFromPrivateKeyHex rejects malformed hex', () {
+      expect(() => HDKeyService.addressFromPrivateKeyHex(''),
+          throwsA(isA<FormatException>()));
+      expect(() => HDKeyService.addressFromPrivateKeyHex('deadbeef'),
+          throwsA(isA<FormatException>()));
+      expect(
+          () => HDKeyService.addressFromPrivateKeyHex('z' * 64),
+          throwsA(isA<FormatException>()));
     });
   });
 

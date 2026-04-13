@@ -3,12 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../../config/amount_input_formatter.dart';
 import '../../../config/constants.dart';
 import '../../../core/crypto/address_service.dart';
 import '../../../core/platform_util.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/balance_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/responsive_center.dart';
+
+enum _AddressErr { empty, invalid, self }
+enum _AmountErr { empty, notPositive, insufficient, invalid }
 
 class SendScreen extends ConsumerStatefulWidget {
   const SendScreen({super.key});
@@ -21,8 +26,8 @@ class _SendScreenState extends ConsumerState<SendScreen> {
   final _addressController = TextEditingController();
   final _amountController = TextEditingController();
   bool _useGnk = true;
-  String? _addressError;
-  String? _amountError;
+  _AddressErr? _addressErr;
+  _AmountErr? _amountErr;
 
   @override
   void dispose() {
@@ -54,7 +59,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
     if (input.isNotEmpty) {
       try {
         if (toGnk) {
-          final ngonka = BigInt.parse(input);
+          final ngonka = BigInt.parse(input.replaceAll(',', ''));
           _amountController.text = formatGnk(ngonka);
         } else {
           final ngonka = parseGnk(input);
@@ -76,37 +81,60 @@ class _SendScreenState extends ConsumerState<SendScreen> {
     });
   }
 
-  String? _validateAddress(String address) {
-    if (address.isEmpty) return 'Enter recipient address';
-    if (!AddressService.validate(address)) return 'Invalid Gonka address';
+  _AddressErr? _validateAddress(String address) {
+    if (address.isEmpty) return _AddressErr.empty;
+    if (!AddressService.validate(address)) return _AddressErr.invalid;
     final wallet = ref.read(activeWalletProvider);
     if (wallet != null && address == wallet.address) {
-      return 'Cannot send to yourself';
+      return _AddressErr.self;
     }
     return null;
   }
 
-  String? _validateAmount(String input) {
-    if (input.isEmpty) return 'Enter amount';
+  _AmountErr? _validateAmount(String input) {
+    if (input.isEmpty) return _AmountErr.empty;
     try {
-      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input.replaceAll(',', ''));
-      if (ngonka <= BigInt.zero) return 'Amount must be positive';
+      final ngonka = _useGnk
+          ? parseGnk(input)
+          : BigInt.parse(input.replaceAll(',', ''));
+      if (ngonka <= BigInt.zero) return _AmountErr.notPositive;
       final balanceAsync = ref.read(balanceProvider);
       return balanceAsync.whenOrNull(data: (balance) {
-        if (ngonka > balance.spendable) return 'Insufficient balance';
+        if (ngonka > balance.spendable) return _AmountErr.insufficient;
         return null;
       });
     } catch (_) {
-      return 'Invalid amount';
+      return _AmountErr.invalid;
     }
+  }
+
+  String? _addressErrorText(AppLocalizations l10n) {
+    final e = _addressErr;
+    if (e == null) return null;
+    return switch (e) {
+      _AddressErr.empty => l10n.sendErrorEnterAddress,
+      _AddressErr.invalid => l10n.sendErrorInvalidAddress,
+      _AddressErr.self => l10n.sendErrorSelfSend,
+    };
+  }
+
+  String? _amountErrorText(AppLocalizations l10n) {
+    final e = _amountErr;
+    if (e == null) return null;
+    return switch (e) {
+      _AmountErr.empty => l10n.sendErrorEnterAmount,
+      _AmountErr.notPositive => l10n.sendErrorAmountPositive,
+      _AmountErr.insufficient => l10n.sendErrorInsufficient,
+      _AmountErr.invalid => l10n.sendErrorInvalidAmount,
+    };
   }
 
   void _continue() {
     final addrErr = _validateAddress(_addressController.text.trim());
     final amtErr = _validateAmount(_amountController.text.trim());
     setState(() {
-      _addressError = addrErr;
-      _amountError = amtErr;
+      _addressErr = addrErr;
+      _amountErr = amtErr;
     });
     if (addrErr != null || amtErr != null) return;
 
@@ -122,9 +150,10 @@ class _SendScreenState extends ConsumerState<SendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Send'),
+        title: Text(l10n.sendTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -136,7 +165,10 @@ class _SendScreenState extends ConsumerState<SendScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,8 +176,8 @@ class _SendScreenState extends ConsumerState<SendScreen> {
             TextField(
               controller: _addressController,
               decoration: InputDecoration(
-                labelText: 'Recipient Address',
-                errorText: _addressError,
+                labelText: l10n.sendRecipientLabel,
+                errorText: _addressErrorText(l10n),
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(PlatformUtil.isDesktop
@@ -165,9 +197,10 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                     keyboardType: PlatformUtil.isDesktop
                         ? null
                         : const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [commaToDotInsertedFormatter],
                     decoration: InputDecoration(
-                      labelText: 'Amount',
-                      errorText: _amountError,
+                      labelText: l10n.sendAmountLabel,
+                      errorText: _amountErrorText(l10n),
                       border: const OutlineInputBorder(),
                       suffixText: _useGnk
                           ? GonkaConstants.displayDenom
@@ -178,7 +211,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: _setMax,
-                  child: const Text('MAX'),
+                  child: Text(l10n.sendMaxButton),
                 ),
               ],
             ),
@@ -187,13 +220,13 @@ class _SendScreenState extends ConsumerState<SendScreen> {
             Row(
               children: [
                 ChoiceChip(
-                  label: const Text('GNK'),
+                  label: Text(l10n.sendUnitGnk),
                   selected: _useGnk,
                   onSelected: (_) => _switchDenom(true),
                 ),
                 const SizedBox(width: 8),
                 ChoiceChip(
-                  label: const Text('ngonka'),
+                  label: Text(l10n.sendUnitNgonka),
                   selected: !_useGnk,
                   onSelected: (_) => _switchDenom(false),
                 ),
@@ -206,11 +239,12 @@ class _SendScreenState extends ConsumerState<SendScreen> {
               height: 56,
               child: FilledButton(
                 onPressed: _continue,
-                child: const Text('Continue'),
+                child: Text(l10n.sendContinue),
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -236,7 +270,8 @@ class _QrScanPageState extends State<_QrScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context).sendScanQr)),
       body: MobileScanner(
         controller: _controller,
         onDetect: (BarcodeCapture capture) {

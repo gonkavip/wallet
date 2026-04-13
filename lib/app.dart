@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'config/gonka_theme.dart';
+import 'l10n/app_localizations.dart';
+import 'state/providers/locale_provider.dart';
 import 'presentation/screens/onboarding/create_wallet_screen.dart';
 import 'presentation/screens/onboarding/backup_mnemonic_screen.dart';
 import 'presentation/screens/onboarding/import_wallet_screen.dart';
 import 'presentation/screens/onboarding/name_wallet_screen.dart';
 import 'presentation/screens/onboarding/set_pin_screen.dart';
+import 'presentation/screens/onboarding/onboarding_secret.dart';
 import 'presentation/screens/auth/pin_entry_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/home/wallet_detail_screen.dart';
@@ -48,17 +53,17 @@ GoRouter _buildRouter(String initialRoute) {
     GoRoute(
       path: '/onboarding/name',
       builder: (_, state) {
-        final mnemonic = state.extra as String;
-        return NameWalletScreen(mnemonic: mnemonic);
+        final secret = state.extra as OnboardingSecret;
+        return NameWalletScreen(secret: secret);
       },
     ),
     GoRoute(
       path: '/onboarding/pin',
       builder: (_, state) {
-        final data = state.extra as Map<String, String>;
+        final data = state.extra as Map<String, Object>;
         return SetPinScreen(
-          mnemonic: data['mnemonic']!,
-          walletName: data['name']!,
+          secret: data['secret'] as OnboardingSecret,
+          walletName: data['name'] as String,
         );
       },
     ),
@@ -202,36 +207,36 @@ GoRouter _buildRouter(String initialRoute) {
   return appRouter;
 }
 
-class GonkaWalletApp extends StatelessWidget {
+class GonkaWalletApp extends ConsumerStatefulWidget {
   final String initialRoute;
   const GonkaWalletApp({super.key, required this.initialRoute});
 
   @override
+  ConsumerState<GonkaWalletApp> createState() => _GonkaWalletAppState();
+}
+
+class _GonkaWalletAppState extends ConsumerState<GonkaWalletApp> {
+  late final GoRouter _router = _buildRouter(widget.initialRoute);
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final locale = ref.watch(localeProvider);
     return MaterialApp.router(
-      title: 'Gonka Wallet',
+      onGenerateTitle: (ctx) => AppLocalizations.of(ctx).appTitle,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3B82F6),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-        ),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3B82F6),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-        ),
-      ),
-      routerConfig: _buildRouter(initialRoute),
+      theme: buildGonkaDarkTheme(),
+      darkTheme: buildGonkaDarkTheme(),
+      themeMode: ThemeMode.dark,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: _router,
     );
   }
 }

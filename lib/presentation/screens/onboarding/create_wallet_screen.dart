@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../config/design_tokens.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 class CreateWalletScreen extends StatelessWidget {
@@ -9,6 +12,7 @@ class CreateWalletScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final canGoBack = context.canPop();
     return Scaffold(
       appBar: canGoBack
@@ -17,79 +21,94 @@ class CreateWalletScreen extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => context.pop(),
               ),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
             )
           : null,
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 16),
         child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              SvgPicture.asset(
-                'assets/logo.svg',
-                width: 100,
-                height: 100,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.primary,
-                  BlendMode.srcIn,
+              GlowBackground(
+                size: 240,
+                child: SvgPicture.asset(
+                  'assets/logo.svg',
+                  width: 100,
+                  height: 100,
+                  colorFilter: const ColorFilter.mode(
+                    GonkaColors.accentBlue,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
-              Text(
-                'Gonka Wallet',
+              GradientText(
+                l10n.onboardingCreateTitle,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1,
                     ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Secure wallet for the Gonka blockchain',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                l10n.onboardingCreateSubtitle,
+                style: const TextStyle(
+                  color: GonkaColors.textMuted,
+                  fontSize: 15,
+                  height: 1.4,
+                ),
                 textAlign: TextAlign.center,
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
-                height: 56,
                 child: FilledButton(
                   onPressed: () => context.push('/onboarding/backup'),
-                  child: const Text('Create New Wallet'),
+                  child: Text(l10n.onboardingCreateNewWallet),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
-                height: 56,
                 child: OutlinedButton(
                   onPressed: () => context.push('/onboarding/import'),
-                  child: const Text('Import Existing Wallet'),
+                  child: Text(l10n.onboardingCreateImportWallet),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () => launchUrl(Uri.parse('https://gonka.vip/terms/'), mode: LaunchMode.externalApplication),
+                    onTap: () => launchUrl(
+                        Uri.parse('https://gonka.vip/terms/'),
+                        mode: LaunchMode.externalApplication),
                     child: Text(
-                      'Terms of Use',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500], decoration: TextDecoration.underline),
+                      l10n.onboardingCreateTerms,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: GonkaColors.textMuted,
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('|', style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('|',
+                        style: TextStyle(
+                            fontSize: 12, color: GonkaColors.textMuted)),
                   ),
                   GestureDetector(
-                    onTap: () => launchUrl(Uri.parse('https://gonka.vip/privacy/'), mode: LaunchMode.externalApplication),
+                    onTap: () => launchUrl(
+                        Uri.parse('https://gonka.vip/privacy/'),
+                        mode: LaunchMode.externalApplication),
                     child: Text(
-                      'Privacy Policy',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500], decoration: TextDecoration.underline),
+                      l10n.onboardingCreatePrivacy,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: GonkaColors.textMuted,
+                      ),
                     ),
                   ),
                 ],

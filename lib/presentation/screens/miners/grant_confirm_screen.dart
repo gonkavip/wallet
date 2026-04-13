@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/grant_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
@@ -28,10 +29,11 @@ class _GrantConfirmScreenState extends ConsumerState<GrantConfirmScreen> {
     setState(() => _authenticating = true);
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
 
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         setState(() => _authenticating = false);
         _execute();
@@ -74,11 +76,12 @@ class _GrantConfirmScreenState extends ConsumerState<GrantConfirmScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final wallet = ref.watch(activeWalletProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Confirm Grant'),
+        title: Text(l10n.grantConfirmTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -90,38 +93,47 @@ class _GrantConfirmScreenState extends ConsumerState<GrantConfirmScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Action', style: Theme.of(context).textTheme.bodySmall),
-            Text('Grant ML Permissions',
+            Text(l10n.commonAction,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.grantConfirmAction,
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Granter', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonGranter,
+                style: Theme.of(context).textTheme.bodySmall),
             if (wallet != null) AddressDisplay(address: wallet.address),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Grantee', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonGrantee,
+                style: Theme.of(context).textTheme.bodySmall),
             AddressDisplay(address: widget.granteeAddress, compact: false),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Expiration', style: Theme.of(context).textTheme.bodySmall),
-            Text('2 years', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.grantConfirmExpiration,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.grantConfirmExpirationValue,
+                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Permissions', style: Theme.of(context).textTheme.bodySmall),
-            Text('27 ML operations',
+            Text(l10n.grantConfirmPermissions,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.grantConfirmPermissionsValue,
                 style: Theme.of(context).textTheme.titleMedium),
 
             const Spacer(),
@@ -135,12 +147,13 @@ class _GrantConfirmScreenState extends ConsumerState<GrantConfirmScreen> {
                 child: FilledButton(
                   onPressed: _authenticating ? null : _authenticate,
                   child: Text(_authenticating
-                      ? 'Authenticating...'
-                      : 'Confirm & Grant'),
+                      ? l10n.confirmSendAuthenticating
+                      : l10n.grantConfirmButton),
                 ),
               ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.gonka" "\0"
-            VALUE "FileDescription", "gonka_wallet" "\0"
+            VALUE "CompanyName", "Gonka" "\0"
+            VALUE "FileDescription", "Gonka Wallet" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "gonka_wallet" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.gonka. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Gonka. All rights reserved." "\0"
             VALUE "OriginalFilename", "gonka_wallet.exe" "\0"
-            VALUE "ProductName", "gonka_wallet" "\0"
+            VALUE "ProductName", "Gonka Wallet" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

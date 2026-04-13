@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../error_l10n.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 class CollateralResultScreen extends StatelessWidget {
@@ -19,99 +22,65 @@ class CollateralResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actionName = isDeposit ? 'Deposit' : 'Withdrawal';
+    final l10n = AppLocalizations.of(context);
+    final String headline;
+    if (success) {
+      headline = isDeposit
+          ? l10n.collateralResultDepositSuccess
+          : l10n.collateralResultWithdrawSuccess;
+    } else {
+      headline = isDeposit
+          ? l10n.collateralResultDepositFailed
+          : l10n.collateralResultWithdrawFailed;
+    }
 
     return Scaffold(
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 16),
         child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              Icon(
-                success ? Icons.check_circle : Icons.error,
-                size: 80,
-                color: success ? Colors.green : Colors.red,
-              ),
-              const SizedBox(height: 24),
+              ResultIcon(success: success),
+              const SizedBox(height: 28),
               Text(
-                success ? '$actionName Successful!' : '$actionName Failed',
-                style: Theme.of(context).textTheme.headlineSmall,
+                headline,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: GonkaColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
-              const SizedBox(height: 16),
-              if (success && txhash.isNotEmpty) ...[
-                Text(
-                  'Transaction Hash',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: txhash));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Hash copied')),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            txhash,
-                            style: const TextStyle(
-                                fontFamily: 'monospace', fontSize: 12),
-                          ),
-                        ),
-                        const Icon(Icons.copy, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              const SizedBox(height: 20),
+              if (success && txhash.isNotEmpty) TxHashDisplay(hash: txhash),
               if (!success && error.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    error,
-                    style: TextStyle(color: Colors.red.shade700),
-                  ),
+                InfoBanner(
+                  variant: InfoBannerVariant.error,
+                  message: localizeError(l10n, error),
                 ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
-                height: 56,
                 child: FilledButton(
                   onPressed: () {
                     context.pop();
                     context.pop();
                     context.pop();
                   },
-                  child: const Text('Done'),
+                  child: Text(l10n.commonDone),
                 ),
               ),
               if (!success) ...[
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
                   child: OutlinedButton(
                     onPressed: () {
                       context.pop();
                       context.pop();
                     },
-                    child: const Text('Retry'),
+                    child: Text(l10n.commonRetry),
                   ),
                 ),
               ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
 import '../../../data/models/node_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/node_provider.dart';
 import '../../widgets/responsive_center.dart';
 
@@ -15,6 +17,7 @@ class NodeSettingsScreen extends ConsumerStatefulWidget {
 class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final nodeState = ref.watch(nodesProvider);
     final nodes = nodeState.nodes;
     final activeNode = nodeState.activeNode;
@@ -22,7 +25,7 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Node Settings'),
+        title: Text(l10n.nodeSettingsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -46,13 +49,15 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
           else
             IconButton(
               icon: const Icon(Icons.refresh),
-              tooltip: 'Refresh Nodes',
+              tooltip: l10n.nodeSettingsRefresh,
               onPressed: () =>
                   ref.read(nodesProvider.notifier).triggerHealthCheck(),
             ),
         ],
       ),
       body: ResponsiveCenter(child: ListView(
+        padding: EdgeInsets.only(
+            bottom: 16 + MediaQuery.paddingOf(context).bottom),
         children: [
           ...nodes.asMap().entries.map((entry) {
             final i = entry.key;
@@ -60,26 +65,47 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
             final isActive = activeNode?.url == node.url;
 
             return ListTile(
-              leading: node.isChecking
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Icon(
-                      Icons.circle,
-                      size: 12,
-                      color: node.isHealthy
-                          ? Colors.green
-                          : node.isOnline
-                              ? Colors.orange
-                              : Colors.red,
-                    ),
+              titleAlignment: ListTileTitleAlignment.center,
+              leading: SizedBox(
+                width: 24,
+                height: 24,
+                child: Center(
+                  child: node.isChecking
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: node.isHealthy
+                                ? GonkaColors.success
+                                : node.isOnline
+                                    ? GonkaColors.warning
+                                    : GonkaColors.error,
+                            boxShadow: [
+                              BoxShadow(
+                                color: (node.isHealthy
+                                        ? GonkaColors.success
+                                        : node.isOnline
+                                            ? GonkaColors.warning
+                                            : GonkaColors.error)
+                                    .withValues(alpha: 0.5),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ),
               title: Text(node.label),
               subtitle: Text(
                 node.isChecking
-                    ? '${node.url}\nChecking...'
-                    : '${node.url}\n${node.isHealthy ? '${node.latencyMs}ms' : node.isOnline ? (node.isSyncing ? 'Syncing...' : 'Not synced') : 'Offline'}',
+                    ? '${node.url}\n${l10n.nodeStatusChecking}'
+                    : '${node.url}\n${node.isHealthy ? l10n.nodeStatusLatency(node.latencyMs) : node.isOnline ? (node.isSyncing ? l10n.nodeStatusSyncing : l10n.nodeStatusNotSynced) : l10n.nodeStatusOffline}',
               ),
               isThreeLine: true,
               selected: isActive,
@@ -87,7 +113,7 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (isActive)
-                    const Chip(label: Text('Active')),
+                    Chip(label: Text(l10n.nodeActive)),
                   if (!isActive)
                     IconButton(
                       icon: const Icon(Icons.check_circle_outline),
@@ -107,7 +133,7 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.add),
-            title: const Text('Add Node'),
+            title: Text(l10n.nodeAdd),
             onTap: _addNode,
           ),
         ],
@@ -123,58 +149,59 @@ class _NodeSettingsScreenState extends ConsumerState<NodeSettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Add Node'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'Node URL',
-                  hintText: 'https://node.example.com:8000',
-                  border: OutlineInputBorder(),
+        builder: (ctx, setDialogState) {
+          final l10n = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l10n.nodeAdd),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: urlController,
+                  decoration: InputDecoration(
+                    labelText: l10n.nodeUrlLabel,
+                    hintText: l10n.nodeUrlHint,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: labelController,
-                decoration: const InputDecoration(
-                  labelText: 'Label',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: labelController,
+                  decoration: InputDecoration(
+                    labelText: l10n.nodeLabelLabel,
+                  ),
                 ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  title: Text(l10n.nodeProxyMode),
+                  subtitle: Text(l10n.nodeProxyModeSubtitle),
+                  value: proxyMode,
+                  onChanged: (v) => setDialogState(() => proxyMode = v),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.commonCancel),
               ),
-              const SizedBox(height: 12),
-              SwitchListTile(
-                title: const Text('Proxy Mode'),
-                subtitle: const Text('/chain-api/ + /chain-rpc/'),
-                value: proxyMode,
-                onChanged: (v) => setDialogState(() => proxyMode = v),
+              FilledButton(
+                onPressed: () {
+                  final url = urlController.text.trim();
+                  if (url.isEmpty) return;
+                  ref.read(nodesProvider.notifier).addNode(NodeModel(
+                        url: url,
+                        label: labelController.text.trim().isEmpty
+                            ? l10n.nodeDefaultLabel
+                            : labelController.text.trim(),
+                        proxyMode: proxyMode,
+                      ));
+                  Navigator.pop(ctx);
+                },
+                child: Text(l10n.nodeAddButton),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final url = urlController.text.trim();
-                if (url.isEmpty) return;
-                ref.read(nodesProvider.notifier).addNode(NodeModel(
-                      url: url,
-                      label: labelController.text.trim().isEmpty
-                          ? 'Custom Node'
-                          : labelController.text.trim(),
-                      proxyMode: proxyMode,
-                    ));
-                Navigator.pop(ctx);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

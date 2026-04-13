@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/responsive_center.dart';
@@ -43,9 +44,10 @@ class _SecuritySettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Security'),
+        title: Text(l10n.securityTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -58,24 +60,26 @@ class _SecuritySettingsScreenState
         ),
       ),
       body: ResponsiveCenter(child: ListView(
+        padding: EdgeInsets.only(
+            bottom: 16 + MediaQuery.paddingOf(context).bottom),
         children: [
           ListTile(
             leading: const Icon(Icons.pin),
-            title: const Text('Change PIN'),
+            title: Text(l10n.securityChangePin),
             onTap: _changePin,
           ),
           if (_biometricAvailable == true)
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),
-              title: const Text('Biometric Authentication'),
+              title: Text(l10n.securityBiometric),
               value: _biometricEnabled ?? false,
               onChanged: _toggleBiometric,
             ),
           SwitchListTile(
             secondary: const Icon(Icons.delete_forever),
-            title: const Text('Erase wallets after failed PIN'),
+            title: Text(l10n.securityWipe),
             subtitle: Text(
-              'Delete all wallets after ${GonkaConstants.maxPinAttempts} wrong attempts',
+              l10n.securityWipeSubtitle(GonkaConstants.maxPinAttempts),
             ),
             value: _wipeEnabled ?? true,
             onChanged: _toggleWipe,
@@ -88,9 +92,11 @@ class _SecuritySettingsScreenState
   void _changePin() async {
     final success = await context.push<bool>('/auth/pin-change') ?? false;
     if (mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? 'PIN changed' : 'PIN not changed'),
+          content: Text(
+              success ? l10n.securityPinChanged : l10n.securityPinNotChanged),
         ),
       );
     }
@@ -106,7 +112,8 @@ class _SecuritySettingsScreenState
     final storage = ref.read(secureStorageProvider);
     if (value) {
       final auth = ref.read(authServiceProvider);
-      final success = await auth.authenticateBiometric();
+      final reason = AppLocalizations.of(context).authBiometricReason;
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         await storage.setBiometricEnabled(true);
         setState(() => _biometricEnabled = true);

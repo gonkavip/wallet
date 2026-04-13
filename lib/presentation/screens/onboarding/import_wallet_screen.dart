@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/crypto/hd_key_service.dart';
 import '../../../core/crypto/mnemonic_service.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
+import 'onboarding_secret.dart';
+
+enum _ImportError { wordCount, fillAll, invalid, invalidPrivateKey }
+
+enum _ImportMode { wordByWord, paste, privateKey }
 
 class ImportWalletScreen extends StatefulWidget {
   const ImportWalletScreen({super.key});
@@ -15,11 +23,13 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
       List.generate(24, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(24, (_) => FocusNode());
   final TextEditingController _pasteController = TextEditingController();
-  String? _error;
+  final TextEditingController _pkController = TextEditingController();
+  _ImportError? _error;
+  int _wordCount = 0;
   bool _showSuggestions = false;
   int _activeSuggestionField = -1;
   List<String> _suggestions = [];
-  bool _pasteMode = false;
+  _ImportMode _mode = _ImportMode.wordByWord;
 
   @override
   void dispose() {
@@ -30,6 +40,7 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
       f.dispose();
     }
     _pasteController.dispose();
+    _pkController.dispose();
     super.dispose();
   }
 
@@ -63,34 +74,61 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
   }
 
   void _validate() {
+    if (_mode == _ImportMode.privateKey) {
+      final raw = _pkController.text;
+      try {
+        final cleaned = normalizePrivateKeyHex(raw);
+        context.push('/onboarding/name',
+            extra: OnboardingSecret.privateKey(cleaned));
+      } catch (_) {
+        setState(() => _error = _ImportError.invalidPrivateKey);
+      }
+      return;
+    }
     String mnemonic;
-    if (_pasteMode) {
+    if (_mode == _ImportMode.paste) {
       mnemonic = _pasteController.text.trim().toLowerCase();
       final words = mnemonic.split(RegExp(r'\s+'));
       if (words.length != 24) {
-        setState(() => _error = 'Seed phrase must be exactly 24 words (got ${words.length})');
+        setState(() {
+          _error = _ImportError.wordCount;
+          _wordCount = words.length;
+        });
         return;
       }
     } else {
       final words = _controllers.map((c) => c.text.trim().toLowerCase()).toList();
       if (words.any((w) => w.isEmpty)) {
-        setState(() => _error = 'Please fill in all 24 words');
+        setState(() => _error = _ImportError.fillAll);
         return;
       }
       mnemonic = words.join(' ');
     }
     if (!MnemonicService.validate(mnemonic)) {
-      setState(() => _error = 'Invalid seed phrase');
+      setState(() => _error = _ImportError.invalid);
       return;
     }
-    context.push('/onboarding/name', extra: mnemonic);
+    context.push('/onboarding/name',
+        extra: OnboardingSecret.mnemonic(mnemonic));
+  }
+
+  String _errorMessage(AppLocalizations l10n) {
+    return switch (_error!) {
+      _ImportError.wordCount =>
+        l10n.onboardingImportErrorWordCount(_wordCount),
+      _ImportError.fillAll => l10n.onboardingImportErrorFillAll,
+      _ImportError.invalid => l10n.onboardingImportErrorInvalid,
+      _ImportError.invalidPrivateKey =>
+        l10n.onboardingImportPrivateKeyErrorInvalid,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Import Wallet'),
+        title: Text(l10n.onboardingImportTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -102,27 +140,35 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(child: Column(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: SegmentedButton<bool>(
-              segments: const [
+            child: SegmentedButton<_ImportMode>(
+              segments: [
                 ButtonSegment(
-                  value: false,
-                  label: Text('Word by word'),
-                  icon: Icon(Icons.grid_view, size: 18),
+                  value: _ImportMode.wordByWord,
+                  label: Text(l10n.onboardingImportWordByWord),
+                  icon: const Icon(Icons.grid_view, size: 18),
                 ),
                 ButtonSegment(
-                  value: true,
-                  label: Text('Paste phrase'),
-                  icon: Icon(Icons.content_paste, size: 18),
+                  value: _ImportMode.paste,
+                  label: Text(l10n.onboardingImportPastePhrase),
+                  icon: const Icon(Icons.content_paste, size: 18),
+                ),
+                ButtonSegment(
+                  value: _ImportMode.privateKey,
+                  label: Text(l10n.onboardingImportPrivateKey),
+                  icon: const Icon(Icons.vpn_key_outlined, size: 18),
                 ),
               ],
-              selected: {_pasteMode},
+              selected: {_mode},
               onSelectionChanged: (v) {
                 setState(() {
-                  _pasteMode = v.first;
+                  _mode = v.first;
                   _error = null;
                   _showSuggestions = false;
                 });
@@ -130,21 +176,21 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
             ),
           ),
           if (_error != null)
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: InfoBanner(
+                variant: InfoBannerVariant.error,
+                message: _errorMessage(l10n),
               ),
-              child: Text(_error!, style: TextStyle(color: Colors.red.shade700)),
             ),
           Expanded(
-            child: _pasteMode ? _buildPasteInput() : _buildGridInput(),
+            child: switch (_mode) {
+              _ImportMode.wordByWord => _buildGridInput(),
+              _ImportMode.paste => _buildPasteInput(),
+              _ImportMode.privateKey => _buildPrivateKeyInput(),
+            },
           ),
-          if (!_pasteMode && _showSuggestions)
+          if (_mode == _ImportMode.wordByWord && _showSuggestions)
             SizedBox(
               height: 48,
               child: ListView(
@@ -165,19 +211,20 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
             padding: const EdgeInsets.all(16),
             child: SizedBox(
               width: double.infinity,
-              height: 56,
               child: FilledButton(
                 onPressed: _validate,
-                child: const Text('Import'),
+                child: Text(l10n.onboardingImportButton),
               ),
             ),
           ),
         ],
       )),
+      ),
     );
   }
 
   Widget _buildPasteInput() {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: TextField(
@@ -186,14 +233,42 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
         expands: true,
         textAlignVertical: TextAlignVertical.top,
         decoration: InputDecoration(
-          hintText: 'Paste your 24-word seed phrase here...',
-          border: const OutlineInputBorder(),
+          hintText: l10n.onboardingImportHint,
           contentPadding: const EdgeInsets.all(16),
           suffixIcon: _pasteController.text.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _pasteController.clear();
+                    setState(() => _error = null);
+                  },
+                )
+              : null,
+        ),
+        autocorrect: false,
+        enableSuggestions: false,
+        onChanged: (_) => setState(() => _error = null),
+      ),
+    );
+  }
+
+  Widget _buildPrivateKeyInput() {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _pkController,
+        maxLines: 4,
+        textAlignVertical: TextAlignVertical.top,
+        style: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+        decoration: InputDecoration(
+          hintText: l10n.onboardingImportPrivateKeyHint,
+          contentPadding: const EdgeInsets.all(16),
+          suffixIcon: _pkController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _pkController.clear();
                     setState(() => _error = null);
                   },
                 )
@@ -224,8 +299,7 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
             labelText: '${index + 1}',
             isDense: true,
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            border: const OutlineInputBorder(),
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           ),
           style: const TextStyle(fontSize: 14),
           autocorrect: false,

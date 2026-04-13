@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/crypto/address_service.dart';
 import '../../core/network/node_client.dart';
 import '../../core/transaction/broadcast_service.dart';
-import '../../data/services/secure_storage_service.dart';
 import 'send_provider.dart';
 import 'node_provider.dart';
 import 'wallet_provider.dart';
@@ -37,7 +36,7 @@ final unjailProvider =
     StateNotifierProvider<UnjailNotifier, UnjailState>((ref) {
   return UnjailNotifier(
     ref.watch(broadcastServiceProvider),
-    ref.watch(secureStorageProvider),
+    ref.watch(walletsProvider.notifier),
   );
 });
 
@@ -54,9 +53,9 @@ final validatorJailedProvider =
 
 class UnjailNotifier extends StateNotifier<UnjailState> {
   final BroadcastService _broadcast;
-  final SecureStorageService _storage;
+  final WalletsNotifier _wallets;
 
-  UnjailNotifier(this._broadcast, this._storage) : super(UnjailState());
+  UnjailNotifier(this._broadcast, this._wallets) : super(UnjailState());
 
   Future<void> unjail({
     required String walletId,
@@ -64,11 +63,11 @@ class UnjailNotifier extends StateNotifier<UnjailState> {
   }) async {
     state = state.copyWith(isLoading: true, clearError: true, clearTxResult: true);
     try {
-      final mnemonic = await _storage.getMnemonic(walletId);
-      if (mnemonic == null) throw Exception('Mnemonic not found');
+      final pkHex = await _wallets.getPrivateKeyHex(walletId);
+      if (pkHex == null) throw Exception('Private key not found');
 
       final result = await _broadcast.unjail(
-        mnemonic: mnemonic,
+        privateKeyHex: pkHex,
         fromAddress: fromAddress,
       );
 

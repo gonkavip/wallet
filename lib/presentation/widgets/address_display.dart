@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../config/constants.dart';
+import '../../l10n/app_localizations.dart';
 
 class AddressDisplay extends StatelessWidget {
   final String address;
@@ -42,11 +43,12 @@ class AddressDisplay extends StatelessWidget {
   }
 
   void _copyToClipboard(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Clipboard.setData(ClipboardData(text: address));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Address copied'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(l10n.widgetAddressCopied),
+        duration: const Duration(seconds: 2),
       ),
     );
     Timer(Duration(seconds: GonkaConstants.clipboardClearSeconds), () {

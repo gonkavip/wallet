@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/constants.dart';
+import '../../../config/design_tokens.dart';
 import '../../../data/models/balance_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/node_provider.dart';
-import '../../../config/constants.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -12,13 +15,14 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final wallets = ref.watch(walletsProvider);
     final nodeState = ref.watch(nodesProvider);
     final activeNode = nodeState.activeNode;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gonka Wallet'),
+        title: Text(l10n.homeTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -31,16 +35,16 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.account_balance_wallet_outlined,
-                      size: 64, color: Colors.grey[400]),
+                  const Icon(Icons.account_balance_wallet_outlined,
+                      size: 64, color: GonkaColors.textMuted),
                   const SizedBox(height: 16),
-                  Text('No wallets yet',
+                  Text(l10n.homeEmpty,
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => context.go('/onboarding/create'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Create Wallet'),
+                    label: Text(l10n.homeCreateWallet),
                   ),
                 ],
               ),
@@ -52,44 +56,69 @@ class HomeScreen extends ConsumerWidget {
                 }
               },
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.fromLTRB(
+                    16, 16, 16, 16 + MediaQuery.paddingOf(context).bottom),
                 children: [
                   if (activeNode != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: InkWell(
                         onTap: () => context.push('/settings/nodes'),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(GonkaRadius.md),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
+                              horizontal: 14, vertical: 10),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(8),
+                            color: GonkaColors.bgCard,
+                            borderRadius:
+                                BorderRadius.circular(GonkaRadius.md),
+                            border: Border.all(
+                                color: GonkaColors.borderSubtle, width: 1),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.circle,
-                                  size: 8,
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: activeNode.isHealthy
-                                      ? Colors.green
+                                      ? GonkaColors.success
                                       : activeNode.isOnline
-                                          ? Colors.orange
-                                          : Colors.red),
-                              const SizedBox(width: 8),
+                                          ? GonkaColors.warning
+                                          : GonkaColors.error,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (activeNode.isHealthy
+                                              ? GonkaColors.success
+                                              : activeNode.isOnline
+                                                  ? GonkaColors.warning
+                                                  : GonkaColors.error)
+                                          .withValues(alpha: 0.5),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 10),
                               Text(activeNode.label,
-                                  style:
-                                      Theme.of(context).textTheme.bodySmall),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                          color: GonkaColors.textPrimary,
+                                          fontWeight: FontWeight.w500)),
                               const Spacer(),
                               if (activeNode.isHealthy)
                                 Text('${activeNode.latencyMs}ms',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                            color: GonkaColors.textMuted)),
                               const SizedBox(width: 4),
-                              Icon(Icons.chevron_right,
-                                  size: 16, color: Colors.grey[400]),
+                              const Icon(Icons.chevron_right,
+                                  size: 16, color: GonkaColors.textMuted),
                             ],
                           ),
                         ),
@@ -112,7 +141,7 @@ class HomeScreen extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => context.push('/onboarding/create'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Wallet'),
+                    label: Text(l10n.homeAddWallet),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 56),
                     ),
@@ -155,69 +184,90 @@ class _WalletCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final balanceAsync = ref.watch(walletBalanceProvider(address));
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF1A237E), Color(0xFF283593)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(GonkaRadius.lg),
+          splashColor: Colors.white.withValues(alpha: 0.06),
+          highlightColor: Colors.white.withValues(alpha: 0.04),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(GonkaRadius.lg),
+              gradient: GonkaGradients.walletCard,
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x263B82F6),
+                  blurRadius: 16,
+                  spreadRadius: -4,
+                  offset: Offset(0, 6),
+                ),
+              ],
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet,
-                      color: Colors.white70, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(name,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(GonkaRadius.lg),
+              child: CustomPaint(
+                painter: const WalletCardDotTexture(),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.account_balance_wallet,
+                        color: Colors.white.withValues(alpha: 0.8), size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(name,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2)),
+                    ),
+                    Icon(Icons.chevron_right,
+                        color: Colors.white.withValues(alpha: 0.6), size: 20),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  '${address.substring(0, 12)}...${address.substring(address.length - 6)}',
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      letterSpacing: 0.3),
+                ),
+                const SizedBox(height: 18),
+                balanceAsync.when(
+                  data: (balance) => Text(
+                    '${formatGnkShort(balance.total)} GNK',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5),
                   ),
-                  const Icon(Icons.chevron_right,
-                      color: Colors.white54, size: 20),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${address.substring(0, 12)}...${address.substring(address.length - 6)}',
-                style: const TextStyle(
-                    color: Colors.white54,
-                    fontFamily: 'monospace',
-                    fontSize: 12),
-              ),
-              const SizedBox(height: 16),
-              balanceAsync.when(
-                data: (balance) => Text(
-                  '${formatGnkShort(balance.total)} GNK',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
+                  loading: () => SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white.withValues(alpha: 0.7)),
+                  ),
+                  error: (_, __) => Text('--',
+                      style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 26)),
                 ),
-                loading: () => const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white54),
+              ],
+            ),
                 ),
-                error: (_, __) => const Text('--',
-                    style: TextStyle(color: Colors.white54, fontSize: 24)),
               ),
-            ],
+            ),
           ),
         ),
       ),

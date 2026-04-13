@@ -1,0 +1,381 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Gonka Wallet",
+
+  "splashLoading": "Loading...",
+  "splashCheckingNodes": "Checking nodes...",
+
+  "onboardingCreateTitle": "Gonka Wallet",
+  "onboardingCreateSubtitle": "Secure wallet for the Gonka blockchain",
+  "onboardingCreateNewWallet": "Create New Wallet",
+  "onboardingCreateImportWallet": "Import Existing Wallet",
+  "onboardingCreateTerms": "Terms of Use",
+  "onboardingCreatePrivacy": "Privacy Policy",
+
+  "onboardingBackupTitle": "Back Up Seed Phrase",
+  "onboardingBackupWarning": "Write down these 24 words in order. Never share them. Anyone with this phrase can access your funds.",
+  "onboardingBackupCheckbox": "I have written down the seed phrase",
+  "onboardingBackupContinue": "Continue",
+  "onboardingBackupVerifyTitle": "Verify Backup",
+  "onboardingBackupVerifyPrompt": "What is word #{index}?",
+  "@onboardingBackupVerifyPrompt": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyHint": "Enter word #{index}",
+  "@onboardingBackupVerifyHint": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyButton": "Verify",
+  "onboardingBackupVerifyError": "Incorrect word. Please try again.",
+
+  "onboardingImportTitle": "Import Wallet",
+  "onboardingImportWordByWord": "Word by word",
+  "onboardingImportPastePhrase": "Paste phrase",
+  "onboardingImportHint": "Paste your 24-word seed phrase here...",
+  "onboardingImportButton": "Import",
+  "onboardingImportErrorWordCount": "Seed phrase must be exactly 24 words (got {count})",
+  "@onboardingImportErrorWordCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "onboardingImportErrorFillAll": "Please fill in all 24 words",
+  "onboardingImportErrorInvalid": "Invalid seed phrase",
+  "onboardingImportPrivateKey": "Private key",
+  "onboardingImportPrivateKeyHint": "Paste your private key (64 hex characters)",
+  "onboardingImportPrivateKeyErrorInvalid": "Invalid private key. Expected 64 hex characters.",
+
+  "onboardingNameTitle": "Name Your Wallet",
+  "onboardingNameHeading": "Give your wallet a name",
+  "onboardingNameSubtext": "This is just for your reference.",
+  "onboardingNameLabel": "Wallet Name",
+  "onboardingNameValidationEmpty": "Please enter a name",
+  "onboardingNameDefault": "My Wallet",
+  "onboardingNameContinue": "Continue",
+
+  "onboardingPinTitle": "Set PIN",
+  "onboardingPinCreateHeading": "Create a 6-digit PIN",
+  "onboardingPinConfirmHeading": "Confirm your PIN",
+  "onboardingPinMismatch": "PINs do not match. Try again.",
+  "onboardingPinBiometricTitle": "Enable Biometrics?",
+  "onboardingPinBiometricBody": "Use Face ID / fingerprint to unlock your wallet?",
+  "onboardingPinBiometricSkip": "Skip",
+  "onboardingPinBiometricEnable": "Enable",
+
+  "authEnterPin": "Enter PIN",
+  "authEnterCurrentPin": "Enter Current PIN",
+  "authEnterNewPin": "Enter New PIN",
+  "authWrongPin": "Wrong PIN. {remaining} attempts remaining.",
+  "@authWrongPin": {
+    "placeholders": { "remaining": { "type": "int" } }
+  },
+  "authCooldown": "Too many attempts. Wait {seconds}s.",
+  "@authCooldown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+
+  "homeTitle": "Gonka Wallet",
+  "homeEmpty": "No wallets yet",
+  "homeCreateWallet": "Create Wallet",
+  "homeAddWallet": "Add Wallet",
+
+  "walletDetailTitle": "Wallet",
+  "walletDetailNotFound": "Wallet not found",
+  "walletDetailShowSeed": "Show Seed Phrase",
+  "walletDetailExportPk": "Export Private Key",
+  "walletDetailExportPkDialogTitle": "Private Key",
+  "walletDetailExportPkWarning": "Anyone with this key can access your funds. Never share it.",
+  "walletDetailExportPkCopied": "Private key copied",
+  "walletDetailRename": "Rename Wallet",
+  "walletDetailDelete": "Delete Wallet",
+  "walletDetailSend": "Send",
+  "walletDetailReceive": "Receive",
+  "walletDetailHostTools": "Host Tools",
+  "walletDetailTxHistory": "Transaction History",
+  "walletDetailNoTx": "No transactions yet",
+  "walletDetailTxError": "Failed to load history",
+  "walletDetailBalanceError": "Failed to load balance: {error}",
+  "@walletDetailBalanceError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "walletDetailSeedDialogTitle": "Seed Phrase",
+  "walletDetailRenameDialogTitle": "Rename Wallet",
+  "walletDetailRenameLabel": "Name",
+  "walletDetailDeleteDialogBody": "Are you sure you want to delete \"{name}\"?\n\nThis will remove the wallet and its seed phrase from this device. Make sure you have backed up your seed phrase!",
+  "@walletDetailDeleteDialogBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonDelete": "Delete",
+  "commonRetry": "Retry",
+  "commonDone": "Done",
+  "commonClose": "Close",
+  "commonCopy": "Copy",
+  "commonFrom": "From",
+  "commonTo": "To",
+  "commonAmount": "Amount",
+  "commonFee": "Fee",
+  "commonFeeZero": "0 GNK",
+  "commonAddress": "Address",
+  "commonAction": "Action",
+  "commonStatus": "Status",
+  "commonType": "Type",
+  "commonHash": "Hash",
+  "commonHeight": "Height",
+  "commonTime": "Time",
+  "commonMemo": "Memo",
+  "commonSuccess": "Success",
+  "commonFailed": "Failed",
+  "commonContract": "Contract",
+  "commonValidator": "Validator",
+  "commonGranter": "Granter",
+  "commonGrantee": "Grantee",
+  "commonProposal": "Proposal",
+  "commonOption": "Option",
+  "commonEpoch": "Epoch",
+
+  "balanceTotal": "Total Balance",
+  "balanceAvailable": "Available",
+  "balanceVesting": "Vesting",
+
+  "authBiometricReason": "Authenticate to access your wallet",
+
+  "errorNoActiveNode": "No active node",
+  "errorMnemonicNotFound": "Mnemonic not found",
+  "errorInvalidMnemonic": "Invalid mnemonic",
+  "errorGeneric": "Something went wrong",
+
+  "txTypeReceived": "Received",
+  "txTypeSent": "Sent",
+  "txTypeContract": "Contract",
+  "txTypeContractDeposit": "Deposit",
+  "txTypeContractWithdraw": "Withdraw",
+  "txTypeUnjail": "Unjail",
+  "txTypeGrant": "Grant Permissions",
+  "txTypeCollateralDeposit": "Collateral Deposit",
+  "txTypeCollateralWithdraw": "Collateral Withdraw",
+  "txTypeVestingReward": "Vesting Reward",
+  "txTypeEpochReward": "Epoch {epoch} Reward",
+  "@txTypeEpochReward": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "txTypeVote": "Vote: {option}",
+  "@txTypeVote": {
+    "placeholders": { "option": { "type": "String" } }
+  },
+  "txTimeJustNow": "Just now",
+  "txTimeMinutesAgo": "{minutes}m ago",
+  "@txTimeMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "txTimeHoursAgo": "{hours}h ago",
+  "@txTimeHoursAgo": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "txTimeDaysAgo": "{days}d ago",
+  "@txTimeDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "sendTitle": "Send",
+  "sendRecipientLabel": "Recipient Address",
+  "sendAmountLabel": "Amount",
+  "sendMaxButton": "MAX",
+  "sendUnitGnk": "GNK",
+  "sendUnitNgonka": "ngonka",
+  "sendContinue": "Continue",
+  "sendErrorEnterAddress": "Enter recipient address",
+  "sendErrorInvalidAddress": "Invalid Gonka address",
+  "sendErrorSelfSend": "Cannot send to yourself",
+  "sendErrorEnterAmount": "Enter amount",
+  "sendErrorAmountPositive": "Amount must be positive",
+  "sendErrorInsufficient": "Insufficient balance",
+  "sendErrorInvalidAmount": "Invalid amount",
+  "sendScanQr": "Scan QR Code",
+
+  "confirmSendTitle": "Confirm Send",
+  "confirmSendButton": "Confirm & Send",
+  "confirmSendAuthenticating": "Authenticating...",
+  "sendResultSuccess": "Transaction Sent!",
+  "sendResultFailed": "Transaction Failed",
+
+  "receiveTitle": "Receive",
+  "receiveNoWallet": "No wallet",
+  "receiveTapToCopy": "Tap address to copy",
+
+  "minersTitle": "Host Tools",
+  "minersPubKey": "My PubKey",
+  "minersPubKeySubtitle": "View and copy your public key",
+  "minersPubKeyCopied": "Public key copied",
+  "minersCollateral": "Collateral",
+  "minersCollateralSubtitle": "Manage your mining collateral",
+  "minersGrant": "Grant Permissions",
+  "minersGrantSubtitle": "Grant permissions to ML operational key",
+  "minersUnjail": "Unjail",
+  "minersUnjailSubtitle": "Unjail your validator",
+  "minersGovernance": "Governance",
+  "minersGovernanceSubtitle": "Vote on proposals",
+  "minersTracker": "Tracker",
+  "minersTrackerSubtitle": "Professional Dashboard",
+
+  "collateralTitle": "Collateral",
+  "collateralCurrent": "Current Collateral",
+  "collateralDeposit": "Deposit",
+  "collateralWithdraw": "Withdraw",
+  "collateralUnbonding": "Unbonding",
+  "collateralCompletionEpoch": "Completion epoch: {epoch}",
+  "@collateralCompletionEpoch": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "collateralEmpty": "No collateral yet",
+  "collateralDepositTitle": "Deposit Collateral",
+  "collateralWithdrawTitle": "Withdraw Collateral",
+  "collateralCurrentInfo": "Current collateral: {amount} GNK",
+  "@collateralCurrentInfo": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "collateralErrorExceeds": "Exceeds current collateral",
+  "collateralConfirmDeposit": "Confirm Deposit",
+  "collateralConfirmWithdraw": "Confirm Withdraw",
+  "collateralConfirmDepositButton": "Confirm & Deposit",
+  "collateralConfirmWithdrawButton": "Confirm & Withdraw",
+  "collateralResultDepositSuccess": "Deposit Successful!",
+  "collateralResultWithdrawSuccess": "Withdrawal Successful!",
+  "collateralResultDepositFailed": "Deposit Failed",
+  "collateralResultWithdrawFailed": "Withdrawal Failed",
+
+  "grantTitle": "Grant Permissions",
+  "grantInfo": "Grant your ML operational key permission to perform inference, training, and other ML operations on your behalf. This does not grant access to your funds.",
+  "grantOpKeyLabel": "Operational Key Address",
+  "grantOpKeyHint": "gonka1...",
+  "grantErrorEnterAddress": "Enter operational key address",
+  "grantErrorInvalidAddress": "Invalid Gonka address",
+  "grantErrorSelf": "Cannot grant permissions to yourself",
+  "grantContinue": "Continue",
+  "grantScanQr": "Scan QR Code",
+  "grantConfirmTitle": "Confirm Grant",
+  "grantConfirmAction": "Grant ML Permissions",
+  "grantConfirmExpiration": "Expiration",
+  "grantConfirmExpirationValue": "2 years",
+  "grantConfirmPermissions": "Permissions",
+  "grantConfirmPermissionsValue": "27 ML operations",
+  "grantConfirmButton": "Confirm & Grant",
+  "grantResultSuccess": "Permissions Granted!",
+  "grantResultFailed": "Grant Failed",
+
+  "unjailTitle": "Unjail Validator",
+  "unjailWarningJailed": "Your validator is jailed. Send an unjail transaction to resume operations.",
+  "unjailInfoNotJailed": "Your validator is not jailed. No action needed.",
+  "unjailInfoNotFound": "Validator not found on chain. Make sure your validator has been created.",
+  "unjailAction": "Unjail Validator",
+  "unjailValidatorAddress": "Validator Address",
+  "unjailConfirmButton": "Confirm & Unjail",
+  "unjailResultSuccess": "Unjail Successful",
+  "unjailResultFailed": "Unjail Failed",
+
+  "governanceTitle": "Governance",
+  "governanceTabAll": "All",
+  "governanceTabActive": "Active",
+  "governanceTabClosed": "Closed",
+  "governanceErrorLoad": "Failed to load proposals: {error}",
+  "@governanceErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "governanceEmptyAll": "No proposals found",
+  "governanceEmptyActive": "No active proposals",
+  "governanceEmptyClosed": "No closed proposals",
+  "governanceStatusActive": "Active",
+  "governanceStatusPassed": "Passed",
+  "governanceStatusRejected": "Rejected",
+  "governanceEndingSoon": "Ending soon",
+  "governanceEndsInDays": "Ends in {days}d {hours}h",
+  "@governanceEndsInDays": {
+    "placeholders": { "days": { "type": "int" }, "hours": { "type": "int" } }
+  },
+  "governanceEndsInHours": "Ends in {hours}h {minutes}m",
+  "@governanceEndsInHours": {
+    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "governanceEndsInMinutes": "Ends in {minutes}m",
+  "@governanceEndsInMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "governanceEndedDaysAgo": "Ended {days}d ago",
+  "@governanceEndedDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "governanceEndedOn": "Ended {date}",
+  "@governanceEndedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "proposalDetailTitle": "Proposal #{id}",
+  "@proposalDetailTitle": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "proposalDetailErrorLoad": "Failed to load proposal: {error}",
+  "@proposalDetailErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "proposalDetailNotFound": "Proposal not found",
+  "proposalDetailSummary": "Summary",
+  "proposalDetailProposer": "Proposer",
+  "proposalDetailVotingPeriod": "Voting Period",
+  "proposalDetailTally": "Tally Results",
+  "proposalVoteYes": "Yes",
+  "proposalVoteAbstain": "Abstain",
+  "proposalVoteNo": "No",
+  "proposalVoteNoWithVeto": "No with Veto",
+  "proposalCastYourVote": "Cast Your Vote",
+  "proposalSubmitVote": "Submit Vote",
+  "proposalVotingEnded": "Voting has ended for this proposal.",
+  "proposalVoteSubmitted": "Vote Submitted",
+  "proposalVoteFailed": "Vote Failed",
+
+  "settingsTitle": "Settings",
+  "settingsNodeSettings": "Node Settings",
+  "settingsSecurity": "Security",
+  "settingsSecuritySubtitle": "PIN & biometrics",
+  "settingsTerms": "Terms of Use",
+  "settingsPrivacy": "Privacy Policy",
+
+  "securityTitle": "Security",
+  "securityChangePin": "Change PIN",
+  "securityBiometric": "Biometric Authentication",
+  "securityWipe": "Erase wallets after failed PIN",
+  "securityWipeSubtitle": "Delete all wallets after {max} wrong attempts",
+  "@securityWipeSubtitle": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "securityPinChanged": "PIN changed",
+  "securityPinNotChanged": "PIN not changed",
+
+  "nodeSettingsTitle": "Node Settings",
+  "nodeSettingsRefresh": "Refresh Nodes",
+  "nodeStatusChecking": "Checking...",
+  "nodeStatusSyncing": "Syncing...",
+  "nodeStatusNotSynced": "Not synced",
+  "nodeStatusOffline": "Offline",
+  "nodeStatusLatency": "{ms}ms",
+  "@nodeStatusLatency": {
+    "placeholders": { "ms": { "type": "int" } }
+  },
+  "nodeActive": "Active",
+  "nodeAdd": "Add Node",
+  "nodeUrlLabel": "Node URL",
+  "nodeUrlHint": "https://node.example.com:8000",
+  "nodeLabelLabel": "Label",
+  "nodeProxyMode": "Proxy Mode",
+  "nodeProxyModeSubtitle": "/chain-api/ + /chain-rpc/",
+  "nodeDefaultLabel": "Custom Node",
+  "nodeAddButton": "Add",
+
+  "securityWarningTitle": "Security Warning",
+  "securityWarningBody": "This device appears to be rooted or jailbroken. Running a wallet app on a compromised device puts your funds at risk.",
+  "securityWarningAck": "I understand the risks",
+
+  "widgetHashCopied": "Hash copied",
+  "widgetAddressCopied": "Address copied",
+  "widgetTxHash": "Transaction Hash"
+}

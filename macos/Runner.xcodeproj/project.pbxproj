@@ -26,6 +26,7 @@
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
+		MAC10001000000000000A001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = MAC10001000000000000B001 /* InfoPlist.strings */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		4FFAF1C89434C0FFF993F933 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A3F5FB35821D1715278AE1 /* Pods_Runner.framework */; };
 		E202AAF16F4E9E6BBED26858 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 192A07F8A1ECF7299F03C91F /* Pods_RunnerTests.framework */; };
@@ -74,6 +75,11 @@
 		33CC10F02044A3C60003C045 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		33CC10F22044A3C60003C045 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Runner/Assets.xcassets; sourceTree = "<group>"; };
 		33CC10F52044A3C60003C045 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		MAC10001000000000000C001 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		MAC10001000000000000C002 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		MAC10001000000000000C003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		MAC10001000000000000C004 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		MAC10001000000000000C005 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		33CC10F72044A3C60003C045 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Runner/Info.plist; sourceTree = "<group>"; };
 		33CC11122044BFA00003C045 /* MainFlutterWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFlutterWindow.swift; sourceTree = "<group>"; };
 		33CEB47222A05771004F2AC0 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
@@ -156,6 +162,7 @@
 				33CC10F22044A3C60003C045 /* Assets.xcassets */,
 				33CC10F42044A3C60003C045 /* MainMenu.xib */,
 				33CC10F72044A3C60003C045 /* Info.plist */,
+				MAC10001000000000000B001 /* InfoPlist.strings */,
 			);
 			name = Resources;
 			path = ..;
@@ -289,6 +296,10 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
+				es,
+				pt,
+				"zh-Hans",
 			);
 			mainGroup = 33CC10E42044A3C60003C045;
 			productRefGroup = 33CC10EE2044A3C60003C045 /* Products */;
@@ -316,6 +327,7 @@
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+				MAC10001000000000000A001 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,6 +470,18 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		MAC10001000000000000B001 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				MAC10001000000000000C001 /* en */,
+				MAC10001000000000000C002 /* ru */,
+				MAC10001000000000000C003 /* es */,
+				MAC10001000000000000C004 /* pt */,
+				MAC10001000000000000C005 /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		33CC10F42044A3C60003C045 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -583,7 +607,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
@@ -722,7 +746,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -748,7 +772,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};

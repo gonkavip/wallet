@@ -92,10 +92,12 @@ class AuthService {
     }
   }
 
-  Future<bool> authenticateBiometric() async {
+  Future<bool> authenticateBiometric({
+    String reason = 'Authenticate to access your wallet',
+  }) async {
     try {
       return await _localAuth.authenticate(
-        localizedReason: 'Authenticate to access your wallet',
+        localizedReason: reason,
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: true,

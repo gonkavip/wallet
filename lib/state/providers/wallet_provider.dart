@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hex/hex.dart';
 import '../../data/models/wallet_model.dart';
 import '../../data/repositories/wallet_repository.dart';
 import '../../data/services/secure_storage_service.dart';
 import '../../core/crypto/mnemonic_service.dart';
 import '../../core/crypto/address_service.dart';
+import '../../core/crypto/hd_key_service.dart';
 
 final walletRepositoryProvider = Provider<WalletRepository>((ref) {
   return WalletRepository();
@@ -82,4 +84,31 @@ class WalletsNotifier extends StateNotifier<List<WalletModel>> {
 
   Future<String?> getMnemonic(String walletId) =>
       _storage.getMnemonic(walletId);
+
+  Future<WalletModel> importWalletFromPrivateKeyHex(
+      String name, String hex) async {
+    final cleaned = normalizePrivateKeyHex(hex);
+    final address = HDKeyService.addressFromPrivateKeyHex(cleaned);
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+
+    final wallet = WalletModel(id: id, name: name, address: address);
+    await _repo.createWallet(wallet);
+    await _storage.savePrivateKeyHex(id, cleaned);
+    await _repo.setActiveWallet(id);
+
+    state = _repo.getWallets();
+    return wallet;
+  }
+
+  Future<bool> hasMnemonic(String walletId) async =>
+      (await _storage.getMnemonic(walletId)) != null;
+
+  Future<String?> getPrivateKeyHex(String walletId) async {
+    final mn = await _storage.getMnemonic(walletId);
+    if (mn != null) {
+      final bytes = HDKeyService.derivePrivateKey(mn);
+      return HEX.encode(bytes);
+    }
+    return _storage.getPrivateKeyHex(walletId);
+  }
 }

@@ -5,8 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/crypto/address_service.dart';
 import '../../../core/platform_util.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/responsive_center.dart';
+
+enum _GrantAddrErr { empty, invalid, self }
 
 class GrantScreen extends ConsumerStatefulWidget {
   const GrantScreen({super.key});
@@ -17,7 +20,7 @@ class GrantScreen extends ConsumerStatefulWidget {
 
 class _GrantScreenState extends ConsumerState<GrantScreen> {
   final _addressController = TextEditingController();
-  String? _addressError;
+  _GrantAddrErr? _addressErr;
 
   @override
   void dispose() {
@@ -42,19 +45,29 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
     }
   }
 
-  String? _validateAddress(String address) {
-    if (address.isEmpty) return 'Enter operational key address';
-    if (!AddressService.validate(address)) return 'Invalid Gonka address';
+  _GrantAddrErr? _validateAddress(String address) {
+    if (address.isEmpty) return _GrantAddrErr.empty;
+    if (!AddressService.validate(address)) return _GrantAddrErr.invalid;
     final wallet = ref.read(activeWalletProvider);
     if (wallet != null && address == wallet.address) {
-      return 'Cannot grant permissions to yourself';
+      return _GrantAddrErr.self;
     }
     return null;
   }
 
+  String? _errorText(AppLocalizations l10n) {
+    final e = _addressErr;
+    if (e == null) return null;
+    return switch (e) {
+      _GrantAddrErr.empty => l10n.grantErrorEnterAddress,
+      _GrantAddrErr.invalid => l10n.grantErrorInvalidAddress,
+      _GrantAddrErr.self => l10n.grantErrorSelf,
+    };
+  }
+
   void _continue() {
     final addrErr = _validateAddress(_addressController.text.trim());
-    setState(() => _addressError = addrErr);
+    setState(() => _addressErr = addrErr);
     if (addrErr != null) return;
 
     context.push('/miners/grant/confirm', extra: {
@@ -64,9 +77,10 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Grant Permissions'),
+        title: Text(l10n.grantTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -78,7 +92,10 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,9 +110,7 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Grant your ML operational key permission to perform '
-                        'inference, training, and other ML operations on your behalf. '
-                        'This does not grant access to your funds.',
+                        l10n.grantInfo,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
@@ -107,9 +122,9 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
             TextField(
               controller: _addressController,
               decoration: InputDecoration(
-                labelText: 'Operational Key Address',
-                hintText: 'gonka1...',
-                errorText: _addressError,
+                labelText: l10n.grantOpKeyLabel,
+                hintText: l10n.grantOpKeyHint,
+                errorText: _errorText(l10n),
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(PlatformUtil.isDesktop
@@ -125,11 +140,12 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
               height: 56,
               child: FilledButton(
                 onPressed: _continue,
-                child: const Text('Continue'),
+                child: Text(l10n.grantContinue),
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -155,7 +171,8 @@ class _QrScanPageState extends State<_QrScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context).grantScanQr)),
       body: MobileScanner(
         controller: _controller,
         onDetect: (BarcodeCapture capture) {

@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/network/node_client.dart';
 import '../../../core/transaction/msg_vote.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/governance_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../error_l10n.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
+
+String _voteLabel(AppLocalizations l10n, VoteOption option) =>
+    switch (option) {
+      VoteOption.yes => l10n.proposalVoteYes,
+      VoteOption.abstain => l10n.proposalVoteAbstain,
+      VoteOption.no => l10n.proposalVoteNo,
+      VoteOption.noWithVeto => l10n.proposalVoteNoWithVeto,
+    };
 
 class ProposalDetailScreen extends ConsumerStatefulWidget {
   final String proposalId;
@@ -33,10 +44,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     setState(() => _authenticating = true);
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
 
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         setState(() => _authenticating = false);
         _execute();
@@ -95,11 +107,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final proposalIdInt = int.tryParse(widget.proposalId) ?? 0;
     final proposalAsync = ref.watch(proposalDetailProvider(widget.proposalId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Proposal #${widget.proposalId}'),
+        title: Text(l10n.proposalDetailTitle(proposalIdInt)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -117,11 +131,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(
-                child: Text('Failed to load proposal: $e'),
+                child: Text(l10n.proposalDetailErrorLoad(e.toString())),
               ),
               data: (proposal) {
                 if (proposal == null) {
-                  return const Center(child: Text('Proposal not found'));
+                  return Center(child: Text(l10n.proposalDetailNotFound));
                 }
                 return _buildDetail(context, proposal);
               },
@@ -130,6 +144,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   }
 
   Widget _buildDetail(BuildContext context, ProposalItem proposal) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final tally = proposal.tally;
     final totalVotes = tally.totalVotes;
@@ -137,16 +152,16 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     final Color badgeColor;
     final String badgeText;
     if (proposal.isVotingPeriod) {
-      badgeColor = Colors.green;
-      badgeText = 'Active';
+      badgeColor = GonkaColors.success;
+      badgeText = l10n.governanceStatusActive;
     } else if (proposal.isPassed) {
-      badgeColor = Colors.blue;
-      badgeText = 'Passed';
+      badgeColor = GonkaColors.info;
+      badgeText = l10n.governanceStatusPassed;
     } else if (proposal.isRejected) {
-      badgeColor = Colors.red;
-      badgeText = 'Rejected';
+      badgeColor = GonkaColors.error;
+      badgeText = l10n.governanceStatusRejected;
     } else {
-      badgeColor = Colors.grey;
+      badgeColor = GonkaColors.textMuted;
       badgeText = proposal.status
           .replaceAll('PROPOSAL_STATUS_', '')
           .replaceAll('_', ' ')
@@ -161,49 +176,51 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         proposal.messageType;
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.fromLTRB(
+          24, 24, 24, 24 + MediaQuery.paddingOf(context).bottom),
       children: [
         Text(proposal.title,
-            style: theme.textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 12),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: GonkaColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            )),
+        const SizedBox(height: 14),
 
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: badgeColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(badgeText,
-                  style: TextStyle(
-                      color: badgeColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600)),
-            ),
+            StatusPill(label: badgeText, color: badgeColor),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
 
         if (proposal.summary.isNotEmpty) ...[
-          Text('Summary', style: theme.textTheme.bodySmall),
-          const SizedBox(height: 4),
-          Text(proposal.summary, style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 16),
+          Text(l10n.proposalDetailSummary,
+              style: const TextStyle(
+                color: GonkaColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4,
+              )),
+          const SizedBox(height: 6),
+          Text(proposal.summary,
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: GonkaColors.textPrimary,
+                  height: 1.5)),
+          const SizedBox(height: 20),
         ],
 
         const Divider(),
         const SizedBox(height: 12),
 
         if (msgTypeShort.isNotEmpty) ...[
-          _infoRow('Type', msgTypeShort),
+          _infoRow(l10n.commonType, msgTypeShort),
           const SizedBox(height: 8),
         ],
 
         if (proposal.proposer.isNotEmpty) ...[
           _infoRow(
-              'Proposer',
+              l10n.proposalDetailProposer,
               proposal.proposer.length > 20
                   ? '${proposal.proposer.substring(0, 10)}...${proposal.proposer.substring(proposal.proposer.length - 6)}'
                   : proposal.proposer),
@@ -213,7 +230,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         if (proposal.votingStartTime != null &&
             proposal.votingEndTime != null) ...[
           _infoRow(
-            'Voting Period',
+            l10n.proposalDetailVotingPeriod,
             '${_formatDateTime(proposal.votingStartTime!)} — ${_formatDateTime(proposal.votingEndTime!)}',
           ),
           const SizedBox(height: 8),
@@ -221,62 +238,59 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
         const SizedBox(height: 16),
 
-        Text('Tally Results', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 12),
-        _tallyBar('Yes', tally.yesCount, totalVotes, Colors.green),
-        const SizedBox(height: 8),
-        _tallyBar('Abstain', tally.abstainCount, totalVotes, Colors.grey),
-        const SizedBox(height: 8),
-        _tallyBar('No', tally.noCount, totalVotes, Colors.red),
-        const SizedBox(height: 8),
-        _tallyBar(
-            'No with Veto', tally.noWithVetoCount, totalVotes, Colors.orange),
+        Text(l10n.proposalDetailTally,
+            style: theme.textTheme.titleMedium?.copyWith(
+                color: GonkaColors.textPrimary,
+                fontWeight: FontWeight.w700)),
+        const SizedBox(height: 14),
+        _tallyBar(l10n.proposalVoteYes, tally.yesCount, totalVotes,
+            GonkaColors.success),
+        const SizedBox(height: 10),
+        _tallyBar(l10n.proposalVoteAbstain, tally.abstainCount, totalVotes,
+            GonkaColors.textMuted),
+        const SizedBox(height: 10),
+        _tallyBar(l10n.proposalVoteNo, tally.noCount, totalVotes,
+            GonkaColors.error),
+        const SizedBox(height: 10),
+        _tallyBar(l10n.proposalVoteNoWithVeto, tally.noWithVetoCount,
+            totalVotes, GonkaColors.warning),
 
         const SizedBox(height: 24),
         const Divider(),
         const SizedBox(height: 16),
 
         if (proposal.isVotingPeriod) ...[
-          Text('Cast Your Vote', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 12),
-          _voteButton(VoteOption.yes, Colors.green),
+          Text(l10n.proposalCastYourVote,
+              style: theme.textTheme.titleMedium?.copyWith(
+                  color: GonkaColors.textPrimary,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 14),
+          _voteButton(l10n, VoteOption.yes, GonkaColors.success),
           const SizedBox(height: 8),
-          _voteButton(VoteOption.abstain, Colors.grey),
+          _voteButton(l10n, VoteOption.abstain, GonkaColors.textMuted),
           const SizedBox(height: 8),
-          _voteButton(VoteOption.no, Colors.red),
+          _voteButton(l10n, VoteOption.no, GonkaColors.error),
           const SizedBox(height: 8),
-          _voteButton(VoteOption.noWithVeto, Colors.orange),
+          _voteButton(l10n, VoteOption.noWithVeto, GonkaColors.warning),
           const SizedBox(height: 24),
           if (_broadcasting)
             const Center(child: CircularProgressIndicator())
           else
             SizedBox(
               width: double.infinity,
-              height: 56,
               child: FilledButton(
                 onPressed: _selectedOption != null && !_authenticating
                     ? _authenticate
                     : null,
                 child: Text(_authenticating
-                    ? 'Authenticating...'
-                    : 'Submit Vote'),
+                    ? l10n.confirmSendAuthenticating
+                    : l10n.proposalSubmitVote),
               ),
             ),
         ] else ...[
-          Card(
-            color: Colors.grey.withValues(alpha: 0.1),
-            child: const Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.grey),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text('Voting has ended for this proposal.'),
-                  ),
-                ],
-              ),
-            ),
+          InfoBanner(
+            variant: InfoBannerVariant.info,
+            message: l10n.proposalVotingEnded,
           ),
         ],
 
@@ -293,11 +307,14 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           width: 100,
           child: Text(label,
               style: const TextStyle(
-                  color: Colors.grey, fontWeight: FontWeight.w500)),
+                  color: GonkaColors.textMuted,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12)),
         ),
         Expanded(
           child: Text(value,
-              style: const TextStyle(fontSize: 13)),
+              style: const TextStyle(
+                  fontSize: 13, color: GonkaColors.textPrimary)),
         ),
       ],
     );
@@ -317,21 +334,23 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label,
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: GonkaColors.textPrimary)),
             Text('$percentage%',
                 style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: color)),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
             value: fraction,
-            backgroundColor: color.withValues(alpha: 0.1),
+            backgroundColor: GonkaColors.bgCard,
             color: color,
             minHeight: 8,
           ),
@@ -340,26 +359,30 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
   }
 
-  Widget _voteButton(VoteOption option, Color color) {
+  Widget _voteButton(
+      AppLocalizations l10n, VoteOption option, Color color) {
     final selected = _selectedOption == option;
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: 52,
       child: OutlinedButton(
         onPressed: () => setState(() => _selectedOption = option),
         style: OutlinedButton.styleFrom(
           backgroundColor:
-              selected ? color.withValues(alpha: 0.15) : null,
+              selected ? color.withValues(alpha: 0.15) : Colors.transparent,
           side: BorderSide(
-            color: selected ? color : Colors.grey.withValues(alpha: 0.3),
-            width: selected ? 2 : 1,
+            color: selected ? color : GonkaColors.borderSubtle,
+            width: selected ? 1.5 : 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(GonkaRadius.md),
           ),
         ),
         child: Text(
-          option.displayName,
+          _voteLabel(l10n, option),
           style: TextStyle(
-            color: selected ? color : null,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+            color: selected ? color : GonkaColors.textPrimary,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),
@@ -367,61 +390,31 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   }
 
   Widget _buildResult(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           const Spacer(),
-          Icon(
-            _success ? Icons.check_circle : Icons.error,
-            size: 80,
-            color: _success ? Colors.green : Colors.red,
-          ),
-          const SizedBox(height: 24),
+          ResultIcon(success: _success),
+          const SizedBox(height: 28),
           Text(
-            _success ? 'Vote Submitted' : 'Vote Failed',
-            style: Theme.of(context).textTheme.headlineSmall,
+            _success ? l10n.proposalVoteSubmitted : l10n.proposalVoteFailed,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: GonkaColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
-          const SizedBox(height: 16),
-          if (_success && _txhash.isNotEmpty) ...[
-            Text('Transaction Hash',
-                style: Theme.of(context).textTheme.bodySmall),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: _txhash));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Hash copied to clipboard')),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _txhash,
-                  style:
-                      const TextStyle(fontFamily: 'monospace', fontSize: 11),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+          const SizedBox(height: 20),
+          if (_success && _txhash.isNotEmpty) TxHashDisplay(hash: _txhash),
+          if (!_success && _error.isNotEmpty)
+            InfoBanner(
+              variant: InfoBannerVariant.error,
+              message: localizeError(l10n, _error),
             ),
-          ],
-          if (!_success && _error.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              _error,
-              style: TextStyle(color: Colors.red[300], fontSize: 13),
-              textAlign: TextAlign.center,
-            ),
-          ],
           const Spacer(),
           SizedBox(
             width: double.infinity,
-            height: 56,
             child: FilledButton(
               onPressed: () {
                 if (context.canPop()) {
@@ -430,17 +423,16 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   context.go('/miners/governance');
                 }
               },
-              child: const Text('Done'),
+              child: Text(l10n.commonDone),
             ),
           ),
           if (!_success) ...[
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              height: 56,
               child: OutlinedButton(
                 onPressed: _retry,
-                child: const Text('Retry'),
+                child: Text(l10n.commonRetry),
               ),
             ),
           ],

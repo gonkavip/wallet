@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/node_provider.dart';
 import '../../widgets/responsive_center.dart';
 
@@ -10,11 +11,12 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final activeNode = ref.watch(nodesProvider).activeNode;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settingsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -27,36 +29,40 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: ResponsiveCenter(child: ListView(
+        padding: EdgeInsets.only(
+            bottom: 16 + MediaQuery.paddingOf(context).bottom),
         children: [
           ListTile(
             leading: const Icon(Icons.dns),
-            title: const Text('Node Settings'),
+            title: Text(l10n.settingsNodeSettings),
             subtitle: activeNode != null
                 ? Text(
-                    '${activeNode.label} (${activeNode.isHealthy ? '${activeNode.latencyMs}ms' : activeNode.isOnline ? 'not synced' : 'offline'})')
+                    '${activeNode.label} (${activeNode.isHealthy ? l10n.nodeStatusLatency(activeNode.latencyMs) : activeNode.isOnline ? l10n.nodeStatusNotSynced : l10n.nodeStatusOffline})')
                 : null,
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/settings/nodes'),
           ),
           ListTile(
             leading: const Icon(Icons.security),
-            title: const Text('Security'),
-            subtitle: const Text('PIN & biometrics'),
+            title: Text(l10n.settingsSecurity),
+            subtitle: Text(l10n.settingsSecuritySubtitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/settings/security'),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Terms of Use'),
+            title: Text(l10n.settingsTerms),
             trailing: const Icon(Icons.open_in_new, size: 18),
-            onTap: () => launchUrl(Uri.parse('https://gonka.vip/terms/'), mode: LaunchMode.externalApplication),
+            onTap: () => launchUrl(Uri.parse('https://gonka.vip/terms/'),
+                mode: LaunchMode.externalApplication),
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Privacy Policy'),
+            title: Text(l10n.settingsPrivacy),
             trailing: const Icon(Icons.open_in_new, size: 18),
-            onTap: () => launchUrl(Uri.parse('https://gonka.vip/privacy/'), mode: LaunchMode.externalApplication),
+            onTap: () => launchUrl(Uri.parse('https://gonka.vip/privacy/'),
+                mode: LaunchMode.externalApplication),
           ),
         ],
       )),

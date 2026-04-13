@@ -1,0 +1,381 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "Gonka Wallet",
+
+  "splashLoading": "Cargando...",
+  "splashCheckingNodes": "Comprobando nodos...",
+
+  "onboardingCreateTitle": "Gonka Wallet",
+  "onboardingCreateSubtitle": "Monedero seguro para la blockchain Gonka",
+  "onboardingCreateNewWallet": "Crear nuevo monedero",
+  "onboardingCreateImportWallet": "Importar monedero existente",
+  "onboardingCreateTerms": "Términos de uso",
+  "onboardingCreatePrivacy": "Política de privacidad",
+
+  "onboardingBackupTitle": "Copia de seguridad de la frase semilla",
+  "onboardingBackupWarning": "Escribe estas 24 palabras en orden. No las compartas con nadie. Cualquiera que tenga esta frase puede acceder a tus fondos.",
+  "onboardingBackupCheckbox": "He anotado la frase semilla",
+  "onboardingBackupContinue": "Continuar",
+  "onboardingBackupVerifyTitle": "Verificar copia de seguridad",
+  "onboardingBackupVerifyPrompt": "¿Cuál es la palabra #{index}?",
+  "@onboardingBackupVerifyPrompt": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyHint": "Introduce la palabra #{index}",
+  "@onboardingBackupVerifyHint": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyButton": "Verificar",
+  "onboardingBackupVerifyError": "Palabra incorrecta. Inténtalo de nuevo.",
+
+  "onboardingImportTitle": "Importar monedero",
+  "onboardingImportWordByWord": "Palabra por palabra",
+  "onboardingImportPastePhrase": "Pegar frase",
+  "onboardingImportHint": "Pega aquí tu frase semilla de 24 palabras...",
+  "onboardingImportButton": "Importar",
+  "onboardingImportErrorWordCount": "La frase semilla debe tener exactamente 24 palabras (hay {count})",
+  "@onboardingImportErrorWordCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "onboardingImportErrorFillAll": "Rellena las 24 palabras",
+  "onboardingImportErrorInvalid": "Frase semilla inválida",
+  "onboardingImportPrivateKey": "Clave privada",
+  "onboardingImportPrivateKeyHint": "Pega tu clave privada (64 caracteres hex)",
+  "onboardingImportPrivateKeyErrorInvalid": "Clave privada inválida. Se esperan 64 caracteres hex.",
+
+  "onboardingNameTitle": "Nombra tu monedero",
+  "onboardingNameHeading": "Dale un nombre a tu monedero",
+  "onboardingNameSubtext": "Es sólo para tu referencia.",
+  "onboardingNameLabel": "Nombre del monedero",
+  "onboardingNameValidationEmpty": "Introduce un nombre",
+  "onboardingNameDefault": "Mi monedero",
+  "onboardingNameContinue": "Continuar",
+
+  "onboardingPinTitle": "Establecer PIN",
+  "onboardingPinCreateHeading": "Crea un PIN de 6 dígitos",
+  "onboardingPinConfirmHeading": "Confirma tu PIN",
+  "onboardingPinMismatch": "Los PIN no coinciden. Inténtalo de nuevo.",
+  "onboardingPinBiometricTitle": "¿Activar biometría?",
+  "onboardingPinBiometricBody": "¿Usar Face ID / huella para desbloquear tu monedero?",
+  "onboardingPinBiometricSkip": "Omitir",
+  "onboardingPinBiometricEnable": "Activar",
+
+  "authEnterPin": "Introduce el PIN",
+  "authEnterCurrentPin": "Introduce el PIN actual",
+  "authEnterNewPin": "Introduce el nuevo PIN",
+  "authWrongPin": "PIN incorrecto. Te quedan {remaining} intentos.",
+  "@authWrongPin": {
+    "placeholders": { "remaining": { "type": "int" } }
+  },
+  "authCooldown": "Demasiados intentos. Espera {seconds} s.",
+  "@authCooldown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+
+  "homeTitle": "Gonka Wallet",
+  "homeEmpty": "Aún no tienes monederos",
+  "homeCreateWallet": "Crear monedero",
+  "homeAddWallet": "Añadir monedero",
+
+  "walletDetailTitle": "Monedero",
+  "walletDetailNotFound": "Monedero no encontrado",
+  "walletDetailShowSeed": "Mostrar frase semilla",
+  "walletDetailExportPk": "Exportar clave privada",
+  "walletDetailExportPkDialogTitle": "Clave privada",
+  "walletDetailExportPkWarning": "Cualquiera que tenga esta clave puede acceder a tus fondos. No la compartas con nadie.",
+  "walletDetailExportPkCopied": "Clave privada copiada",
+  "walletDetailRename": "Renombrar monedero",
+  "walletDetailDelete": "Eliminar monedero",
+  "walletDetailSend": "Enviar",
+  "walletDetailReceive": "Recibir",
+  "walletDetailHostTools": "Herramientas de host",
+  "walletDetailTxHistory": "Historial de transacciones",
+  "walletDetailNoTx": "Aún no hay transacciones",
+  "walletDetailTxError": "Error al cargar el historial",
+  "walletDetailBalanceError": "Error al cargar el saldo: {error}",
+  "@walletDetailBalanceError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "walletDetailSeedDialogTitle": "Frase semilla",
+  "walletDetailRenameDialogTitle": "Renombrar monedero",
+  "walletDetailRenameLabel": "Nombre",
+  "walletDetailDeleteDialogBody": "¿Seguro que quieres eliminar «{name}»?\n\nEsto eliminará el monedero y su frase semilla de este dispositivo. ¡Asegúrate de haber guardado una copia de la frase semilla!",
+  "@walletDetailDeleteDialogBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "commonCancel": "Cancelar",
+  "commonSave": "Guardar",
+  "commonDelete": "Eliminar",
+  "commonRetry": "Reintentar",
+  "commonDone": "Hecho",
+  "commonClose": "Cerrar",
+  "commonCopy": "Copiar",
+  "commonFrom": "De",
+  "commonTo": "A",
+  "commonAmount": "Cantidad",
+  "commonFee": "Comisión",
+  "commonFeeZero": "0 GNK",
+  "commonAddress": "Dirección",
+  "commonAction": "Acción",
+  "commonStatus": "Estado",
+  "commonType": "Tipo",
+  "commonHash": "Hash",
+  "commonHeight": "Bloque",
+  "commonTime": "Hora",
+  "commonMemo": "Memo",
+  "commonSuccess": "Éxito",
+  "commonFailed": "Error",
+  "commonContract": "Contrato",
+  "commonValidator": "Validador",
+  "commonGranter": "Otorgante",
+  "commonGrantee": "Beneficiario",
+  "commonProposal": "Propuesta",
+  "commonOption": "Opción",
+  "commonEpoch": "Época",
+
+  "balanceTotal": "Saldo total",
+  "balanceAvailable": "Disponible",
+  "balanceVesting": "En vesting",
+
+  "authBiometricReason": "Autentícate para acceder a tu monedero",
+
+  "errorNoActiveNode": "Sin nodo activo",
+  "errorMnemonicNotFound": "Frase semilla no encontrada",
+  "errorInvalidMnemonic": "Frase semilla inválida",
+  "errorGeneric": "Algo salió mal",
+
+  "txTypeReceived": "Recibido",
+  "txTypeSent": "Enviado",
+  "txTypeContract": "Contrato",
+  "txTypeContractDeposit": "Depósito",
+  "txTypeContractWithdraw": "Retiro",
+  "txTypeUnjail": "Desencarcelar",
+  "txTypeGrant": "Otorgar permisos",
+  "txTypeCollateralDeposit": "Depósito de garantía",
+  "txTypeCollateralWithdraw": "Retiro de garantía",
+  "txTypeVestingReward": "Recompensa de vesting",
+  "txTypeEpochReward": "Recompensa de la época {epoch}",
+  "@txTypeEpochReward": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "txTypeVote": "Voto: {option}",
+  "@txTypeVote": {
+    "placeholders": { "option": { "type": "String" } }
+  },
+  "txTimeJustNow": "Ahora mismo",
+  "txTimeMinutesAgo": "hace {minutes} min",
+  "@txTimeMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "txTimeHoursAgo": "hace {hours} h",
+  "@txTimeHoursAgo": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "txTimeDaysAgo": "hace {days} d",
+  "@txTimeDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "sendTitle": "Enviar",
+  "sendRecipientLabel": "Dirección del destinatario",
+  "sendAmountLabel": "Cantidad",
+  "sendMaxButton": "MÁX",
+  "sendUnitGnk": "GNK",
+  "sendUnitNgonka": "ngonka",
+  "sendContinue": "Continuar",
+  "sendErrorEnterAddress": "Introduce la dirección del destinatario",
+  "sendErrorInvalidAddress": "Dirección Gonka inválida",
+  "sendErrorSelfSend": "No puedes enviarte a ti mismo",
+  "sendErrorEnterAmount": "Introduce la cantidad",
+  "sendErrorAmountPositive": "La cantidad debe ser positiva",
+  "sendErrorInsufficient": "Saldo insuficiente",
+  "sendErrorInvalidAmount": "Cantidad inválida",
+  "sendScanQr": "Escanear código QR",
+
+  "confirmSendTitle": "Confirmar envío",
+  "confirmSendButton": "Confirmar y enviar",
+  "confirmSendAuthenticating": "Autenticando...",
+  "sendResultSuccess": "¡Transacción enviada!",
+  "sendResultFailed": "Error en la transacción",
+
+  "receiveTitle": "Recibir",
+  "receiveNoWallet": "Sin monedero",
+  "receiveTapToCopy": "Toca la dirección para copiar",
+
+  "minersTitle": "Herramientas de host",
+  "minersPubKey": "Mi clave pública",
+  "minersPubKeySubtitle": "Ver y copiar tu clave pública",
+  "minersPubKeyCopied": "Clave pública copiada",
+  "minersCollateral": "Garantía",
+  "minersCollateralSubtitle": "Gestiona tu garantía de minería",
+  "minersGrant": "Otorgar permisos",
+  "minersGrantSubtitle": "Otorga permisos a la clave operativa de ML",
+  "minersUnjail": "Desencarcelar",
+  "minersUnjailSubtitle": "Desencarcela tu validador",
+  "minersGovernance": "Gobernanza",
+  "minersGovernanceSubtitle": "Vota propuestas",
+  "minersTracker": "Monitor",
+  "minersTrackerSubtitle": "Panel profesional",
+
+  "collateralTitle": "Garantía",
+  "collateralCurrent": "Garantía actual",
+  "collateralDeposit": "Depositar",
+  "collateralWithdraw": "Retirar",
+  "collateralUnbonding": "Desvinculación",
+  "collateralCompletionEpoch": "Época de finalización: {epoch}",
+  "@collateralCompletionEpoch": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "collateralEmpty": "Aún no hay garantía",
+  "collateralDepositTitle": "Depositar garantía",
+  "collateralWithdrawTitle": "Retirar garantía",
+  "collateralCurrentInfo": "Garantía actual: {amount} GNK",
+  "@collateralCurrentInfo": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "collateralErrorExceeds": "Excede la garantía actual",
+  "collateralConfirmDeposit": "Confirmar depósito",
+  "collateralConfirmWithdraw": "Confirmar retiro",
+  "collateralConfirmDepositButton": "Confirmar y depositar",
+  "collateralConfirmWithdrawButton": "Confirmar y retirar",
+  "collateralResultDepositSuccess": "¡Depósito realizado!",
+  "collateralResultWithdrawSuccess": "¡Retiro realizado!",
+  "collateralResultDepositFailed": "Error en el depósito",
+  "collateralResultWithdrawFailed": "Error en el retiro",
+
+  "grantTitle": "Otorgar permisos",
+  "grantInfo": "Otorga a tu clave operativa de ML permiso para realizar inferencia, entrenamiento y otras operaciones de ML en tu nombre. Esto no concede acceso a tus fondos.",
+  "grantOpKeyLabel": "Dirección de la clave operativa",
+  "grantOpKeyHint": "gonka1...",
+  "grantErrorEnterAddress": "Introduce la dirección de la clave operativa",
+  "grantErrorInvalidAddress": "Dirección Gonka inválida",
+  "grantErrorSelf": "No puedes otorgarte permisos a ti mismo",
+  "grantContinue": "Continuar",
+  "grantScanQr": "Escanear código QR",
+  "grantConfirmTitle": "Confirmar otorgamiento",
+  "grantConfirmAction": "Otorgar permisos de ML",
+  "grantConfirmExpiration": "Vencimiento",
+  "grantConfirmExpirationValue": "2 años",
+  "grantConfirmPermissions": "Permisos",
+  "grantConfirmPermissionsValue": "27 operaciones de ML",
+  "grantConfirmButton": "Confirmar y otorgar",
+  "grantResultSuccess": "¡Permisos otorgados!",
+  "grantResultFailed": "Error al otorgar",
+
+  "unjailTitle": "Desencarcelar validador",
+  "unjailWarningJailed": "Tu validador está encarcelado. Envía una transacción de desencarcelamiento para reanudar las operaciones.",
+  "unjailInfoNotJailed": "Tu validador no está encarcelado. No es necesario realizar ninguna acción.",
+  "unjailInfoNotFound": "Validador no encontrado en la cadena. Asegúrate de que tu validador haya sido creado.",
+  "unjailAction": "Desencarcelar validador",
+  "unjailValidatorAddress": "Dirección del validador",
+  "unjailConfirmButton": "Confirmar y desencarcelar",
+  "unjailResultSuccess": "Desencarcelamiento exitoso",
+  "unjailResultFailed": "Error al desencarcelar",
+
+  "governanceTitle": "Gobernanza",
+  "governanceTabAll": "Todas",
+  "governanceTabActive": "Activas",
+  "governanceTabClosed": "Cerradas",
+  "governanceErrorLoad": "Error al cargar las propuestas: {error}",
+  "@governanceErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "governanceEmptyAll": "No se encontraron propuestas",
+  "governanceEmptyActive": "No hay propuestas activas",
+  "governanceEmptyClosed": "No hay propuestas cerradas",
+  "governanceStatusActive": "Activa",
+  "governanceStatusPassed": "Aprobada",
+  "governanceStatusRejected": "Rechazada",
+  "governanceEndingSoon": "Terminando pronto",
+  "governanceEndsInDays": "Termina en {days} d {hours} h",
+  "@governanceEndsInDays": {
+    "placeholders": { "days": { "type": "int" }, "hours": { "type": "int" } }
+  },
+  "governanceEndsInHours": "Termina en {hours} h {minutes} min",
+  "@governanceEndsInHours": {
+    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "governanceEndsInMinutes": "Termina en {minutes} min",
+  "@governanceEndsInMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "governanceEndedDaysAgo": "Terminó hace {days} d",
+  "@governanceEndedDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "governanceEndedOn": "Terminó el {date}",
+  "@governanceEndedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "proposalDetailTitle": "Propuesta #{id}",
+  "@proposalDetailTitle": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "proposalDetailErrorLoad": "Error al cargar la propuesta: {error}",
+  "@proposalDetailErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "proposalDetailNotFound": "Propuesta no encontrada",
+  "proposalDetailSummary": "Resumen",
+  "proposalDetailProposer": "Proponente",
+  "proposalDetailVotingPeriod": "Período de votación",
+  "proposalDetailTally": "Resultados del recuento",
+  "proposalVoteYes": "Sí",
+  "proposalVoteAbstain": "Abstención",
+  "proposalVoteNo": "No",
+  "proposalVoteNoWithVeto": "No con veto",
+  "proposalCastYourVote": "Emite tu voto",
+  "proposalSubmitVote": "Enviar voto",
+  "proposalVotingEnded": "La votación de esta propuesta ha terminado.",
+  "proposalVoteSubmitted": "Voto enviado",
+  "proposalVoteFailed": "Error al votar",
+
+  "settingsTitle": "Ajustes",
+  "settingsNodeSettings": "Ajustes del nodo",
+  "settingsSecurity": "Seguridad",
+  "settingsSecuritySubtitle": "PIN y biometría",
+  "settingsTerms": "Términos de uso",
+  "settingsPrivacy": "Política de privacidad",
+
+  "securityTitle": "Seguridad",
+  "securityChangePin": "Cambiar PIN",
+  "securityBiometric": "Autenticación biométrica",
+  "securityWipe": "Borrar monederos tras PIN fallido",
+  "securityWipeSubtitle": "Eliminar todos los monederos tras {max} intentos fallidos",
+  "@securityWipeSubtitle": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "securityPinChanged": "PIN cambiado",
+  "securityPinNotChanged": "PIN no cambiado",
+
+  "nodeSettingsTitle": "Ajustes del nodo",
+  "nodeSettingsRefresh": "Actualizar nodos",
+  "nodeStatusChecking": "Comprobando...",
+  "nodeStatusSyncing": "Sincronizando...",
+  "nodeStatusNotSynced": "No sincronizado",
+  "nodeStatusOffline": "Desconectado",
+  "nodeStatusLatency": "{ms} ms",
+  "@nodeStatusLatency": {
+    "placeholders": { "ms": { "type": "int" } }
+  },
+  "nodeActive": "Activo",
+  "nodeAdd": "Añadir nodo",
+  "nodeUrlLabel": "URL del nodo",
+  "nodeUrlHint": "https://node.example.com:8000",
+  "nodeLabelLabel": "Etiqueta",
+  "nodeProxyMode": "Modo proxy",
+  "nodeProxyModeSubtitle": "/chain-api/ + /chain-rpc/",
+  "nodeDefaultLabel": "Nodo personalizado",
+  "nodeAddButton": "Añadir",
+
+  "securityWarningTitle": "Advertencia de seguridad",
+  "securityWarningBody": "Este dispositivo parece estar rooteado o con jailbreak. Ejecutar una app de monedero en un dispositivo comprometido pone tus fondos en riesgo.",
+  "securityWarningAck": "Entiendo los riesgos",
+
+  "widgetHashCopied": "Hash copiado",
+  "widgetAddressCopied": "Dirección copiada",
+  "widgetTxHash": "Hash de transacción"
+}

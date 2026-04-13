@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/network/node_client.dart';
 import '../../core/transaction/broadcast_service.dart';
-import '../../data/services/secure_storage_service.dart';
 import 'send_provider.dart';
 import 'wallet_provider.dart';
 
@@ -35,15 +34,15 @@ final grantProvider =
     StateNotifierProvider<GrantNotifier, GrantState>((ref) {
   return GrantNotifier(
     ref.watch(broadcastServiceProvider),
-    ref.watch(secureStorageProvider),
+    ref.watch(walletsProvider.notifier),
   );
 });
 
 class GrantNotifier extends StateNotifier<GrantState> {
   final BroadcastService _broadcast;
-  final SecureStorageService _storage;
+  final WalletsNotifier _wallets;
 
-  GrantNotifier(this._broadcast, this._storage) : super(GrantState());
+  GrantNotifier(this._broadcast, this._wallets) : super(GrantState());
 
   Future<void> grantPermissions({
     required String walletId,
@@ -52,11 +51,11 @@ class GrantNotifier extends StateNotifier<GrantState> {
   }) async {
     state = state.copyWith(isLoading: true, clearError: true, clearTxResult: true);
     try {
-      final mnemonic = await _storage.getMnemonic(walletId);
-      if (mnemonic == null) throw Exception('Mnemonic not found');
+      final pkHex = await _wallets.getPrivateKeyHex(walletId);
+      if (pkHex == null) throw Exception('Private key not found');
 
       final result = await _broadcast.grantMlOpsPermissions(
-        mnemonic: mnemonic,
+        privateKeyHex: pkHex,
         fromAddress: fromAddress,
         granteeAddress: granteeAddress,
       );

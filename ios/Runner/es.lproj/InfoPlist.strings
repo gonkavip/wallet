@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Gonka Wallet";
+"CFBundleName" = "Gonka Wallet";
+"NSCameraUsageDescription" = "Escanear códigos QR para recibir direcciones";
+"NSFaceIDUsageDescription" = "Desbloquear tu monedero con Face ID";

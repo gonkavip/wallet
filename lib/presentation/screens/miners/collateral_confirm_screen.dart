@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/collateral_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
@@ -32,10 +33,11 @@ class _CollateralConfirmScreenState
     setState(() => _authenticating = true);
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
 
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         setState(() => _authenticating = false);
         _execute();
@@ -87,9 +89,12 @@ class _CollateralConfirmScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final wallet = ref.watch(activeWalletProvider);
     final amount = BigInt.parse(widget.amountNgonka);
-    final title = widget.isDeposit ? 'Confirm Deposit' : 'Confirm Withdraw';
+    final title = widget.isDeposit
+        ? l10n.collateralConfirmDeposit
+        : l10n.collateralConfirmWithdraw;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,32 +110,43 @@ class _CollateralConfirmScreenState
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Action', style: Theme.of(context).textTheme.bodySmall),
-            Text(widget.isDeposit ? 'Deposit Collateral' : 'Withdraw Collateral',
+            Text(l10n.commonAction,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(
+                widget.isDeposit
+                    ? l10n.collateralDepositTitle
+                    : l10n.collateralWithdrawTitle,
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Address', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonAddress,
+                style: Theme.of(context).textTheme.bodySmall),
             if (wallet != null) AddressDisplay(address: wallet.address),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Amount', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonAmount,
+                style: Theme.of(context).textTheme.bodySmall),
             AmountDisplay(amountNgonka: amount, exact: true),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Fee', style: Theme.of(context).textTheme.bodySmall),
-            Text('0 GNK', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.commonFee,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonFeeZero,
+                style: Theme.of(context).textTheme.titleMedium),
 
             const Spacer(),
 
@@ -143,12 +159,15 @@ class _CollateralConfirmScreenState
                 child: FilledButton(
                   onPressed: _authenticating ? null : _authenticate,
                   child: Text(_authenticating
-                      ? 'Authenticating...'
-                      : 'Confirm & ${widget.isDeposit ? "Deposit" : "Withdraw"}'),
+                      ? l10n.confirmSendAuthenticating
+                      : (widget.isDeposit
+                          ? l10n.collateralConfirmDepositButton
+                          : l10n.collateralConfirmWithdrawButton)),
                 ),
               ),
           ],
         ),
+      ),
       ),
     );
   }

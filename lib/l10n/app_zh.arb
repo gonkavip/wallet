@@ -1,0 +1,381 @@
+{
+  "@@locale": "zh",
+
+  "appTitle": "Gonka Wallet",
+
+  "splashLoading": "加载中...",
+  "splashCheckingNodes": "正在检查节点...",
+
+  "onboardingCreateTitle": "Gonka Wallet",
+  "onboardingCreateSubtitle": "Gonka 区块链的安全钱包",
+  "onboardingCreateNewWallet": "创建新钱包",
+  "onboardingCreateImportWallet": "导入现有钱包",
+  "onboardingCreateTerms": "使用条款",
+  "onboardingCreatePrivacy": "隐私政策",
+
+  "onboardingBackupTitle": "备份助记词",
+  "onboardingBackupWarning": "请按顺序写下这 24 个单词。切勿与任何人分享。掌握这组助记词的人可以访问您的资金。",
+  "onboardingBackupCheckbox": "我已抄写助记词",
+  "onboardingBackupContinue": "继续",
+  "onboardingBackupVerifyTitle": "验证备份",
+  "onboardingBackupVerifyPrompt": "第 {index} 个单词是什么?",
+  "@onboardingBackupVerifyPrompt": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyHint": "请输入第 {index} 个单词",
+  "@onboardingBackupVerifyHint": {
+    "placeholders": { "index": { "type": "int" } }
+  },
+  "onboardingBackupVerifyButton": "验证",
+  "onboardingBackupVerifyError": "单词错误,请重试。",
+
+  "onboardingImportTitle": "导入钱包",
+  "onboardingImportWordByWord": "逐词输入",
+  "onboardingImportPastePhrase": "粘贴助记词",
+  "onboardingImportHint": "在此粘贴您的 24 个单词助记词...",
+  "onboardingImportButton": "导入",
+  "onboardingImportErrorWordCount": "助记词必须恰好为 24 个单词(当前 {count} 个)",
+  "@onboardingImportErrorWordCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "onboardingImportErrorFillAll": "请填写全部 24 个单词",
+  "onboardingImportErrorInvalid": "无效的助记词",
+  "onboardingImportPrivateKey": "私钥",
+  "onboardingImportPrivateKeyHint": "粘贴您的私钥(64 位十六进制字符)",
+  "onboardingImportPrivateKeyErrorInvalid": "无效的私钥。应为 64 位十六进制字符。",
+
+  "onboardingNameTitle": "为钱包命名",
+  "onboardingNameHeading": "给您的钱包起个名字",
+  "onboardingNameSubtext": "仅供您参考。",
+  "onboardingNameLabel": "钱包名称",
+  "onboardingNameValidationEmpty": "请输入名称",
+  "onboardingNameDefault": "我的钱包",
+  "onboardingNameContinue": "继续",
+
+  "onboardingPinTitle": "设置 PIN 码",
+  "onboardingPinCreateHeading": "创建 6 位 PIN 码",
+  "onboardingPinConfirmHeading": "确认 PIN 码",
+  "onboardingPinMismatch": "PIN 码不一致,请重试。",
+  "onboardingPinBiometricTitle": "启用生物识别?",
+  "onboardingPinBiometricBody": "使用 Face ID / 指纹解锁您的钱包?",
+  "onboardingPinBiometricSkip": "跳过",
+  "onboardingPinBiometricEnable": "启用",
+
+  "authEnterPin": "输入 PIN 码",
+  "authEnterCurrentPin": "输入当前 PIN 码",
+  "authEnterNewPin": "输入新 PIN 码",
+  "authWrongPin": "PIN 码错误。剩余 {remaining} 次尝试。",
+  "@authWrongPin": {
+    "placeholders": { "remaining": { "type": "int" } }
+  },
+  "authCooldown": "尝试次数过多。请等待 {seconds} 秒。",
+  "@authCooldown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+
+  "homeTitle": "Gonka Wallet",
+  "homeEmpty": "暂无钱包",
+  "homeCreateWallet": "创建钱包",
+  "homeAddWallet": "添加钱包",
+
+  "walletDetailTitle": "钱包",
+  "walletDetailNotFound": "未找到钱包",
+  "walletDetailShowSeed": "显示助记词",
+  "walletDetailExportPk": "导出私钥",
+  "walletDetailExportPkDialogTitle": "私钥",
+  "walletDetailExportPkWarning": "任何掌握此私钥的人都可以访问您的资金。切勿分享。",
+  "walletDetailExportPkCopied": "私钥已复制",
+  "walletDetailRename": "重命名钱包",
+  "walletDetailDelete": "删除钱包",
+  "walletDetailSend": "发送",
+  "walletDetailReceive": "接收",
+  "walletDetailHostTools": "主机工具",
+  "walletDetailTxHistory": "交易记录",
+  "walletDetailNoTx": "暂无交易",
+  "walletDetailTxError": "加载记录失败",
+  "walletDetailBalanceError": "加载余额失败: {error}",
+  "@walletDetailBalanceError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "walletDetailSeedDialogTitle": "助记词",
+  "walletDetailRenameDialogTitle": "重命名钱包",
+  "walletDetailRenameLabel": "名称",
+  "walletDetailDeleteDialogBody": "确定要删除「{name}」吗?\n\n这将从本设备中移除该钱包及其助记词。请确保您已备份助记词!",
+  "@walletDetailDeleteDialogBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+
+  "commonCancel": "取消",
+  "commonSave": "保存",
+  "commonDelete": "删除",
+  "commonRetry": "重试",
+  "commonDone": "完成",
+  "commonClose": "关闭",
+  "commonCopy": "复制",
+  "commonFrom": "从",
+  "commonTo": "至",
+  "commonAmount": "金额",
+  "commonFee": "手续费",
+  "commonFeeZero": "0 GNK",
+  "commonAddress": "地址",
+  "commonAction": "操作",
+  "commonStatus": "状态",
+  "commonType": "类型",
+  "commonHash": "哈希",
+  "commonHeight": "区块高度",
+  "commonTime": "时间",
+  "commonMemo": "备注",
+  "commonSuccess": "成功",
+  "commonFailed": "失败",
+  "commonContract": "合约",
+  "commonValidator": "验证者",
+  "commonGranter": "授权方",
+  "commonGrantee": "被授权方",
+  "commonProposal": "提案",
+  "commonOption": "选项",
+  "commonEpoch": "纪元",
+
+  "balanceTotal": "总余额",
+  "balanceAvailable": "可用",
+  "balanceVesting": "锁仓中",
+
+  "authBiometricReason": "请验证身份以访问您的钱包",
+
+  "errorNoActiveNode": "没有活动节点",
+  "errorMnemonicNotFound": "未找到助记词",
+  "errorInvalidMnemonic": "无效的助记词",
+  "errorGeneric": "发生错误",
+
+  "txTypeReceived": "已接收",
+  "txTypeSent": "已发送",
+  "txTypeContract": "合约",
+  "txTypeContractDeposit": "存入",
+  "txTypeContractWithdraw": "提取",
+  "txTypeUnjail": "解禁",
+  "txTypeGrant": "授予权限",
+  "txTypeCollateralDeposit": "质押存入",
+  "txTypeCollateralWithdraw": "质押提取",
+  "txTypeVestingReward": "锁仓奖励",
+  "txTypeEpochReward": "第 {epoch} 纪元奖励",
+  "@txTypeEpochReward": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "txTypeVote": "投票: {option}",
+  "@txTypeVote": {
+    "placeholders": { "option": { "type": "String" } }
+  },
+  "txTimeJustNow": "刚刚",
+  "txTimeMinutesAgo": "{minutes} 分钟前",
+  "@txTimeMinutesAgo": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "txTimeHoursAgo": "{hours} 小时前",
+  "@txTimeHoursAgo": {
+    "placeholders": { "hours": { "type": "int" } }
+  },
+  "txTimeDaysAgo": "{days} 天前",
+  "@txTimeDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "sendTitle": "发送",
+  "sendRecipientLabel": "收款地址",
+  "sendAmountLabel": "金额",
+  "sendMaxButton": "最大",
+  "sendUnitGnk": "GNK",
+  "sendUnitNgonka": "ngonka",
+  "sendContinue": "继续",
+  "sendErrorEnterAddress": "请输入收款地址",
+  "sendErrorInvalidAddress": "无效的 Gonka 地址",
+  "sendErrorSelfSend": "不能发送给自己",
+  "sendErrorEnterAmount": "请输入金额",
+  "sendErrorAmountPositive": "金额必须大于零",
+  "sendErrorInsufficient": "余额不足",
+  "sendErrorInvalidAmount": "无效的金额",
+  "sendScanQr": "扫描二维码",
+
+  "confirmSendTitle": "确认发送",
+  "confirmSendButton": "确认并发送",
+  "confirmSendAuthenticating": "正在验证...",
+  "sendResultSuccess": "交易已发送!",
+  "sendResultFailed": "交易失败",
+
+  "receiveTitle": "接收",
+  "receiveNoWallet": "无钱包",
+  "receiveTapToCopy": "点击地址复制",
+
+  "minersTitle": "主机工具",
+  "minersPubKey": "我的公钥",
+  "minersPubKeySubtitle": "查看并复制您的公钥",
+  "minersPubKeyCopied": "公钥已复制",
+  "minersCollateral": "质押",
+  "minersCollateralSubtitle": "管理您的挖矿质押",
+  "minersGrant": "授予权限",
+  "minersGrantSubtitle": "向 ML 操作密钥授予权限",
+  "minersUnjail": "解禁",
+  "minersUnjailSubtitle": "解禁您的验证者",
+  "minersGovernance": "治理",
+  "minersGovernanceSubtitle": "对提案进行投票",
+  "minersTracker": "监控面板",
+  "minersTrackerSubtitle": "专业仪表板",
+
+  "collateralTitle": "质押",
+  "collateralCurrent": "当前质押",
+  "collateralDeposit": "存入",
+  "collateralWithdraw": "提取",
+  "collateralUnbonding": "解绑中",
+  "collateralCompletionEpoch": "完成纪元: {epoch}",
+  "@collateralCompletionEpoch": {
+    "placeholders": { "epoch": { "type": "int" } }
+  },
+  "collateralEmpty": "暂无质押",
+  "collateralDepositTitle": "存入质押",
+  "collateralWithdrawTitle": "提取质押",
+  "collateralCurrentInfo": "当前质押: {amount} GNK",
+  "@collateralCurrentInfo": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "collateralErrorExceeds": "超过当前质押数量",
+  "collateralConfirmDeposit": "确认存入",
+  "collateralConfirmWithdraw": "确认提取",
+  "collateralConfirmDepositButton": "确认并存入",
+  "collateralConfirmWithdrawButton": "确认并提取",
+  "collateralResultDepositSuccess": "存入成功!",
+  "collateralResultWithdrawSuccess": "提取成功!",
+  "collateralResultDepositFailed": "存入失败",
+  "collateralResultWithdrawFailed": "提取失败",
+
+  "grantTitle": "授予权限",
+  "grantInfo": "授予您的 ML 操作密钥代表您执行推理、训练及其他 ML 操作的权限。此授权不会提供对资金的访问权限。",
+  "grantOpKeyLabel": "操作密钥地址",
+  "grantOpKeyHint": "gonka1...",
+  "grantErrorEnterAddress": "请输入操作密钥地址",
+  "grantErrorInvalidAddress": "无效的 Gonka 地址",
+  "grantErrorSelf": "不能向自己授予权限",
+  "grantContinue": "继续",
+  "grantScanQr": "扫描二维码",
+  "grantConfirmTitle": "确认授权",
+  "grantConfirmAction": "授予 ML 权限",
+  "grantConfirmExpiration": "到期时间",
+  "grantConfirmExpirationValue": "2 年",
+  "grantConfirmPermissions": "权限",
+  "grantConfirmPermissionsValue": "27 项 ML 操作",
+  "grantConfirmButton": "确认并授予",
+  "grantResultSuccess": "权限已授予!",
+  "grantResultFailed": "授权失败",
+
+  "unjailTitle": "解禁验证者",
+  "unjailWarningJailed": "您的验证者已被封禁。请发送解禁交易以恢复运行。",
+  "unjailInfoNotJailed": "您的验证者未被封禁,无需操作。",
+  "unjailInfoNotFound": "链上未找到验证者。请确认您的验证者已创建。",
+  "unjailAction": "解禁验证者",
+  "unjailValidatorAddress": "验证者地址",
+  "unjailConfirmButton": "确认并解禁",
+  "unjailResultSuccess": "解禁成功",
+  "unjailResultFailed": "解禁失败",
+
+  "governanceTitle": "治理",
+  "governanceTabAll": "全部",
+  "governanceTabActive": "进行中",
+  "governanceTabClosed": "已结束",
+  "governanceErrorLoad": "加载提案失败: {error}",
+  "@governanceErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "governanceEmptyAll": "未找到提案",
+  "governanceEmptyActive": "没有进行中的提案",
+  "governanceEmptyClosed": "没有已结束的提案",
+  "governanceStatusActive": "进行中",
+  "governanceStatusPassed": "已通过",
+  "governanceStatusRejected": "已拒绝",
+  "governanceEndingSoon": "即将结束",
+  "governanceEndsInDays": "{days} 天 {hours} 小时后结束",
+  "@governanceEndsInDays": {
+    "placeholders": { "days": { "type": "int" }, "hours": { "type": "int" } }
+  },
+  "governanceEndsInHours": "{hours} 小时 {minutes} 分钟后结束",
+  "@governanceEndsInHours": {
+    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "governanceEndsInMinutes": "{minutes} 分钟后结束",
+  "@governanceEndsInMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "governanceEndedDaysAgo": "{days} 天前结束",
+  "@governanceEndedDaysAgo": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "governanceEndedOn": "{date} 结束",
+  "@governanceEndedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "proposalDetailTitle": "提案 #{id}",
+  "@proposalDetailTitle": {
+    "placeholders": { "id": { "type": "int" } }
+  },
+  "proposalDetailErrorLoad": "加载提案失败: {error}",
+  "@proposalDetailErrorLoad": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "proposalDetailNotFound": "未找到提案",
+  "proposalDetailSummary": "摘要",
+  "proposalDetailProposer": "提案人",
+  "proposalDetailVotingPeriod": "投票期",
+  "proposalDetailTally": "投票结果",
+  "proposalVoteYes": "赞成",
+  "proposalVoteAbstain": "弃权",
+  "proposalVoteNo": "反对",
+  "proposalVoteNoWithVeto": "反对并否决",
+  "proposalCastYourVote": "投出您的票",
+  "proposalSubmitVote": "提交投票",
+  "proposalVotingEnded": "此提案的投票已结束。",
+  "proposalVoteSubmitted": "投票已提交",
+  "proposalVoteFailed": "投票失败",
+
+  "settingsTitle": "设置",
+  "settingsNodeSettings": "节点设置",
+  "settingsSecurity": "安全",
+  "settingsSecuritySubtitle": "PIN 码与生物识别",
+  "settingsTerms": "使用条款",
+  "settingsPrivacy": "隐私政策",
+
+  "securityTitle": "安全",
+  "securityChangePin": "修改 PIN 码",
+  "securityBiometric": "生物识别认证",
+  "securityWipe": "PIN 错误后清除钱包",
+  "securityWipeSubtitle": "在 {max} 次错误尝试后删除所有钱包",
+  "@securityWipeSubtitle": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "securityPinChanged": "PIN 码已修改",
+  "securityPinNotChanged": "PIN 码未修改",
+
+  "nodeSettingsTitle": "节点设置",
+  "nodeSettingsRefresh": "刷新节点",
+  "nodeStatusChecking": "检查中...",
+  "nodeStatusSyncing": "同步中...",
+  "nodeStatusNotSynced": "未同步",
+  "nodeStatusOffline": "离线",
+  "nodeStatusLatency": "{ms} 毫秒",
+  "@nodeStatusLatency": {
+    "placeholders": { "ms": { "type": "int" } }
+  },
+  "nodeActive": "活动",
+  "nodeAdd": "添加节点",
+  "nodeUrlLabel": "节点 URL",
+  "nodeUrlHint": "https://node.example.com:8000",
+  "nodeLabelLabel": "标签",
+  "nodeProxyMode": "代理模式",
+  "nodeProxyModeSubtitle": "/chain-api/ + /chain-rpc/",
+  "nodeDefaultLabel": "自定义节点",
+  "nodeAddButton": "添加",
+
+  "securityWarningTitle": "安全警告",
+  "securityWarningBody": "此设备似乎已被 Root 或越狱。在受损设备上运行钱包应用会使您的资金面临风险。",
+  "securityWarningAck": "我了解风险",
+
+  "widgetHashCopied": "哈希已复制",
+  "widgetAddressCopied": "地址已复制",
+  "widgetTxHash": "交易哈希"
+}

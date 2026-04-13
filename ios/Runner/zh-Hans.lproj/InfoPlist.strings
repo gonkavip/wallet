@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Gonka Wallet";
+"CFBundleName" = "Gonka Wallet";
+"NSCameraUsageDescription" = "扫描二维码以接收地址";
+"NSFaceIDUsageDescription" = "使用 Face ID 解锁您的钱包";

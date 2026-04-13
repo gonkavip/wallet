@@ -19,6 +19,15 @@ class SecureStorageService {
   Future<void> deleteMnemonic(String walletId) =>
       _storage.delete(key: 'mnemonic_$walletId');
 
+  Future<void> savePrivateKeyHex(String walletId, String hex) =>
+      _storage.write(key: 'pk_$walletId', value: hex);
+
+  Future<String?> getPrivateKeyHex(String walletId) =>
+      _storage.read(key: 'pk_$walletId');
+
+  Future<void> deletePrivateKeyHex(String walletId) =>
+      _storage.delete(key: 'pk_$walletId');
+
   Future<void> savePinHash(String hash) =>
       _storage.write(key: 'pin_hash', value: hash);
 
@@ -64,6 +73,7 @@ class SecureStorageService {
 
   Future<void> deleteWallet(String walletId) async {
     await deleteMnemonic(walletId);
+    await deletePrivateKeyHex(walletId);
   }
 
   Future<void> deleteAll() => _storage.deleteAll();

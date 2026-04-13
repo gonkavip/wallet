@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/crypto/address_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/unjail_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
+import '../../error_l10n.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 class UnjailScreen extends ConsumerStatefulWidget {
@@ -27,10 +30,11 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
     setState(() => _authenticating = true);
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
 
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         setState(() => _authenticating = false);
         _execute();
@@ -91,7 +95,7 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Unjail Validator'),
+        title: Text(AppLocalizations.of(context).unjailTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -103,11 +107,15 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
-        padding: const EdgeInsets.all(24),
-        child: _done
-            ? _buildResult(context)
-            : _buildConfirm(context, wallet, valoperAddr),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
+          padding: const EdgeInsets.all(24),
+          child: _done
+              ? _buildResult(context)
+              : _buildConfirm(context, wallet, valoperAddr),
+        ),
       ),
     );
   }
@@ -126,68 +134,75 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
 
   Widget _buildConfirmBody(BuildContext context, String valoperAddr,
       {required bool? jailed}) {
+    final l10n = AppLocalizations.of(context);
     final bool canUnjail = jailed == true;
 
-    final Color infoColor;
-    final IconData infoIcon;
+    final InfoBannerVariant variant;
     final String infoText;
 
     if (jailed == true) {
-      infoColor = Colors.amber;
-      infoIcon = Icons.warning_outlined;
-      infoText =
-          'Your validator is jailed. Send an unjail transaction to resume operations.';
+      variant = InfoBannerVariant.warning;
+      infoText = l10n.unjailWarningJailed;
     } else if (jailed == false) {
-      infoColor = Colors.green;
-      infoIcon = Icons.check_circle_outline;
-      infoText = 'Your validator is not jailed. No action needed.';
+      variant = InfoBannerVariant.success;
+      infoText = l10n.unjailInfoNotJailed;
     } else {
-      infoColor = Colors.grey;
-      infoIcon = Icons.help_outline;
-      infoText =
-          'Validator not found on chain. Make sure your validator has been created.';
+      variant = InfoBannerVariant.info;
+      infoText = l10n.unjailInfoNotFound;
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Card(
-          color: infoColor.withValues(alpha: 0.1),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(infoIcon, color: infoColor),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(infoText, style: const TextStyle(fontSize: 13)),
-                ),
-              ],
-            ),
-          ),
-        ),
+        InfoBanner(variant: variant, message: infoText),
         const SizedBox(height: 24),
 
-        Text('Action', style: Theme.of(context).textTheme.bodySmall),
-        Text('Unjail Validator',
-            style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.commonAction,
+            style: const TextStyle(
+                color: GonkaColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4)),
+        const SizedBox(height: 4),
+        Text(l10n.unjailAction,
+            style: const TextStyle(
+                color: GonkaColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600)),
         const SizedBox(height: 16),
         const Divider(),
         const SizedBox(height: 16),
 
-        Text('Validator Address',
-            style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 4),
+        Text(l10n.unjailValidatorAddress,
+            style: const TextStyle(
+                color: GonkaColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4)),
+        const SizedBox(height: 6),
         Text(
           valoperAddr,
-          style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+          style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 12,
+              color: GonkaColors.textPrimary),
         ),
         const SizedBox(height: 16),
         const Divider(),
         const SizedBox(height: 16),
 
-        Text('Fee', style: Theme.of(context).textTheme.bodySmall),
-        Text('0 GNK', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.commonFee,
+            style: const TextStyle(
+                color: GonkaColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4)),
+        const SizedBox(height: 4),
+        Text(l10n.commonFeeZero,
+            style: const TextStyle(
+                color: GonkaColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w700)),
 
         const Spacer(),
 
@@ -196,13 +211,12 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
         else
           SizedBox(
             width: double.infinity,
-            height: 56,
             child: FilledButton(
               onPressed:
                   canUnjail && !_authenticating ? _authenticate : null,
               child: Text(_authenticating
-                  ? 'Authenticating...'
-                  : 'Confirm & Unjail'),
+                  ? l10n.confirmSendAuthenticating
+                  : l10n.unjailConfirmButton),
             ),
           ),
       ],
@@ -210,57 +224,29 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
   }
 
   Widget _buildResult(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         const Spacer(),
-        Icon(
-          _success ? Icons.check_circle : Icons.error,
-          size: 80,
-          color: _success ? Colors.green : Colors.red,
-        ),
-        const SizedBox(height: 24),
+        ResultIcon(success: _success),
+        const SizedBox(height: 28),
         Text(
-          _success ? 'Unjail Successful' : 'Unjail Failed',
-          style: Theme.of(context).textTheme.headlineSmall,
+          _success ? l10n.unjailResultSuccess : l10n.unjailResultFailed,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: GonkaColors.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
         ),
-        const SizedBox(height: 16),
-        if (_success && _txhash.isNotEmpty) ...[
-          Text('Transaction Hash',
-              style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: _txhash));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Hash copied to clipboard')),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _txhash,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 11),
-                textAlign: TextAlign.center,
-              ),
-            ),
+        const SizedBox(height: 20),
+        if (_success && _txhash.isNotEmpty) TxHashDisplay(hash: _txhash),
+        if (!_success && _error.isNotEmpty)
+          InfoBanner(
+            variant: InfoBannerVariant.error,
+            message: localizeError(l10n, _error),
           ),
-        ],
-        if (!_success && _error.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            _error,
-            style: TextStyle(color: Colors.red[300], fontSize: 13),
-            textAlign: TextAlign.center,
-          ),
-        ],
         const Spacer(),
         SizedBox(
           width: double.infinity,
-          height: 56,
           child: FilledButton(
             onPressed: () {
               if (context.canPop()) {
@@ -269,17 +255,16 @@ class _UnjailScreenState extends ConsumerState<UnjailScreen> {
                 context.go('/miners');
               }
             },
-            child: const Text('Done'),
+            child: Text(l10n.commonDone),
           ),
         ),
         if (!_success) ...[
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
-            height: 56,
             child: OutlinedButton(
               onPressed: _retry,
-              child: const Text('Retry'),
+              child: Text(l10n.commonRetry),
             ),
           ),
         ],

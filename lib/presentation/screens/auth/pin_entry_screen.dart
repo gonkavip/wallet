@@ -3,16 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/platform_util.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 enum PinMode { login, verify, change }
 
+enum _PinErrorKind { cooldown, wrongPin }
+
 class PinEntryScreen extends ConsumerStatefulWidget {
   final PinMode mode;
-  const PinEntryScreen({super.key, this.mode = PinMode.login});
+  final VoidCallback? onSuccess;
+  const PinEntryScreen({super.key, this.mode = PinMode.login, this.onSuccess});
 
   @override
   ConsumerState<PinEntryScreen> createState() => _PinEntryScreenState();
@@ -20,7 +26,8 @@ class PinEntryScreen extends ConsumerStatefulWidget {
 
 class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   String _pin = '';
-  String? _error;
+  _PinErrorKind? _errorKind;
+  int _errorArg = 0;
   bool _loading = false;
 
   bool _enteringNew = false;
@@ -29,18 +36,29 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   final _desktopController = TextEditingController();
   final _desktopFocusNode = FocusNode();
 
-  String get _title {
+  String _titleText(AppLocalizations l10n) {
     if (widget.mode == PinMode.change) {
-      return _enteringNew ? 'Enter New PIN' : 'Enter Current PIN';
+      return _enteringNew ? l10n.authEnterNewPin : l10n.authEnterCurrentPin;
     }
-    return 'Enter PIN';
+    return l10n.authEnterPin;
+  }
+
+  String? _errorText(AppLocalizations l10n) {
+    final kind = _errorKind;
+    if (kind == null) return null;
+    return switch (kind) {
+      _PinErrorKind.cooldown => l10n.authCooldown(_errorArg),
+      _PinErrorKind.wrongPin => l10n.authWrongPin(_errorArg),
+    };
   }
 
   @override
   void initState() {
     super.initState();
     if (widget.mode == PinMode.login) {
-      _tryBiometric();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _tryBiometric();
+      });
     }
   }
 
@@ -54,11 +72,14 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   Future<void> _tryBiometric() async {
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success && mounted) {
-        if (widget.mode == PinMode.login) {
+        if (widget.onSuccess != null) {
+          widget.onSuccess!();
+        } else if (widget.mode == PinMode.login) {
           context.go('/home');
         } else {
           context.pop(true);
@@ -67,11 +88,16 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
     }
   }
 
+  void _clearError() {
+    _errorKind = null;
+    _errorArg = 0;
+  }
+
   void _onDigit(int digit) {
     if (_pin.length >= GonkaConstants.pinLength) return;
     setState(() {
       _pin += digit.toString();
-      _error = null;
+      _clearError();
     });
     if (_pin.length == GonkaConstants.pinLength) {
       _onPinComplete();
@@ -82,7 +108,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
     if (_pin.isEmpty) return;
     setState(() {
       _pin = _pin.substring(0, _pin.length - 1);
-      _error = null;
+      _clearError();
     });
   }
 
@@ -102,7 +128,9 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
 
     if (success) {
       if (!mounted) return;
-      if (widget.mode == PinMode.login) {
+      if (widget.onSuccess != null) {
+        widget.onSuccess!();
+      } else if (widget.mode == PinMode.login) {
         context.go('/home');
       } else {
         context.pop(true);
@@ -119,9 +147,14 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
       _desktopController.clear();
       setState(() {
         _pin = '';
-        _error = cooldown > 0
-            ? 'Too many attempts. Wait ${cooldown}s.'
-            : 'Wrong PIN. ${GonkaConstants.maxPinAttempts - auth.failedAttempts} attempts remaining.';
+        if (cooldown > 0) {
+          _errorKind = _PinErrorKind.cooldown;
+          _errorArg = cooldown;
+        } else {
+          _errorKind = _PinErrorKind.wrongPin;
+          _errorArg =
+              GonkaConstants.maxPinAttempts - auth.failedAttempts;
+        }
       });
     }
   }
@@ -139,16 +172,21 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
           _currentPin = _pin;
           _pin = '';
           _enteringNew = true;
-          _error = null;
+          _clearError();
         });
       } else {
         final cooldown = auth.remainingCooldownSeconds;
         _desktopController.clear();
         setState(() {
           _pin = '';
-          _error = cooldown > 0
-              ? 'Too many attempts. Wait ${cooldown}s.'
-              : 'Wrong PIN. ${GonkaConstants.maxPinAttempts - auth.failedAttempts} attempts remaining.';
+          if (cooldown > 0) {
+            _errorKind = _PinErrorKind.cooldown;
+            _errorArg = cooldown;
+          } else {
+            _errorKind = _PinErrorKind.wrongPin;
+            _errorArg =
+                GonkaConstants.maxPinAttempts - auth.failedAttempts;
+          }
         });
       }
     } else {
@@ -164,7 +202,9 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final showBack = widget.mode != PinMode.login;
+    final errorText = _errorText(l10n);
 
     return Scaffold(
       appBar: showBack
@@ -173,26 +213,43 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => context.pop(false),
               ),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
             )
           : null,
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 16),
         child: ResponsiveCenter(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
               if (!showBack) const SizedBox(height: 60),
               const SizedBox(height: 20),
-              Icon(
-                Icons.lock,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
+              GlowBackground(
+                size: 160,
+                child: Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: GonkaColors.accentBlue.withValues(alpha: 0.12),
+                    border: Border.all(
+                      color: GonkaColors.accentBlue.withValues(alpha: 0.4),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.lock_outline_rounded,
+                    size: 42,
+                    color: GonkaColors.accentBlue,
+                  ),
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Text(
-                _title,
-                style: Theme.of(context).textTheme.headlineSmall,
+                _titleText(l10n),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: GonkaColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
               const SizedBox(height: 32),
               if (PlatformUtil.isDesktop)
@@ -201,22 +258,43 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(GonkaConstants.pinLength, (i) {
-                    return Container(
+                    final filled = i < _pin.length;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
                       margin: const EdgeInsets.symmetric(horizontal: 8),
-                      width: 20,
-                      height: 20,
+                      width: filled ? 18 : 14,
+                      height: filled ? 18 : 14,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: i < _pin.length
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey.shade300,
+                        color: filled
+                            ? GonkaColors.accentBlue
+                            : Colors.transparent,
+                        border: Border.all(
+                          color: filled
+                              ? GonkaColors.accentBlue
+                              : GonkaColors.borderStrong,
+                          width: filled ? 0 : 1.5,
+                        ),
+                        boxShadow: filled
+                            ? [
+                                BoxShadow(
+                                  color: GonkaColors.accentBlue
+                                      .withValues(alpha: 0.5),
+                                  blurRadius: 12,
+                                ),
+                              ]
+                            : null,
                       ),
                     );
                   }),
                 ),
-              if (_error != null) ...[
-                const SizedBox(height: 16),
-                Text(_error!, style: TextStyle(color: Colors.red.shade700)),
+              if (errorText != null) ...[
+                const SizedBox(height: 20),
+                Text(errorText,
+                    style: const TextStyle(
+                        color: GonkaColors.error,
+                        fontWeight: FontWeight.w500)),
               ],
               if (_loading) ...[
                 const SizedBox(height: 16),
@@ -224,8 +302,13 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
               ],
               const Spacer(),
               if (!PlatformUtil.isDesktop)
-                Center(child: SizedBox(width: 320, child: _buildNumPad())),
-              const SizedBox(height: 32),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 280),
+                    child: _buildNumPad(),
+                  ),
+                ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -234,6 +317,7 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   }
 
   Widget _buildDesktopPinInput() {
+    final l10n = AppLocalizations.of(context);
     return SizedBox(
       width: 200,
       child: TextField(
@@ -245,15 +329,15 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
         maxLength: GonkaConstants.pinLength,
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: const InputDecoration(
-          hintText: 'Enter PIN',
+        decoration: InputDecoration(
+          hintText: l10n.authEnterPin,
           counterText: '',
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
         onChanged: (value) {
           setState(() {
             _pin = value;
-            _error = null;
+            _clearError();
           });
           if (value.length == GonkaConstants.pinLength) {
             _onPinComplete();
@@ -264,15 +348,21 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   }
 
   Widget _buildNumPad() {
+    const gap = 10.0;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        for (var row = 0; row < 4; row++)
+        for (var row = 0; row < 4; row++) ...[
+          if (row > 0) const SizedBox(height: gap),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              for (var col = 0; col < 3; col++) _buildNumKey(row, col),
+              for (var col = 0; col < 3; col++) ...[
+                if (col > 0) const SizedBox(width: gap),
+                Expanded(child: _buildNumKey(row, col)),
+              ],
             ],
           ),
+        ],
       ],
     );
   }
@@ -280,36 +370,58 @@ class _PinEntryScreenState extends ConsumerState<PinEntryScreen> {
   Widget _buildNumKey(int row, int col) {
     if (row == 3 && col == 0) {
       if (widget.mode == PinMode.change) {
-        return const SizedBox(width: 80, height: 80);
+        return const AspectRatio(aspectRatio: 1.3, child: SizedBox.shrink());
       }
-      return SizedBox(
-        width: 80,
-        height: 80,
-        child: IconButton(
-          onPressed: _tryBiometric,
-          icon: const Icon(Icons.fingerprint, size: 28),
-        ),
+      return _NumPadKey(
+        onTap: _tryBiometric,
+        child: const Icon(Icons.fingerprint_rounded,
+            size: 28, color: GonkaColors.accentBlue),
       );
     }
     if (row == 3 && col == 2) {
-      return SizedBox(
-        width: 80,
-        height: 80,
-        child: IconButton(
-          onPressed: _onDelete,
-          icon: const Icon(Icons.backspace_outlined, size: 28),
-        ),
+      return _NumPadKey(
+        onTap: _onDelete,
+        child: const Icon(Icons.backspace_outlined,
+            size: 26, color: GonkaColors.textPrimary),
       );
     }
     final digit = row == 3 ? 0 : row * 3 + col + 1;
-    return SizedBox(
-      width: 80,
-      height: 80,
-      child: TextButton(
-        onPressed: () => _onDigit(digit),
-        child: Text(
-          '$digit',
-          style: Theme.of(context).textTheme.headlineMedium,
+    return _NumPadKey(
+      onTap: () => _onDigit(digit),
+      child: Text(
+        '$digit',
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          color: GonkaColors.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
+class _NumPadKey extends StatelessWidget {
+  final VoidCallback onTap;
+  final Widget child;
+  const _NumPadKey({required this.onTap, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1.3,
+      child: Material(
+        color: GonkaColors.bgCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(GonkaRadius.md),
+          side: const BorderSide(
+              color: GonkaColors.borderSubtle, width: 1),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(GonkaRadius.md),
+          splashColor: GonkaColors.accentBlue.withValues(alpha: 0.15),
+          highlightColor: GonkaColors.accentBlue.withValues(alpha: 0.08),
+          child: Center(child: child),
         ),
       ),
     );

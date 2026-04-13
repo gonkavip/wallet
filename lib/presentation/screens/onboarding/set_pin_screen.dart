@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
+import '../../../config/design_tokens.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
+import '../../error_l10n.dart';
 import '../../widgets/responsive_center.dart';
+import 'onboarding_secret.dart';
 
 class SetPinScreen extends ConsumerStatefulWidget {
-  final String mnemonic;
+  final OnboardingSecret secret;
   final String walletName;
 
   const SetPinScreen({
     super.key,
-    required this.mnemonic,
+    required this.secret,
     required this.walletName,
   });
 
@@ -24,7 +28,8 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
   String _pin = '';
   String? _firstPin;
   bool _isConfirming = false;
-  String? _error;
+  bool _mismatch = false;
+  String? _errorText;
   bool _loading = false;
 
   @override
@@ -39,15 +44,24 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
     if (pinSet) {
       setState(() => _loading = true);
       try {
-        final wallets = ref.read(walletsProvider.notifier);
-        await wallets.importWallet(widget.walletName, widget.mnemonic);
+        await _persistWallet();
         if (mounted) context.go('/home');
       } catch (e) {
         setState(() {
           _loading = false;
-          _error = e.toString();
+          _errorText = e.toString();
         });
       }
+    }
+  }
+
+  Future<void> _persistWallet() async {
+    final wallets = ref.read(walletsProvider.notifier);
+    if (widget.secret.isMnemonic) {
+      await wallets.importWallet(widget.walletName, widget.secret.mnemonic!);
+    } else {
+      await wallets.importWalletFromPrivateKeyHex(
+          widget.walletName, widget.secret.privateKeyHex!);
     }
   }
 
@@ -55,7 +69,8 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
     if (_pin.length >= GonkaConstants.pinLength) return;
     setState(() {
       _pin += digit.toString();
-      _error = null;
+      _mismatch = false;
+      _errorText = null;
     });
     if (_pin.length == GonkaConstants.pinLength) {
       _onPinComplete();
@@ -66,7 +81,8 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
     if (_pin.isEmpty) return;
     setState(() {
       _pin = _pin.substring(0, _pin.length - 1);
-      _error = null;
+      _mismatch = false;
+      _errorText = null;
     });
   }
 
@@ -83,7 +99,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
     if (_pin != _firstPin) {
       setState(() {
         _pin = '';
-        _error = 'PINs do not match. Try again.';
+        _mismatch = true;
         _isConfirming = false;
         _firstPin = null;
       });
@@ -95,28 +111,29 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
       final auth = ref.read(authServiceProvider);
       await auth.createPin(_pin);
 
-      final wallets = ref.read(walletsProvider.notifier);
-      await wallets.importWallet(widget.walletName, widget.mnemonic);
+      await _persistWallet();
 
       final bioAvailable = await auth.isBiometricAvailable();
       if (bioAvailable && mounted) {
         final enableBio = await showDialog<bool>(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Enable Biometrics?'),
-            content: const Text(
-                'Use Face ID / fingerprint to unlock your wallet?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Skip'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Enable'),
-              ),
-            ],
-          ),
+          builder: (ctx) {
+            final l10n = AppLocalizations.of(ctx);
+            return AlertDialog(
+              title: Text(l10n.onboardingPinBiometricTitle),
+              content: Text(l10n.onboardingPinBiometricBody),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(l10n.onboardingPinBiometricSkip),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(l10n.onboardingPinBiometricEnable),
+                ),
+              ],
+            );
+          },
         );
         if (enableBio == true) {
           await ref
@@ -129,16 +146,23 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
     } catch (e) {
       setState(() {
         _loading = false;
-        _error = e.toString();
+        _errorText = e.toString();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final errorText = _mismatch
+        ? l10n.onboardingPinMismatch
+        : (_errorText != null ? localizeError(l10n, _errorText) : null);
     return Scaffold(
-      appBar: AppBar(title: const Text('Set PIN')),
-      body: _loading
+      appBar: AppBar(title: Text(l10n.onboardingPinTitle)),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : ResponsiveCenter(
               padding: const EdgeInsets.all(24),
@@ -146,78 +170,141 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
                 children: [
                   const SizedBox(height: 40),
                   Text(
-                    _isConfirming ? 'Confirm your PIN' : 'Create a 6-digit PIN',
-                    style: Theme.of(context).textTheme.headlineSmall,
+                    _isConfirming
+                        ? l10n.onboardingPinConfirmHeading
+                        : l10n.onboardingPinCreateHeading,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: GonkaColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
                   const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(GonkaConstants.pinLength, (i) {
-                      return Container(
+                      final filled = i < _pin.length;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOut,
                         margin: const EdgeInsets.symmetric(horizontal: 8),
-                        width: 20,
-                        height: 20,
+                        width: filled ? 18 : 14,
+                        height: filled ? 18 : 14,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: i < _pin.length
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.grey.shade300,
+                          color: filled
+                              ? GonkaColors.accentBlue
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: filled
+                                ? GonkaColors.accentBlue
+                                : GonkaColors.borderStrong,
+                            width: filled ? 0 : 1.5,
+                          ),
+                          boxShadow: filled
+                              ? [
+                                  BoxShadow(
+                                    color: GonkaColors.accentBlue
+                                        .withValues(alpha: 0.5),
+                                    blurRadius: 12,
+                                  ),
+                                ]
+                              : null,
                         ),
                       );
                     }),
                   ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 16),
+                  if (errorText != null) ...[
+                    const SizedBox(height: 20),
                     Text(
-                      _error!,
-                      style: TextStyle(color: Colors.red.shade700),
+                      errorText,
+                      style: const TextStyle(
+                          color: GonkaColors.error,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                   const Spacer(),
-                  Center(child: SizedBox(width: 320, child: _buildNumPad())),
-                  const SizedBox(height: 32),
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 280),
+                      child: _buildNumPad(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
+      ),
     );
   }
 
   Widget _buildNumPad() {
+    const gap = 10.0;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        for (var row = 0; row < 4; row++)
+        for (var row = 0; row < 4; row++) ...[
+          if (row > 0) const SizedBox(height: gap),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              for (var col = 0; col < 3; col++)
-                _buildNumKey(row, col),
+              for (var col = 0; col < 3; col++) ...[
+                if (col > 0) const SizedBox(width: gap),
+                Expanded(child: _buildNumKey(row, col)),
+              ],
             ],
           ),
+        ],
       ],
     );
   }
 
   Widget _buildNumKey(int row, int col) {
-    if (row == 3 && col == 0) return const SizedBox(width: 80, height: 80);
+    if (row == 3 && col == 0) {
+      return const AspectRatio(aspectRatio: 1.3, child: SizedBox.shrink());
+    }
     if (row == 3 && col == 2) {
-      return SizedBox(
-        width: 80,
-        height: 80,
-        child: IconButton(
-          onPressed: _onDelete,
-          icon: const Icon(Icons.backspace_outlined, size: 28),
-        ),
+      return _NumPadKey(
+        onTap: _onDelete,
+        child: const Icon(Icons.backspace_outlined,
+            size: 26, color: GonkaColors.textPrimary),
       );
     }
     final digit = row == 3 ? 0 : row * 3 + col + 1;
-    return SizedBox(
-      width: 80,
-      height: 80,
-      child: TextButton(
-        onPressed: () => _onDigit(digit),
-        child: Text(
-          '$digit',
-          style: Theme.of(context).textTheme.headlineMedium,
+    return _NumPadKey(
+      onTap: () => _onDigit(digit),
+      child: Text(
+        '$digit',
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          color: GonkaColors.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
+class _NumPadKey extends StatelessWidget {
+  final VoidCallback onTap;
+  final Widget child;
+  const _NumPadKey({required this.onTap, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1.3,
+      child: Material(
+        color: GonkaColors.bgCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(GonkaRadius.md),
+          side: const BorderSide(
+              color: GonkaColors.borderSubtle, width: 1),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(GonkaRadius.md),
+          splashColor: GonkaColors.accentBlue.withValues(alpha: 0.15),
+          highlightColor: GonkaColors.accentBlue.withValues(alpha: 0.08),
+          child: Center(child: child),
         ),
       ),
     );

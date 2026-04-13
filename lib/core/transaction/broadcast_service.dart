@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+import 'package:hex/hex.dart';
 import '../crypto/address_service.dart';
 import '../crypto/hd_key_service.dart';
 import '../network/node_client.dart';
@@ -9,13 +11,26 @@ import 'msg_unjail.dart';
 import 'msg_vote.dart';
 import 'tx_builder.dart';
 
+class _KeyPair {
+  final Uint8List privateKey;
+  final Uint8List publicKey;
+  _KeyPair(this.privateKey, this.publicKey);
+}
+
+_KeyPair _keyPairFromHex(String privateKeyHex) {
+  final cleaned = normalizePrivateKeyHex(privateKeyHex);
+  final priv = Uint8List.fromList(HEX.decode(cleaned));
+  final pub = HDKeyService.publicKeyFromPrivate(priv);
+  return _KeyPair(priv, pub);
+}
+
 class BroadcastService {
   final NodeManager _nodeManager;
 
   BroadcastService(this._nodeManager);
 
   Future<BroadcastResult> send({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
     required String toAddress,
     required String amount,
@@ -26,8 +41,9 @@ class BroadcastService {
 
     final accountInfo = await client.getAccountInfo(fromAddress);
 
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final msg = MsgSend(
@@ -57,7 +73,7 @@ class BroadcastService {
     }
   }
   Future<BroadcastResult> depositCollateral({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
     required String amount,
   }) async {
@@ -65,8 +81,9 @@ class BroadcastService {
     if (client == null) throw Exception('No active node');
 
     final accountInfo = await client.getAccountInfo(fromAddress);
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final msg = MsgDepositCollateral(
@@ -95,7 +112,7 @@ class BroadcastService {
   }
 
   Future<BroadcastResult> grantMlOpsPermissions({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
     required String granteeAddress,
   }) async {
@@ -103,8 +120,9 @@ class BroadcastService {
     if (client == null) throw Exception('No active node');
 
     final accountInfo = await client.getAccountInfo(fromAddress);
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final messages = buildMlOpsGrants(
@@ -132,15 +150,16 @@ class BroadcastService {
   }
 
   Future<BroadcastResult> unjail({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
   }) async {
     final client = _nodeManager.client;
     if (client == null) throw Exception('No active node');
 
     final accountInfo = await client.getAccountInfo(fromAddress);
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final valoperAddr = AddressService.toValoperAddress(fromAddress);
@@ -181,7 +200,7 @@ class BroadcastService {
   }
 
   Future<BroadcastResult> vote({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
     required int proposalId,
     required VoteOption option,
@@ -190,8 +209,9 @@ class BroadcastService {
     if (client == null) throw Exception('No active node');
 
     final accountInfo = await client.getAccountInfo(fromAddress);
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final msg = MsgVote(
@@ -226,7 +246,7 @@ class BroadcastService {
   }
 
   Future<BroadcastResult> withdrawCollateral({
-    required String mnemonic,
+    required String privateKeyHex,
     required String fromAddress,
     required String amount,
   }) async {
@@ -234,8 +254,9 @@ class BroadcastService {
     if (client == null) throw Exception('No active node');
 
     final accountInfo = await client.getAccountInfo(fromAddress);
-    final privateKey = HDKeyService.derivePrivateKey(mnemonic);
-    final publicKey = HDKeyService.derivePublicKey(mnemonic);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
 
     try {
       final msg = MsgWithdrawCollateral(

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/amount_input_formatter.dart';
 import '../../../config/constants.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/platform_util.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/balance_provider.dart';
 import '../../../state/providers/collateral_provider.dart';
 import '../../widgets/responsive_center.dart';
+
+enum _CollateralAmountErr { empty, notPositive, insufficient, exceeds, invalid }
 
 class CollateralAmountScreen extends ConsumerStatefulWidget {
   final bool isDeposit;
@@ -21,7 +26,7 @@ class _CollateralAmountScreenState
     extends ConsumerState<CollateralAmountScreen> {
   final _amountController = TextEditingController();
   bool _useGnk = true;
-  String? _amountError;
+  _CollateralAmountErr? _amountErr;
 
   @override
   void dispose() {
@@ -35,7 +40,7 @@ class _CollateralAmountScreenState
     if (input.isNotEmpty) {
       try {
         if (toGnk) {
-          final ngonka = BigInt.parse(input);
+          final ngonka = BigInt.parse(input.replaceAll(',', ''));
           _amountController.text = formatGnk(ngonka);
         } else {
           final ngonka = parseGnk(input);
@@ -67,32 +72,48 @@ class _CollateralAmountScreenState
     }
   }
 
-  String? _validateAmount(String input) {
-    if (input.isEmpty) return 'Enter amount';
+  _CollateralAmountErr? _validateAmount(String input) {
+    if (input.isEmpty) return _CollateralAmountErr.empty;
     try {
-      final ngonka = _useGnk ? parseGnk(input) : BigInt.parse(input.replaceAll(',', ''));
-      if (ngonka <= BigInt.zero) return 'Amount must be positive';
+      final ngonka = _useGnk
+          ? parseGnk(input)
+          : BigInt.parse(input.replaceAll(',', ''));
+      if (ngonka <= BigInt.zero) return _CollateralAmountErr.notPositive;
       if (widget.isDeposit) {
         final balanceAsync = ref.read(balanceProvider);
         return balanceAsync.whenOrNull(data: (balance) {
-          if (ngonka > balance.spendable) return 'Insufficient balance';
+          if (ngonka > balance.spendable) {
+            return _CollateralAmountErr.insufficient;
+          }
           return null;
         });
       } else {
         final collateralState = ref.read(collateralProvider);
         if (ngonka > collateralState.collateral) {
-          return 'Exceeds current collateral';
+          return _CollateralAmountErr.exceeds;
         }
       }
       return null;
     } catch (_) {
-      return 'Invalid amount';
+      return _CollateralAmountErr.invalid;
     }
+  }
+
+  String? _errorText(AppLocalizations l10n) {
+    final e = _amountErr;
+    if (e == null) return null;
+    return switch (e) {
+      _CollateralAmountErr.empty => l10n.sendErrorEnterAmount,
+      _CollateralAmountErr.notPositive => l10n.sendErrorAmountPositive,
+      _CollateralAmountErr.insufficient => l10n.sendErrorInsufficient,
+      _CollateralAmountErr.exceeds => l10n.collateralErrorExceeds,
+      _CollateralAmountErr.invalid => l10n.sendErrorInvalidAmount,
+    };
   }
 
   void _continue() {
     final amtErr = _validateAmount(_amountController.text.trim());
-    setState(() => _amountError = amtErr);
+    setState(() => _amountErr = amtErr);
     if (amtErr != null) return;
 
     final ngonka = _useGnk
@@ -107,8 +128,10 @@ class _CollateralAmountScreenState
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        widget.isDeposit ? 'Deposit Collateral' : 'Withdraw Collateral';
+    final l10n = AppLocalizations.of(context);
+    final title = widget.isDeposit
+        ? l10n.collateralDepositTitle
+        : l10n.collateralWithdrawTitle;
     final collateralState = ref.watch(collateralProvider);
 
     return Scaffold(
@@ -125,17 +148,22 @@ class _CollateralAmountScreenState
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!widget.isDeposit) ...[
               Text(
-                'Current collateral: ${formatGnk(collateralState.collateral)} GNK',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                l10n.collateralCurrentInfo(
+                    formatGnk(collateralState.collateral)),
+                style: const TextStyle(
+                  color: GonkaColors.textMuted,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 16),
             ],
@@ -148,10 +176,10 @@ class _CollateralAmountScreenState
                     keyboardType: PlatformUtil.isDesktop
                         ? null
                         : const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [commaToDotInsertedFormatter],
                     decoration: InputDecoration(
-                      labelText: 'Amount',
-                      errorText: _amountError,
-                      border: const OutlineInputBorder(),
+                      labelText: l10n.sendAmountLabel,
+                      errorText: _errorText(l10n),
                       suffixText: _useGnk
                           ? GonkaConstants.displayDenom
                           : GonkaConstants.baseDenom,
@@ -161,7 +189,7 @@ class _CollateralAmountScreenState
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: _setMax,
-                  child: const Text('MAX'),
+                  child: Text(l10n.sendMaxButton),
                 ),
               ],
             ),
@@ -170,13 +198,13 @@ class _CollateralAmountScreenState
             Row(
               children: [
                 ChoiceChip(
-                  label: const Text('GNK'),
+                  label: Text(l10n.sendUnitGnk),
                   selected: _useGnk,
                   onSelected: (_) => _switchDenom(true),
                 ),
                 const SizedBox(width: 8),
                 ChoiceChip(
-                  label: const Text('ngonka'),
+                  label: Text(l10n.sendUnitNgonka),
                   selected: !_useGnk,
                   onSelected: (_) => _switchDenom(false),
                 ),
@@ -186,14 +214,14 @@ class _CollateralAmountScreenState
             const Spacer(),
             SizedBox(
               width: double.infinity,
-              height: 56,
               child: FilledButton(
                 onPressed: _continue,
-                child: const Text('Continue'),
+                child: Text(l10n.sendContinue),
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

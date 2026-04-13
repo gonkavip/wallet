@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/design_tokens.dart';
 import '../../../core/network/node_client.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/governance_provider.dart';
+import '../../widgets/gonka_widgets.dart';
 import '../../widgets/responsive_center.dart';
 
 class GovernanceScreen extends ConsumerWidget {
@@ -10,13 +13,14 @@ class GovernanceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final proposalsAsync = ref.watch(proposalsProvider);
 
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Governance'),
+          title: Text(l10n.governanceTitle),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -27,11 +31,11 @@ class GovernanceScreen extends ConsumerWidget {
               }
             },
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'All'),
-              Tab(text: 'Active'),
-              Tab(text: 'Closed'),
+              Tab(text: l10n.governanceTabAll),
+              Tab(text: l10n.governanceTabActive),
+              Tab(text: l10n.governanceTabClosed),
             ],
           ),
         ),
@@ -41,13 +45,15 @@ class GovernanceScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const Icon(Icons.error_outline,
+                    size: 48, color: GonkaColors.error),
                 const SizedBox(height: 12),
-                Text('Failed to load proposals: $e'),
+                Text(l10n.governanceErrorLoad(e.toString())),
                 const SizedBox(height: 12),
                 FilledButton(
-                  onPressed: () => ref.read(proposalsProvider.notifier).refresh(),
-                  child: const Text('Retry'),
+                  onPressed: () =>
+                      ref.read(proposalsProvider.notifier).refresh(),
+                  child: Text(l10n.commonRetry),
                 ),
               ],
             ),
@@ -60,18 +66,21 @@ class GovernanceScreen extends ConsumerWidget {
               children: [
                 _ProposalList(
                   proposals: proposals,
-                  emptyMessage: 'No proposals found',
-                  onRefresh: () => ref.read(proposalsProvider.notifier).refresh(),
+                  emptyMessage: l10n.governanceEmptyAll,
+                  onRefresh: () =>
+                      ref.read(proposalsProvider.notifier).refresh(),
                 ),
                 _ProposalList(
                   proposals: active,
-                  emptyMessage: 'No active proposals',
-                  onRefresh: () => ref.read(proposalsProvider.notifier).refresh(),
+                  emptyMessage: l10n.governanceEmptyActive,
+                  onRefresh: () =>
+                      ref.read(proposalsProvider.notifier).refresh(),
                 ),
                 _ProposalList(
                   proposals: closed,
-                  emptyMessage: 'No closed proposals',
-                  onRefresh: () => ref.read(proposalsProvider.notifier).refresh(),
+                  emptyMessage: l10n.governanceEmptyClosed,
+                  onRefresh: () =>
+                      ref.read(proposalsProvider.notifier).refresh(),
                 ),
               ],
             );
@@ -106,11 +115,11 @@ class _ProposalList extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.how_to_vote_outlined,
-                        size: 48, color: Colors.grey[400]),
+                    const Icon(Icons.how_to_vote_outlined,
+                        size: 48, color: GonkaColors.textMuted),
                     const SizedBox(height: 12),
                     Text(emptyMessage,
-                        style: TextStyle(color: Colors.grey[500])),
+                        style: const TextStyle(color: GonkaColors.textMuted)),
                   ],
                 ),
               ),
@@ -122,13 +131,16 @@ class _ProposalList extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: proposals.length,
-        itemBuilder: (context, index) {
-          final proposal = proposals[index];
-          return _ProposalCard(proposal: proposal);
-        },
+      child: Builder(
+        builder: (context) => ListView.builder(
+          padding: EdgeInsets.fromLTRB(
+              16, 16, 16, 16 + MediaQuery.paddingOf(context).bottom),
+          itemCount: proposals.length,
+          itemBuilder: (context, index) {
+            final proposal = proposals[index];
+            return _ProposalCard(proposal: proposal);
+          },
+        ),
       ),
     );
   }
@@ -141,20 +153,21 @@ class _ProposalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final Color badgeColor;
     final String badgeText;
 
     if (proposal.isVotingPeriod) {
-      badgeColor = Colors.green;
-      badgeText = 'Active';
+      badgeColor = GonkaColors.success;
+      badgeText = l10n.governanceStatusActive;
     } else if (proposal.isPassed) {
-      badgeColor = Colors.blue;
-      badgeText = 'Passed';
+      badgeColor = GonkaColors.info;
+      badgeText = l10n.governanceStatusPassed;
     } else if (proposal.isRejected) {
-      badgeColor = Colors.red;
-      badgeText = 'Rejected';
+      badgeColor = GonkaColors.error;
+      badgeText = l10n.governanceStatusRejected;
     } else {
-      badgeColor = Colors.grey;
+      badgeColor = GonkaColors.textMuted;
       badgeText = proposal.status
           .replaceAll('PROPOSAL_STATUS_', '')
           .replaceAll('_', ' ')
@@ -165,69 +178,82 @@ class _ProposalCard extends StatelessWidget {
     if (proposal.isVotingPeriod && proposal.votingEndTime != null) {
       final remaining = proposal.votingEndTime!.difference(DateTime.now());
       if (remaining.isNegative) {
-        timeInfo = 'Ending soon';
+        timeInfo = l10n.governanceEndingSoon;
       } else if (remaining.inDays > 0) {
-        timeInfo = 'Ends in ${remaining.inDays}d ${remaining.inHours % 24}h';
+        timeInfo = l10n.governanceEndsInDays(
+            remaining.inDays, remaining.inHours % 24);
       } else if (remaining.inHours > 0) {
-        timeInfo = 'Ends in ${remaining.inHours}h ${remaining.inMinutes % 60}m';
+        timeInfo = l10n.governanceEndsInHours(
+            remaining.inHours, remaining.inMinutes % 60);
       } else {
-        timeInfo = 'Ends in ${remaining.inMinutes}m';
+        timeInfo = l10n.governanceEndsInMinutes(remaining.inMinutes);
       }
     } else if (proposal.votingEndTime != null) {
       final dt = proposal.votingEndTime!.toLocal();
-      timeInfo =
-          'Ended ${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+      final formatted =
+          '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+      timeInfo = l10n.governanceEndedOn(formatted);
     } else {
       timeInfo = '';
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Row(
-          children: [
-            Text('#${proposal.id}',
-                style: TextStyle(
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(proposal.title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(badgeText,
-                    style: TextStyle(
-                        color: badgeColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500)),
+      decoration: BoxDecoration(
+        color: GonkaColors.bgCard,
+        borderRadius: BorderRadius.circular(GonkaRadius.md),
+        border: Border.all(color: GonkaColors.borderSubtle, width: 1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(GonkaRadius.md),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => context.push('/miners/governance/${proposal.id}'),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text('#${proposal.id}',
+                          style: const TextStyle(
+                              color: GonkaColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(proposal.title,
+                            style: const TextStyle(
+                                color: GonkaColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      const Icon(Icons.chevron_right,
+                          color: GonkaColors.textMuted),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      StatusPill(label: badgeText, color: badgeColor),
+                      if (timeInfo.isNotEmpty) ...[
+                        const SizedBox(width: 10),
+                        Text(timeInfo,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: GonkaColors.textMuted)),
+                      ],
+                    ],
+                  ),
+                ],
               ),
-              if (timeInfo.isNotEmpty) ...[
-                const SizedBox(width: 8),
-                Text(timeInfo,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-              ],
-            ],
+            ),
           ),
         ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.push('/miners/governance/${proposal.id}'),
       ),
     );
   }

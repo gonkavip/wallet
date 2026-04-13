@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/send_provider.dart';
@@ -29,10 +30,11 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
     setState(() => _authenticating = true);
     final auth = ref.read(authServiceProvider);
     final storage = ref.read(secureStorageProvider);
+    final reason = AppLocalizations.of(context).authBiometricReason;
 
     final bioEnabled = await storage.isBiometricEnabled();
     if (bioEnabled) {
-      final success = await auth.authenticateBiometric();
+      final success = await auth.authenticateBiometric(reason: reason);
       if (success) {
         setState(() {
           _authenticating = false;
@@ -74,13 +76,14 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final wallet = ref.watch(activeWalletProvider);
     final amount = BigInt.parse(widget.amountNgonka);
     final sendResult = ref.watch(sendProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Confirm Send'),
+        title: Text(l10n.confirmSendTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -92,31 +95,39 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
           },
         ),
       ),
-      body: ResponsiveCenter(
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 16),
+        child: ResponsiveCenter(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('From', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonFrom,
+                style: Theme.of(context).textTheme.bodySmall),
             if (wallet != null) AddressDisplay(address: wallet.address),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('To', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonTo,
+                style: Theme.of(context).textTheme.bodySmall),
             AddressDisplay(address: widget.toAddress, compact: false),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Amount', style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonAmount,
+                style: Theme.of(context).textTheme.bodySmall),
             AmountDisplay(amountNgonka: amount, exact: true),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('Fee', style: Theme.of(context).textTheme.bodySmall),
-            Text('0 GNK', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.commonFee,
+                style: Theme.of(context).textTheme.bodySmall),
+            Text(l10n.commonFeeZero,
+                style: Theme.of(context).textTheme.titleMedium),
 
             const Spacer(),
 
@@ -130,12 +141,13 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
                 child: FilledButton(
                   onPressed: _authenticating ? null : _authenticate,
                   child: Text(_authenticating
-                      ? 'Authenticating...'
-                      : 'Confirm & Send'),
+                      ? l10n.confirmSendAuthenticating
+                      : l10n.confirmSendButton),
                 ),
               ),
           ],
         ),
+      ),
       ),
     );
   }
