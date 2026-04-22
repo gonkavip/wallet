@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../state/providers/balance_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../widgets/responsive_center.dart';
+import '../addressbook/address_book_picker.dart';
 
 enum _AddressErr { empty, invalid, self }
 enum _AmountErr { empty, notPositive, insufficient, invalid }
@@ -34,6 +35,13 @@ class _SendScreenState extends ConsumerState<SendScreen> {
     _addressController.dispose();
     _amountController.dispose();
     super.dispose();
+  }
+
+  void _pickFromAddressBook() async {
+    final entry = await showAddressBookPicker(context);
+    if (entry != null) {
+      _addressController.text = entry.address;
+    }
   }
 
   void _scanQr() async {
@@ -179,11 +187,20 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                 labelText: l10n.sendRecipientLabel,
                 errorText: _addressErrorText(l10n),
                 border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(PlatformUtil.isDesktop
-                      ? Icons.content_paste
-                      : Icons.qr_code_scanner),
-                  onPressed: _scanQr,
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.contacts_outlined),
+                      onPressed: _pickFromAddressBook,
+                    ),
+                    IconButton(
+                      icon: Icon(PlatformUtil.isDesktop
+                          ? Icons.content_paste
+                          : Icons.qr_code_scanner),
+                      onPressed: _scanQr,
+                    ),
+                  ],
                 ),
               ),
             ),

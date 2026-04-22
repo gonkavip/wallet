@@ -900,4 +900,175 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get widgetTxHash => 'Hash da transação';
+
+  @override
+  String get scanUnrecognized => 'Código QR não reconhecido';
+
+  @override
+  String get addressbookTitle => 'Agenda de endereços';
+
+  @override
+  String get addressbookEmpty => 'Nenhum endereço salvo';
+
+  @override
+  String get addressbookAdd => 'Adicionar endereço';
+
+  @override
+  String get addressbookNameLabel => 'Nome';
+
+  @override
+  String get addressbookAddressLabel => 'Endereço';
+
+  @override
+  String get addressbookDelete => 'Excluir';
+
+  @override
+  String get addressbookDeleteConfirm => 'Excluir este endereço?';
+
+  @override
+  String get addressbookEdit => 'Editar';
+
+  @override
+  String get addressbookSave => 'Salvar';
+
+  @override
+  String get addressbookInvalidAddress => 'Endereço gonka inválido';
+
+  @override
+  String get addressbookDuplicate => 'Este endereço já está salvo';
+
+  @override
+  String get addressbookSelectTitle => 'Escolher destinatário';
+
+  @override
+  String get wcConnectTitle => 'Conectar DApp';
+
+  @override
+  String get wcConnectScan => 'Escanear QR';
+
+  @override
+  String get wcConnectPaste => 'Colar URI';
+
+  @override
+  String get wcConnectContinue => 'Continuar';
+
+  @override
+  String get wcConnectUriHint => 'wc:...';
+
+  @override
+  String get wcConnectInvalidUri => 'URI do WalletConnect inválido';
+
+  @override
+  String get wcConnectExpiredUri => 'Esta solicitação de conexão expirou';
+
+  @override
+  String get wcApproveTitle => 'Solicitação de conexão';
+
+  @override
+  String get wcApproveChooseWallet => 'Escolher carteira';
+
+  @override
+  String get wcApproveChainsLabel => 'Redes';
+
+  @override
+  String get wcApproveMethodsLabel => 'Métodos';
+
+  @override
+  String get wcApproveApprove => 'Aprovar';
+
+  @override
+  String get wcApproveReject => 'Rejeitar';
+
+  @override
+  String get wcApproveUnsupportedChain =>
+      'Este DApp solicita uma rede não suportada. Apenas cosmos:gonka-mainnet é permitida.';
+
+  @override
+  String get wcApproveUnsupportedMethod =>
+      'Este DApp solicita um método não suportado.';
+
+  @override
+  String get wcSignTitle => 'Assinar transação';
+
+  @override
+  String get wcSignDapp => 'DApp';
+
+  @override
+  String get wcSignSigner => 'Assinante';
+
+  @override
+  String get wcSignMemo => 'Nota';
+
+  @override
+  String get wcSignApprove => 'Aprovar e assinar';
+
+  @override
+  String get wcSignReject => 'Rejeitar';
+
+  @override
+  String get wcSignUnknownMessage =>
+      'Tipo de mensagem desconhecido. Revise os dados cuidadosamente.';
+
+  @override
+  String get wcPermissionsTitle => 'Permissões';
+
+  @override
+  String get wcPermissionsActive => 'Sessões ativas';
+
+  @override
+  String get wcPermissionsNamespaces => 'Namespace';
+
+  @override
+  String get wcPermissionsDisconnect => 'Desconectar';
+
+  @override
+  String get wcPermissionsDisconnectConfirm => 'Desconectar este DApp?';
+
+  @override
+  String get wcPermissionsAddSession => 'Adicionar conexão';
+
+  @override
+  String get wcPermissionsEmpty => 'Nenhum DApp conectado';
+
+  @override
+  String wcPermissionsApproved(String date) {
+    return 'Conectado em $date';
+  }
+
+  @override
+  String get walletDetailPermissions => 'Permissões';
+
+  @override
+  String get wcErrorNoWallets => 'Crie uma carteira antes de conectar DApps';
+
+  @override
+  String get wcErrorChainMismatch =>
+      'Rede incorreta: esperava cosmos:gonka-mainnet';
+
+  @override
+  String get wcErrorSignerMismatch =>
+      'Endereço do assinante não corresponde à carteira conectada';
+
+  @override
+  String wcErrorGeneric(String error) {
+    return 'Erro do WalletConnect: $error';
+  }
+
+  @override
+  String get wcBiometricReason => 'Autentique-se para assinar a transação';
+
+  @override
+  String get wcMsgSendFrom => 'De';
+
+  @override
+  String get wcMsgSendTo => 'Para';
+
+  @override
+  String get wcMsgSendAmount => 'Quantia';
+
+  @override
+  String get wcMsgRawTypeUrl => 'Tipo';
+
+  @override
+  String get wcMsgRawValueHex => 'Dados brutos (hex)';
 }

@@ -887,4 +887,171 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get widgetTxHash => '交易哈希';
+
+  @override
+  String get scanUnrecognized => '无法识别的二维码';
+
+  @override
+  String get addressbookTitle => '地址簿';
+
+  @override
+  String get addressbookEmpty => '没有已保存的地址';
+
+  @override
+  String get addressbookAdd => '添加地址';
+
+  @override
+  String get addressbookNameLabel => '名称';
+
+  @override
+  String get addressbookAddressLabel => '地址';
+
+  @override
+  String get addressbookDelete => '删除';
+
+  @override
+  String get addressbookDeleteConfirm => '删除此地址？';
+
+  @override
+  String get addressbookEdit => '编辑';
+
+  @override
+  String get addressbookSave => '保存';
+
+  @override
+  String get addressbookInvalidAddress => '无效的 gonka 地址';
+
+  @override
+  String get addressbookDuplicate => '此地址已保存';
+
+  @override
+  String get addressbookSelectTitle => '选择收款人';
+
+  @override
+  String get wcConnectTitle => '连接 DApp';
+
+  @override
+  String get wcConnectScan => '扫描二维码';
+
+  @override
+  String get wcConnectPaste => '粘贴 URI';
+
+  @override
+  String get wcConnectContinue => '继续';
+
+  @override
+  String get wcConnectUriHint => 'wc:...';
+
+  @override
+  String get wcConnectInvalidUri => '无效的 WalletConnect URI';
+
+  @override
+  String get wcConnectExpiredUri => '此连接请求已过期';
+
+  @override
+  String get wcApproveTitle => '连接请求';
+
+  @override
+  String get wcApproveChooseWallet => '选择钱包';
+
+  @override
+  String get wcApproveChainsLabel => '网络';
+
+  @override
+  String get wcApproveMethodsLabel => '方法';
+
+  @override
+  String get wcApproveApprove => '批准';
+
+  @override
+  String get wcApproveReject => '拒绝';
+
+  @override
+  String get wcApproveUnsupportedChain =>
+      '此 DApp 请求了不支持的网络。仅支持 cosmos:gonka-mainnet。';
+
+  @override
+  String get wcApproveUnsupportedMethod => '此 DApp 请求了不支持的方法。';
+
+  @override
+  String get wcSignTitle => '签署交易';
+
+  @override
+  String get wcSignDapp => 'DApp';
+
+  @override
+  String get wcSignSigner => '签名方';
+
+  @override
+  String get wcSignMemo => '备注';
+
+  @override
+  String get wcSignApprove => '批准并签名';
+
+  @override
+  String get wcSignReject => '拒绝';
+
+  @override
+  String get wcSignUnknownMessage => '未知消息类型。请仔细检查原始数据。';
+
+  @override
+  String get wcPermissionsTitle => '权限';
+
+  @override
+  String get wcPermissionsActive => '活动会话';
+
+  @override
+  String get wcPermissionsNamespaces => '命名空间';
+
+  @override
+  String get wcPermissionsDisconnect => '断开连接';
+
+  @override
+  String get wcPermissionsDisconnectConfirm => '断开此 DApp 的连接？';
+
+  @override
+  String get wcPermissionsAddSession => '添加连接';
+
+  @override
+  String get wcPermissionsEmpty => '未连接任何 DApp';
+
+  @override
+  String wcPermissionsApproved(String date) {
+    return '已于 $date 连接';
+  }
+
+  @override
+  String get walletDetailPermissions => '权限';
+
+  @override
+  String get wcErrorNoWallets => '连接 DApp 前请先创建钱包';
+
+  @override
+  String get wcErrorChainMismatch => '网络不匹配：预期 cosmos:gonka-mainnet';
+
+  @override
+  String get wcErrorSignerMismatch => '签名地址与已连接的钱包不一致';
+
+  @override
+  String wcErrorGeneric(String error) {
+    return 'WalletConnect 错误：$error';
+  }
+
+  @override
+  String get wcBiometricReason => '请验证身份以签署交易';
+
+  @override
+  String get wcMsgSendFrom => '来自';
+
+  @override
+  String get wcMsgSendTo => '发送到';
+
+  @override
+  String get wcMsgSendAmount => '数量';
+
+  @override
+  String get wcMsgRawTypeUrl => '类型';
+
+  @override
+  String get wcMsgRawValueHex => '原始数据 (hex)';
 }

@@ -31,12 +31,33 @@ import 'presentation/screens/miners/grant_result_screen.dart';
 import 'presentation/screens/miners/unjail_screen.dart';
 import 'presentation/screens/miners/governance_screen.dart';
 import 'presentation/screens/miners/proposal_detail_screen.dart';
+import 'presentation/screens/addressbook/address_book_screen.dart';
+import 'presentation/screens/walletconnect/wc_connect_screen.dart';
+import 'presentation/screens/walletconnect/wc_approve_session_screen.dart';
+import 'presentation/screens/walletconnect/wc_sign_request_screen.dart';
+import 'presentation/screens/walletconnect/wc_permissions_screen.dart';
 
 late GoRouter appRouter;
 
 GoRouter _buildRouter(String initialRoute) {
   appRouter = GoRouter(
     initialLocation: initialRoute,
+    redirect: (context, state) {
+      final loc = state.uri.toString();
+      if (loc.contains('wc?uri=') ||
+          loc.contains('/wc?uri=') ||
+          loc.startsWith('gonka:')) {
+        return '/home';
+      }
+      return null;
+    },
+    errorBuilder: (context, state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (appRouter.canPop()) appRouter.pop();
+        appRouter.go('/home');
+      });
+      return const Scaffold(body: SizedBox.shrink());
+    },
     routes: [
     GoRoute(
       path: '/onboarding/create',
@@ -115,6 +136,12 @@ GoRouter _buildRouter(String initialRoute) {
     ),
 
     GoRoute(path: '/receive', builder: (_, __) => const ReceiveScreen()),
+
+    GoRoute(
+        path: '/addressbook',
+        builder: (_, state) => AddressBookScreen(
+              highlightId: state.extra as String?,
+            )),
 
     GoRoute(path: '/miners', builder: (_, __) => const MinersScreen()),
     GoRoute(
@@ -201,6 +228,28 @@ GoRouter _buildRouter(String initialRoute) {
     GoRoute(
       path: '/settings/security',
       builder: (_, __) => const SecuritySettingsScreen(),
+    ),
+
+    GoRoute(
+      path: '/wc/connect',
+      builder: (_, __) => const WcConnectScreen(),
+    ),
+    GoRoute(
+      path: '/wc/approve',
+      builder: (_, state) {
+        final walletId = state.extra as String?;
+        return WcApproveSessionScreen(preSelectedWalletId: walletId);
+      },
+    ),
+    GoRoute(
+      path: '/wc/sign',
+      builder: (_, __) => const WcSignRequestScreen(),
+    ),
+    GoRoute(
+      path: '/wc/permissions/:walletId',
+      builder: (_, state) => WcPermissionsScreen(
+        walletId: state.pathParameters['walletId']!,
+      ),
     ),
   ],
   );

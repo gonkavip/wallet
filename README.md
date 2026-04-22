@@ -9,7 +9,7 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/us/app/gonka-wallet/id6760277065"><img src="https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white" alt="App Store"></a>&nbsp;&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=com.dutiap.gonkawallet"><img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white" alt="Google Play"></a>&nbsp;&nbsp;&nbsp;<a href="https://wallet.gonka.vip/download/GonkaWallet.dmg"><img src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a>&nbsp;&nbsp;&nbsp;<a href="https://wallet.gonka.vip/download/GonkaWallet.exe"><img src="https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDMuNDQ5TDkuNzUgMi4xdjkuNDUxSDBtMTAuOTQ5LTkuNjAyTDI0IDB2MTEuNEgxMC45NDlNMCAxMi42aDkuNzV2OS40NTFMMCAyMC42OTlNMTAuOTQ5IDEyLjZIMjRWMjRsLTEyLjktMS44MDEiLz48L3N2Zz4%3D&logoColor=white" alt="Windows"></a>
+  <a href="https://apps.apple.com/us/app/gonka-wallet/id6760277065"><img src="https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white" alt="App Store"></a>&nbsp;&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=com.dutiap.gonkawallet"><img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white" alt="Google Play"></a>&nbsp;&nbsp;&nbsp;<a href="https://github.com/gonkavip/wallet/releases/latest/download/GonkaWallet.dmg"><img src="https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS"></a>&nbsp;&nbsp;&nbsp;<a href="https://github.com/gonkavip/wallet/releases/latest/download/GonkaWallet.exe"><img src="https://img.shields.io/badge/Windows-0078D4?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDMuNDQ5TDkuNzUgMi4xdjkuNDUxSDBtMTAuOTQ5LTkuNjAyTDI0IDB2MTEuNEgxMC45NDlNMCAxMi42aDkuNzV2OS40NTFMMCAyMC42OTlNMTAuOTQ5IDEyLjZIMjRWMjRsLTEyLjktMS44MDEiLz48L3N2Zz4%3D&logoColor=white" alt="Windows"></a>
 </p>
 
 ## Features
@@ -28,13 +28,34 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 - Send GNK tokens to any gonka1... address
 - QR code scanner for recipient address input (clipboard paste on desktop)
 - QR code generation for receiving tokens
+- Address book picker in the recipient field
 - Amount input in GNK or ngonka with denomination toggle
+- Balance display mode cycles GNK → ngonka → USD (USD via live market price)
 - Thousands separator formatting for all amounts
 - Smart GNK display: 2 decimal digits for whole amounts, variable precision for fractional
 - Automatic comma-to-dot conversion for decimal separator (ru/es/pt keyboards)
 - Transaction confirmation screen with full details
 - Transaction history with all types: send, receive, vesting rewards, collateral, grants, unjail, votes, smart contract interactions
-- Copy-to-clipboard for transaction hashes
+- Contact names auto-resolved in history tiles and tx detail rows
+- Tap tx hash to copy, open-in-explorer shortcut to tracker.gonka.vip
+
+### Address Book
+- Local Hive-backed address book with name, address, created date
+- Add from home QR scan, from tx detail rows, or manually
+- Duplicate detection and bech32 validation on save
+- Imported wallets auto-register under their name
+- Picker integrated into the Send screen
+
+### WalletConnect v2
+- Connect to DApps via wc: URI — QR scan on mobile, paste on desktop
+- Deep link support: gonka://wc?uri=... opens pairing directly
+- Per-wallet session binding (one session ↔ one wallet)
+- Supported namespace: cosmos:gonka-mainnet, method cosmos_signDirect
+- Approval screen decodes MsgSend into from / to / amount; unknown messages
+  shown as typeUrl + raw hex
+- Biometric / PIN prompt before every signature
+- Permissions screen per wallet: list active sessions, disconnect individually
+- Sessions auto-disconnected when the wallet is deleted
 
 ### Smart Contract Support
 - Automatic detection of MsgExecuteContract transactions
@@ -106,10 +127,11 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 lib/
   config/         Constants, formatting, design tokens, theme, input formatters
   core/
-    crypto/       BIP39, BIP32, secp256k1, bech32, private key utilities
-    network/      Node client, node manager, API endpoints
-    transaction/  Protobuf encoding, tx builder, message types
-    platform_util Platform detection (desktop vs mobile)
+    crypto/          BIP39, BIP32, secp256k1, bech32, private key utilities
+    network/         Node client, node manager, API endpoints
+    transaction/     Protobuf encoding, tx builder, message types
+    walletconnect/   WC v2 service, URI parser, namespace builder, SignDoc/MsgSend decoders
+    platform_util    Platform detection (desktop vs mobile)
   data/
     models/       Wallet, balance, node, tx history models
     repositories/ Wallet, node, and settings persistence (Hive)

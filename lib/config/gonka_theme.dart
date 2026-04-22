@@ -29,8 +29,6 @@ ThemeData buildGonkaDarkTheme() {
     outlineVariant: GonkaColors.borderSubtle,
   );
 
-
-
   final textTheme = Typography.whiteMountainView.apply(
     bodyColor: GonkaColors.textPrimary,
     displayColor: GonkaColors.textPrimary,

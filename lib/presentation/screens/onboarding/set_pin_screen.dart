@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../config/constants.dart';
 import '../../../config/design_tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../state/providers/address_book_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../error_l10n.dart';
@@ -57,11 +58,14 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
 
   Future<void> _persistWallet() async {
     final wallets = ref.read(walletsProvider.notifier);
-    if (widget.secret.isMnemonic) {
-      await wallets.importWallet(widget.walletName, widget.secret.mnemonic!);
-    } else {
-      await wallets.importWalletFromPrivateKeyHex(
-          widget.walletName, widget.secret.privateKeyHex!);
+    final wallet = widget.secret.isMnemonic
+        ? await wallets.importWallet(
+            widget.walletName, widget.secret.mnemonic!)
+        : await wallets.importWalletFromPrivateKeyHex(
+            widget.walletName, widget.secret.privateKeyHex!);
+    final book = ref.read(addressBookProvider.notifier);
+    if (!book.containsAddress(wallet.address)) {
+      await book.add(widget.walletName, wallet.address);
     }
   }
 

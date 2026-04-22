@@ -903,4 +903,175 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widgetTxHash => 'Hash de transacción';
+
+  @override
+  String get scanUnrecognized => 'Código QR no reconocido';
+
+  @override
+  String get addressbookTitle => 'Libreta de direcciones';
+
+  @override
+  String get addressbookEmpty => 'No hay direcciones guardadas';
+
+  @override
+  String get addressbookAdd => 'Añadir dirección';
+
+  @override
+  String get addressbookNameLabel => 'Nombre';
+
+  @override
+  String get addressbookAddressLabel => 'Dirección';
+
+  @override
+  String get addressbookDelete => 'Eliminar';
+
+  @override
+  String get addressbookDeleteConfirm => '¿Eliminar esta dirección?';
+
+  @override
+  String get addressbookEdit => 'Editar';
+
+  @override
+  String get addressbookSave => 'Guardar';
+
+  @override
+  String get addressbookInvalidAddress => 'Dirección gonka no válida';
+
+  @override
+  String get addressbookDuplicate => 'Esta dirección ya está guardada';
+
+  @override
+  String get addressbookSelectTitle => 'Elegir destinatario';
+
+  @override
+  String get wcConnectTitle => 'Conectar DApp';
+
+  @override
+  String get wcConnectScan => 'Escanear QR';
+
+  @override
+  String get wcConnectPaste => 'Pegar URI';
+
+  @override
+  String get wcConnectContinue => 'Continuar';
+
+  @override
+  String get wcConnectUriHint => 'wc:...';
+
+  @override
+  String get wcConnectInvalidUri => 'URI de WalletConnect no válido';
+
+  @override
+  String get wcConnectExpiredUri => 'Esta solicitud de conexión ha expirado';
+
+  @override
+  String get wcApproveTitle => 'Solicitud de conexión';
+
+  @override
+  String get wcApproveChooseWallet => 'Elegir monedero';
+
+  @override
+  String get wcApproveChainsLabel => 'Redes';
+
+  @override
+  String get wcApproveMethodsLabel => 'Métodos';
+
+  @override
+  String get wcApproveApprove => 'Aprobar';
+
+  @override
+  String get wcApproveReject => 'Rechazar';
+
+  @override
+  String get wcApproveUnsupportedChain =>
+      'Esta DApp solicita una red no compatible. Solo se admite cosmos:gonka-mainnet.';
+
+  @override
+  String get wcApproveUnsupportedMethod =>
+      'Esta DApp solicita un método no compatible.';
+
+  @override
+  String get wcSignTitle => 'Firmar transacción';
+
+  @override
+  String get wcSignDapp => 'DApp';
+
+  @override
+  String get wcSignSigner => 'Firmante';
+
+  @override
+  String get wcSignMemo => 'Nota';
+
+  @override
+  String get wcSignApprove => 'Aprobar y firmar';
+
+  @override
+  String get wcSignReject => 'Rechazar';
+
+  @override
+  String get wcSignUnknownMessage =>
+      'Tipo de mensaje desconocido. Revisa los datos con atención.';
+
+  @override
+  String get wcPermissionsTitle => 'Permisos';
+
+  @override
+  String get wcPermissionsActive => 'Sesiones activas';
+
+  @override
+  String get wcPermissionsNamespaces => 'Namespace';
+
+  @override
+  String get wcPermissionsDisconnect => 'Desconectar';
+
+  @override
+  String get wcPermissionsDisconnectConfirm => '¿Desconectar esta DApp?';
+
+  @override
+  String get wcPermissionsAddSession => 'Añadir conexión';
+
+  @override
+  String get wcPermissionsEmpty => 'Ninguna DApp conectada';
+
+  @override
+  String wcPermissionsApproved(String date) {
+    return 'Conectado $date';
+  }
+
+  @override
+  String get walletDetailPermissions => 'Permisos';
+
+  @override
+  String get wcErrorNoWallets => 'Crea un monedero antes de conectar DApps';
+
+  @override
+  String get wcErrorChainMismatch =>
+      'Red incorrecta: se esperaba cosmos:gonka-mainnet';
+
+  @override
+  String get wcErrorSignerMismatch =>
+      'La dirección del firmante no coincide con el monedero conectado';
+
+  @override
+  String wcErrorGeneric(String error) {
+    return 'Error de WalletConnect: $error';
+  }
+
+  @override
+  String get wcBiometricReason => 'Autentícate para firmar la transacción';
+
+  @override
+  String get wcMsgSendFrom => 'De';
+
+  @override
+  String get wcMsgSendTo => 'Para';
+
+  @override
+  String get wcMsgSendAmount => 'Cantidad';
+
+  @override
+  String get wcMsgRawTypeUrl => 'Tipo';
+
+  @override
+  String get wcMsgRawValueHex => 'Valor sin procesar (hex)';
 }

@@ -71,6 +71,16 @@ String formatGnkShort(BigInt ngonka) {
   return formatGnk(ngonka);
 }
 
+String formatUsd(BigInt ngonka, double pricePerGnk) {
+  final gnk = ngonka.toDouble() / denomMultiplier.toDouble();
+  final usd = gnk * pricePerGnk;
+  final whole = usd.truncate();
+  final fraction = ((usd - whole) * 100).round().abs();
+  final wholeStr = _addCommas(whole.toString());
+  final fractionStr = fraction.toString().padLeft(2, '0');
+  return '\$$wholeStr.$fractionStr';
+}
+
 BigInt parseGnk(String gnkAmount) {
   final cleaned = gnkAmount.replaceAll(',', '');
   final parts = cleaned.split('.');

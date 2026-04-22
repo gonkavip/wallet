@@ -54,6 +54,23 @@ class TxBuilder {
     return base64Encode(txRaw);
   }
 
+  static Uint8List signDirectFromBytes({
+    required Uint8List bodyBytes,
+    required Uint8List authInfoBytes,
+    required String chainId,
+    required int accountNumber,
+    required Uint8List privateKey,
+  }) {
+    final signDocBytes = _buildSignDoc(
+      bodyBytes: bodyBytes,
+      authInfoBytes: authInfoBytes,
+      chainId: chainId,
+      accountNumber: accountNumber,
+    );
+    final hash = TxSigner.sha256Hash(signDocBytes);
+    return TxSigner.sign(hash, privateKey);
+  }
+
   static Uint8List _buildTxBodyMulti(List<TxMessage> messages, String memo) {
     final body = ProtobufWriter();
     for (final msg in messages) {

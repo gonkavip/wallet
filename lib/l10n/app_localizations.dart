@@ -1765,6 +1765,330 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transaction Hash'**
   String get widgetTxHash;
+
+  /// No description provided for @scanUnrecognized.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognized QR code'**
+  String get scanUnrecognized;
+
+  /// No description provided for @addressbookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Address Book'**
+  String get addressbookTitle;
+
+  /// No description provided for @addressbookEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved addresses'**
+  String get addressbookEmpty;
+
+  /// No description provided for @addressbookAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Address'**
+  String get addressbookAdd;
+
+  /// No description provided for @addressbookNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get addressbookNameLabel;
+
+  /// No description provided for @addressbookAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get addressbookAddressLabel;
+
+  /// No description provided for @addressbookDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get addressbookDelete;
+
+  /// No description provided for @addressbookDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this address?'**
+  String get addressbookDeleteConfirm;
+
+  /// No description provided for @addressbookEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get addressbookEdit;
+
+  /// No description provided for @addressbookSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get addressbookSave;
+
+  /// No description provided for @addressbookInvalidAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid gonka address'**
+  String get addressbookInvalidAddress;
+
+  /// No description provided for @addressbookDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'This address is already saved'**
+  String get addressbookDuplicate;
+
+  /// No description provided for @addressbookSelectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose recipient'**
+  String get addressbookSelectTitle;
+
+  /// No description provided for @wcConnectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect DApp'**
+  String get wcConnectTitle;
+
+  /// No description provided for @wcConnectScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get wcConnectScan;
+
+  /// No description provided for @wcConnectPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste URI'**
+  String get wcConnectPaste;
+
+  /// No description provided for @wcConnectContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get wcConnectContinue;
+
+  /// No description provided for @wcConnectUriHint.
+  ///
+  /// In en, this message translates to:
+  /// **'wc:...'**
+  String get wcConnectUriHint;
+
+  /// No description provided for @wcConnectInvalidUri.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid WalletConnect URI'**
+  String get wcConnectInvalidUri;
+
+  /// No description provided for @wcConnectExpiredUri.
+  ///
+  /// In en, this message translates to:
+  /// **'This connection request has expired'**
+  String get wcConnectExpiredUri;
+
+  /// No description provided for @wcApproveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection request'**
+  String get wcApproveTitle;
+
+  /// No description provided for @wcApproveChooseWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose wallet'**
+  String get wcApproveChooseWallet;
+
+  /// No description provided for @wcApproveChainsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Chains'**
+  String get wcApproveChainsLabel;
+
+  /// No description provided for @wcApproveMethodsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Methods'**
+  String get wcApproveMethodsLabel;
+
+  /// No description provided for @wcApproveApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get wcApproveApprove;
+
+  /// No description provided for @wcApproveReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get wcApproveReject;
+
+  /// No description provided for @wcApproveUnsupportedChain.
+  ///
+  /// In en, this message translates to:
+  /// **'This DApp requests an unsupported chain. Only cosmos:gonka-mainnet is supported.'**
+  String get wcApproveUnsupportedChain;
+
+  /// No description provided for @wcApproveUnsupportedMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'This DApp requests an unsupported method.'**
+  String get wcApproveUnsupportedMethod;
+
+  /// No description provided for @wcSignTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign transaction'**
+  String get wcSignTitle;
+
+  /// No description provided for @wcSignDapp.
+  ///
+  /// In en, this message translates to:
+  /// **'DApp'**
+  String get wcSignDapp;
+
+  /// No description provided for @wcSignSigner.
+  ///
+  /// In en, this message translates to:
+  /// **'Signer'**
+  String get wcSignSigner;
+
+  /// No description provided for @wcSignMemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Memo'**
+  String get wcSignMemo;
+
+  /// No description provided for @wcSignApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve & Sign'**
+  String get wcSignApprove;
+
+  /// No description provided for @wcSignReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get wcSignReject;
+
+  /// No description provided for @wcSignUnknownMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown message type. Review raw data carefully.'**
+  String get wcSignUnknownMessage;
+
+  /// No description provided for @wcPermissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get wcPermissionsTitle;
+
+  /// No description provided for @wcPermissionsActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active sessions'**
+  String get wcPermissionsActive;
+
+  /// No description provided for @wcPermissionsNamespaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Namespace info'**
+  String get wcPermissionsNamespaces;
+
+  /// No description provided for @wcPermissionsDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get wcPermissionsDisconnect;
+
+  /// No description provided for @wcPermissionsDisconnectConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect this DApp?'**
+  String get wcPermissionsDisconnectConfirm;
+
+  /// No description provided for @wcPermissionsAddSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Add connection'**
+  String get wcPermissionsAddSession;
+
+  /// No description provided for @wcPermissionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No connected DApps'**
+  String get wcPermissionsEmpty;
+
+  /// No description provided for @wcPermissionsApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected {date}'**
+  String wcPermissionsApproved(String date);
+
+  /// No description provided for @walletDetailPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get walletDetailPermissions;
+
+  /// No description provided for @wcErrorNoWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a wallet before connecting DApps'**
+  String get wcErrorNoWallets;
+
+  /// No description provided for @wcErrorChainMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain mismatch: expected cosmos:gonka-mainnet'**
+  String get wcErrorChainMismatch;
+
+  /// No description provided for @wcErrorSignerMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Signer address does not match the connected wallet'**
+  String get wcErrorSignerMismatch;
+
+  /// No description provided for @wcErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'WalletConnect error: {error}'**
+  String wcErrorGeneric(String error);
+
+  /// No description provided for @wcBiometricReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to sign the transaction'**
+  String get wcBiometricReason;
+
+  /// No description provided for @wcMsgSendFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get wcMsgSendFrom;
+
+  /// No description provided for @wcMsgSendTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get wcMsgSendTo;
+
+  /// No description provided for @wcMsgSendAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get wcMsgSendAmount;
+
+  /// No description provided for @wcMsgRawTypeUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get wcMsgRawTypeUrl;
+
+  /// No description provided for @wcMsgRawValueHex.
+  ///
+  /// In en, this message translates to:
+  /// **'Raw value (hex)'**
+  String get wcMsgRawValueHex;
 }
 
 class _AppLocalizationsDelegate

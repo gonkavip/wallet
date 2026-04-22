@@ -1,19 +1,37 @@
 import 'package:flutter/material.dart';
+import '../../config/constants.dart';
 import '../../config/design_tokens.dart';
 import '../../data/models/balance_model.dart';
 import '../../l10n/app_localizations.dart';
 import 'amount_display.dart';
+import 'balance_display_mode.dart';
 import 'gonka_widgets.dart';
 
 class BalanceCard extends StatelessWidget {
   final BalanceModel balance;
-  final bool useGnk;
+  final BalanceDisplayMode mode;
+  final double? usdPrice;
 
   const BalanceCard({
     super.key,
     required this.balance,
-    this.useGnk = true,
+    this.mode = BalanceDisplayMode.gnk,
+    this.usdPrice,
   });
+
+  bool get _useGnk => mode == BalanceDisplayMode.gnk;
+  bool get _isUsd => mode == BalanceDisplayMode.usd;
+
+  Widget _amount(BuildContext context, BigInt ngonka, TextStyle? style) {
+    if (_isUsd && usdPrice != null) {
+      return Text(formatUsd(ngonka, usdPrice!), style: style);
+    }
+    return AmountDisplay(
+      amountNgonka: ngonka,
+      useGnk: _useGnk,
+      style: style,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +69,10 @@ class BalanceCard extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 8),
-          AmountDisplay(
-            amountNgonka: balance.total,
-            useGnk: useGnk,
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+          _amount(
+            context,
+            balance.total,
+            Theme.of(context).textTheme.headlineLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
@@ -78,14 +96,13 @@ class BalanceCard extends StatelessWidget {
                               ),
                     ),
                     const SizedBox(height: 4),
-                    AmountDisplay(
-                      amountNgonka: balance.spendable,
-                      useGnk: useGnk,
-                      style:
-                          Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
+                    _amount(
+                      context,
+                      balance.spendable,
+                      Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ],
                 ),
@@ -113,10 +130,10 @@ class BalanceCard extends StatelessWidget {
                             ),
                       ),
                       const SizedBox(height: 4),
-                      AmountDisplay(
-                        amountNgonka: balance.vesting,
-                        useGnk: useGnk,
-                        style: Theme.of(context)
+                      _amount(
+                        context,
+                        balance.vesting,
+                        Theme.of(context)
                             .textTheme
                             .titleMedium
                             ?.copyWith(

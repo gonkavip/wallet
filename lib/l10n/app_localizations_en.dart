@@ -897,4 +897,175 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetTxHash => 'Transaction Hash';
+
+  @override
+  String get scanUnrecognized => 'Unrecognized QR code';
+
+  @override
+  String get addressbookTitle => 'Address Book';
+
+  @override
+  String get addressbookEmpty => 'No saved addresses';
+
+  @override
+  String get addressbookAdd => 'Add Address';
+
+  @override
+  String get addressbookNameLabel => 'Name';
+
+  @override
+  String get addressbookAddressLabel => 'Address';
+
+  @override
+  String get addressbookDelete => 'Delete';
+
+  @override
+  String get addressbookDeleteConfirm => 'Delete this address?';
+
+  @override
+  String get addressbookEdit => 'Edit';
+
+  @override
+  String get addressbookSave => 'Save';
+
+  @override
+  String get addressbookInvalidAddress => 'Invalid gonka address';
+
+  @override
+  String get addressbookDuplicate => 'This address is already saved';
+
+  @override
+  String get addressbookSelectTitle => 'Choose recipient';
+
+  @override
+  String get wcConnectTitle => 'Connect DApp';
+
+  @override
+  String get wcConnectScan => 'Scan QR';
+
+  @override
+  String get wcConnectPaste => 'Paste URI';
+
+  @override
+  String get wcConnectContinue => 'Continue';
+
+  @override
+  String get wcConnectUriHint => 'wc:...';
+
+  @override
+  String get wcConnectInvalidUri => 'Invalid WalletConnect URI';
+
+  @override
+  String get wcConnectExpiredUri => 'This connection request has expired';
+
+  @override
+  String get wcApproveTitle => 'Connection request';
+
+  @override
+  String get wcApproveChooseWallet => 'Choose wallet';
+
+  @override
+  String get wcApproveChainsLabel => 'Chains';
+
+  @override
+  String get wcApproveMethodsLabel => 'Methods';
+
+  @override
+  String get wcApproveApprove => 'Approve';
+
+  @override
+  String get wcApproveReject => 'Reject';
+
+  @override
+  String get wcApproveUnsupportedChain =>
+      'This DApp requests an unsupported chain. Only cosmos:gonka-mainnet is supported.';
+
+  @override
+  String get wcApproveUnsupportedMethod =>
+      'This DApp requests an unsupported method.';
+
+  @override
+  String get wcSignTitle => 'Sign transaction';
+
+  @override
+  String get wcSignDapp => 'DApp';
+
+  @override
+  String get wcSignSigner => 'Signer';
+
+  @override
+  String get wcSignMemo => 'Memo';
+
+  @override
+  String get wcSignApprove => 'Approve & Sign';
+
+  @override
+  String get wcSignReject => 'Reject';
+
+  @override
+  String get wcSignUnknownMessage =>
+      'Unknown message type. Review raw data carefully.';
+
+  @override
+  String get wcPermissionsTitle => 'Permissions';
+
+  @override
+  String get wcPermissionsActive => 'Active sessions';
+
+  @override
+  String get wcPermissionsNamespaces => 'Namespace info';
+
+  @override
+  String get wcPermissionsDisconnect => 'Disconnect';
+
+  @override
+  String get wcPermissionsDisconnectConfirm => 'Disconnect this DApp?';
+
+  @override
+  String get wcPermissionsAddSession => 'Add connection';
+
+  @override
+  String get wcPermissionsEmpty => 'No connected DApps';
+
+  @override
+  String wcPermissionsApproved(String date) {
+    return 'Connected $date';
+  }
+
+  @override
+  String get walletDetailPermissions => 'Permissions';
+
+  @override
+  String get wcErrorNoWallets => 'Create a wallet before connecting DApps';
+
+  @override
+  String get wcErrorChainMismatch =>
+      'Chain mismatch: expected cosmos:gonka-mainnet';
+
+  @override
+  String get wcErrorSignerMismatch =>
+      'Signer address does not match the connected wallet';
+
+  @override
+  String wcErrorGeneric(String error) {
+    return 'WalletConnect error: $error';
+  }
+
+  @override
+  String get wcBiometricReason => 'Authenticate to sign the transaction';
+
+  @override
+  String get wcMsgSendFrom => 'From';
+
+  @override
+  String get wcMsgSendTo => 'To';
+
+  @override
+  String get wcMsgSendAmount => 'Amount';
+
+  @override
+  String get wcMsgRawTypeUrl => 'Type';
+
+  @override
+  String get wcMsgRawValueHex => 'Raw value (hex)';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../config/design_tokens.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -271,34 +272,41 @@ class TxHashDisplay extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  hash,
-                  style: const TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    color: GonkaColors.textPrimary,
-                    height: 1.4,
+                child: InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text: hash));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.widgetHashCopied),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  child: Text(
+                    hash,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: GonkaColors.textPrimary,
+                      height: 1.4,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               InkWell(
-                onTap: () async {
-                  await Clipboard.setData(ClipboardData(text: hash));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.widgetHashCopied),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                },
+                onTap: () => launchUrl(
+                  Uri.parse('https://tracker.gonka.vip/tx/$hash'),
+                  mode: LaunchMode.externalApplication,
+                ),
                 borderRadius: BorderRadius.circular(8),
                 child: const Padding(
                   padding: EdgeInsets.all(4),
                   child: Icon(
-                    Icons.copy_rounded,
+                    Icons.open_in_new,
                     size: 18,
                     color: GonkaColors.accentBlue,
                   ),

@@ -2,19 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../config/constants.dart';
 import '../../../config/design_tokens.dart';
+import '../../../core/crypto/address_service.dart';
 import '../../../core/transaction/msg_vote.dart';
+import '../../../data/models/address_book_entry.dart';
 import '../../../data/models/balance_model.dart';
 import '../../../data/models/tx_history_model.dart';
 import '../../../data/services/device_security_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../state/providers/address_book_provider.dart';
 import '../../../state/providers/auth_provider.dart';
 import '../../../state/providers/balance_provider.dart';
+import '../../../state/providers/market_price_provider.dart';
 import '../../../state/providers/tx_history_provider.dart';
 import '../../../state/providers/wallet_provider.dart';
+import '../../../state/providers/wc_connect_provider.dart';
+import '../../../state/providers/wc_provider.dart';
 import '../../widgets/address_display.dart';
 import '../../widgets/balance_card.dart';
+import '../../widgets/balance_display_mode.dart';
 import '../../widgets/responsive_center.dart';
 
 String _voteLabel(AppLocalizations l10n, VoteOption option) =>
@@ -36,8 +44,19 @@ class WalletDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
-  bool _useGnk = true;
+  BalanceDisplayMode _mode = BalanceDisplayMode.gnk;
   bool _hasMnemonic = true;
+
+  BalanceDisplayMode _nextMode(BalanceDisplayMode current, {required bool hasUsd}) {
+    switch (current) {
+      case BalanceDisplayMode.gnk:
+        return BalanceDisplayMode.ngonka;
+      case BalanceDisplayMode.ngonka:
+        return hasUsd ? BalanceDisplayMode.usd : BalanceDisplayMode.gnk;
+      case BalanceDisplayMode.usd:
+        return BalanceDisplayMode.gnk;
+    }
+  }
 
   @override
   void initState() {
@@ -91,6 +110,8 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                   _exportPrivateKey(context, ref, wallet.id);
                 case 'rename':
                   _renameWallet(context, ref, wallet.id, wallet.name);
+                case 'permissions':
+                  context.push('/wc/permissions/${wallet.id}');
                 case 'delete':
                   _deleteWallet(
                       context, ref, wallet.id, wallet.name, wallets.length);
@@ -104,6 +125,9 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
                   value: 'pk', child: Text(l10n.walletDetailExportPk)),
               PopupMenuItem(
                   value: 'rename', child: Text(l10n.walletDetailRename)),
+              PopupMenuItem(
+                  value: 'permissions',
+                  child: Text(l10n.walletDetailPermissions)),
               PopupMenuItem(
                 value: 'delete',
                 child: Text(l10n.walletDetailDelete,
@@ -126,10 +150,25 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             const SizedBox(height: 16),
 
             GestureDetector(
-              onTap: () => setState(() => _useGnk = !_useGnk),
+              onTap: () {
+                final usdPrice = ref.read(marketPriceProvider).valueOrNull;
+                setState(() =>
+                    _mode = _nextMode(_mode, hasUsd: usdPrice != null));
+              },
               child: balanceAsync.when(
-                data: (balance) =>
-                    BalanceCard(balance: balance, useGnk: _useGnk),
+                data: (balance) {
+                  final usdPrice =
+                      ref.watch(marketPriceProvider).valueOrNull;
+                  final effectiveMode =
+                      (_mode == BalanceDisplayMode.usd && usdPrice == null)
+                          ? BalanceDisplayMode.gnk
+                          : _mode;
+                  return BalanceCard(
+                    balance: balance,
+                    mode: effectiveMode,
+                    usdPrice: usdPrice,
+                  );
+                },
                 loading: () => BalanceCard(balance: BalanceModel.zero()),
                 error: (e, _) => Card(
                   child: Padding(
@@ -454,9 +493,19 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
             FilledButton(
               style:
                   FilledButton.styleFrom(backgroundColor: GonkaColors.error),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(ctx);
-                ref.read(walletsProvider.notifier).deleteWallet(id);
+                final sessions =
+                    ref.read(wcSessionsByWalletProvider(id));
+                for (final s in sessions) {
+                  try {
+                    await ref
+                        .read(wcConnectProvider.notifier)
+                        .disconnect(s.topic);
+                  } catch (_) {}
+                }
+                await ref.read(walletsProvider.notifier).deleteWallet(id);
+                if (!context.mounted) return;
                 if (totalWallets <= 1) {
                   context.go('/onboarding/create');
                 } else {
@@ -472,15 +521,26 @@ class _WalletDetailScreenState extends ConsumerState<WalletDetailScreen> {
   }
 }
 
-class _TxHistoryTile extends StatelessWidget {
+class _TxHistoryTile extends ConsumerWidget {
   final TxHistoryItem tx;
   final String myAddress;
 
   const _TxHistoryTile({required this.tx, required this.myAddress});
 
+  String _resolveAddr(List<AddressBookEntry> book, String addr) {
+    for (final e in book) {
+      if (e.address == addr) return e.name;
+    }
+    if (addr.length > 20) {
+      return '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}';
+    }
+    return addr;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final addressBook = ref.watch(addressBookProvider);
     final isVesting = tx.type == TxType.vestingReward;
     final isCollateralDeposit = tx.type == TxType.collateralDeposit;
     final isCollateralWithdraw = tx.type == TxType.collateralWithdraw;
@@ -508,10 +568,7 @@ class _TxHistoryTile extends StatelessWidget {
           ? GonkaColors.txContractWithdraw
           : GonkaColors.txContract;
       title = action;
-      final addr = tx.toAddress;
-      subtitle = addr.length > 20
-          ? '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}'
-          : addr;
+      subtitle = _resolveAddr(addressBook, tx.toAddress);
     } else if (isVote) {
       final voteOption = VoteOption.fromString(tx.memo);
       icon = Icons.how_to_vote;
@@ -528,10 +585,7 @@ class _TxHistoryTile extends StatelessWidget {
       icon = Icons.vpn_key;
       color = GonkaColors.txGrant;
       title = l10n.txTypeGrant;
-      final addr = tx.toAddress;
-      subtitle = addr.length > 20
-          ? '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}'
-          : addr;
+      subtitle = _resolveAddr(addressBook, tx.toAddress);
     } else if (isCollateralDeposit) {
       icon = Icons.shield_outlined;
       color = GonkaColors.txCollateralDeposit;
@@ -553,18 +607,12 @@ class _TxHistoryTile extends StatelessWidget {
       icon = Icons.arrow_downward;
       color = GonkaColors.txReceive;
       title = l10n.txTypeReceived;
-      final addr = tx.fromAddress;
-      subtitle = addr.length > 20
-          ? '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}'
-          : addr;
+      subtitle = _resolveAddr(addressBook, tx.fromAddress);
     } else {
       icon = Icons.arrow_upward;
       color = GonkaColors.txSend;
       title = l10n.txTypeSent;
-      final addr = tx.toAddress;
-      subtitle = addr.length > 20
-          ? '${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}'
-          : addr;
+      subtitle = _resolveAddr(addressBook, tx.toAddress);
     }
 
     return Container(
@@ -579,7 +627,7 @@ class _TxHistoryTile extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => _showTxDetail(context),
+            onTap: () => _showTxDetail(context, ref),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
@@ -634,8 +682,9 @@ class _TxHistoryTile extends StatelessWidget {
     );
   }
 
-  void _showTxDetail(BuildContext context) {
+  void _showTxDetail(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final addressBook = ref.read(addressBookProvider);
     final isVesting = tx.type == TxType.vestingReward;
     final isCollateral = tx.isCollateral;
     final isGrant = tx.isGrant;
@@ -687,8 +736,8 @@ class _TxHistoryTile extends StatelessWidget {
               _detailRow(l10n.commonType, contractActionLabel),
               _detailRow(l10n.commonStatus, statusText),
               _detailRow(l10n.commonAmount, amountText),
-              _detailRow(l10n.commonFrom, tx.fromAddress),
-              _detailRow(l10n.commonContract, tx.toAddress),
+              _addressRow(context, ref, l10n.commonFrom, tx.fromAddress, addressBook),
+              _addressRow(context, ref, l10n.commonContract, tx.toAddress, addressBook),
               _detailRow(l10n.commonHeight, heightText),
               _detailRow(l10n.commonTime, timeText),
               _detailRow(l10n.commonHash, tx.txhash, isHash: true),
@@ -708,15 +757,15 @@ class _TxHistoryTile extends StatelessWidget {
             ] else if (isUnjail) ...[
               _detailRow(l10n.commonType, l10n.txTypeUnjail),
               _detailRow(l10n.commonStatus, statusText),
-              _detailRow(l10n.commonValidator, tx.fromAddress),
+              _addressRow(context, ref, l10n.commonValidator, tx.fromAddress, addressBook),
               _detailRow(l10n.commonHeight, heightText),
               _detailRow(l10n.commonTime, timeText),
               _detailRow(l10n.commonHash, tx.txhash, isHash: true),
             ] else if (isGrant) ...[
               _detailRow(l10n.commonType, l10n.txTypeGrant),
               _detailRow(l10n.commonStatus, statusText),
-              _detailRow(l10n.commonGranter, tx.fromAddress),
-              _detailRow(l10n.commonGrantee, tx.toAddress),
+              _addressRow(context, ref, l10n.commonGranter, tx.fromAddress, addressBook),
+              _addressRow(context, ref, l10n.commonGrantee, tx.toAddress, addressBook),
               _detailRow(l10n.commonHeight, heightText),
               _detailRow(l10n.commonTime, timeText),
               _detailRow(l10n.commonHash, tx.txhash, isHash: true),
@@ -728,7 +777,7 @@ class _TxHistoryTile extends StatelessWidget {
                       : l10n.txTypeCollateralWithdraw),
               _detailRow(l10n.commonStatus, statusText),
               _detailRow(l10n.commonAmount, amountText),
-              _detailRow(l10n.commonAddress, tx.fromAddress),
+              _addressRow(context, ref, l10n.commonAddress, tx.fromAddress, addressBook),
               _detailRow(l10n.commonHeight, heightText),
               _detailRow(l10n.commonTime, timeText),
               _detailRow(l10n.commonHash, tx.txhash, isHash: true),
@@ -749,8 +798,8 @@ class _TxHistoryTile extends StatelessWidget {
                       ? l10n.txTypeReceived
                       : l10n.txTypeSent),
               _detailRow(l10n.commonAmount, amountText),
-              _detailRow(l10n.commonFrom, tx.fromAddress),
-              _detailRow(l10n.commonTo, tx.toAddress),
+              _addressRow(context, ref, l10n.commonFrom, tx.fromAddress, addressBook),
+              _addressRow(context, ref, l10n.commonTo, tx.toAddress, addressBook),
               _detailRow(l10n.commonHeight, heightText),
               _detailRow(l10n.commonTime, timeText),
               if (tx.memo.isNotEmpty) _detailRow(l10n.commonMemo, tx.memo),
@@ -778,13 +827,59 @@ class _TxHistoryTile extends StatelessWidget {
                     fontSize: 12)),
           ),
           Expanded(
-            child: Text(value,
-                style: const TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    color: GonkaColors.textPrimary)),
+            child: isHash
+                ? _CopyableHashText(value: value)
+                : Text(value,
+                    style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                        color: GonkaColors.textPrimary)),
           ),
-          if (isHash) _CopyButton(value: value),
+          if (isHash) _OpenInExplorerButton(txhash: value),
+        ],
+      ),
+    );
+  }
+
+  Widget _addressRow(BuildContext context, WidgetRef ref, String label,
+      String address, List<AddressBookEntry> book) {
+    final entry = book.where((e) => e.address == address).firstOrNull;
+    final isKnown = entry != null;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 74,
+            child: Text(label,
+                style: const TextStyle(
+                    color: GonkaColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12)),
+          ),
+          Expanded(
+            child: isKnown
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.push('/addressbook',
+                          extra: entry.id);
+                    },
+                    child: Text(entry.name,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: GonkaColors.accentBlue,
+                            fontWeight: FontWeight.w600)),
+                  )
+                : Text(address,
+                    style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                        color: GonkaColors.textPrimary)),
+          ),
+          if (!isKnown && AddressService.validate(address))
+            _AddToBookButton(address: address),
         ],
       ),
     );
@@ -811,20 +906,26 @@ class _TxHistoryTile extends StatelessWidget {
   }
 }
 
-class _CopyButton extends StatefulWidget {
+class _CopyableHashText extends StatefulWidget {
   final String value;
-  const _CopyButton({required this.value});
+  const _CopyableHashText({required this.value});
 
   @override
-  State<_CopyButton> createState() => _CopyButtonState();
+  State<_CopyableHashText> createState() => _CopyableHashTextState();
 }
 
-class _CopyButtonState extends State<_CopyButton> {
+class _CopyableHashTextState extends State<_CopyableHashText> {
   bool _copied = false;
 
   void _onTap() {
     Clipboard.setData(ClipboardData(text: widget.value));
     setState(() => _copied = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).widgetHashCopied),
+        duration: const Duration(seconds: 1),
+      ),
+    );
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });
@@ -834,12 +935,107 @@ class _CopyButtonState extends State<_CopyButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _onTap,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 4),
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        widget.value,
+        style: TextStyle(
+          fontFamily: 'monospace',
+          fontSize: 12,
+          color: _copied ? GonkaColors.success : GonkaColors.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
+class _OpenInExplorerButton extends StatelessWidget {
+  final String txhash;
+  const _OpenInExplorerButton({required this.txhash});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => launchUrl(
+        Uri.parse('https://tracker.gonka.vip/tx/$txhash'),
+        mode: LaunchMode.externalApplication,
+      ),
+      child: const Padding(
+        padding: EdgeInsets.only(left: 4),
         child: Icon(
-          _copied ? Icons.check : Icons.copy,
+          Icons.open_in_new,
           size: 16,
-          color: _copied ? GonkaColors.success : GonkaColors.textMuted,
+          color: GonkaColors.textMuted,
+        ),
+      ),
+    );
+  }
+}
+
+class _AddToBookButton extends ConsumerStatefulWidget {
+  final String address;
+  const _AddToBookButton({required this.address});
+
+  @override
+  ConsumerState<_AddToBookButton> createState() => _AddToBookButtonState();
+}
+
+class _AddToBookButtonState extends ConsumerState<_AddToBookButton> {
+  bool _added = false;
+
+  void _onTap() {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.addressbookAdd),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: l10n.addressbookNameLabel,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                ref
+                    .read(addressBookProvider.notifier)
+                    .add(name, widget.address);
+                Navigator.pop(ctx);
+                setState(() => _added = true);
+              }
+            },
+            child: Text(l10n.addressbookSave),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_added) {
+      return const Padding(
+        padding: EdgeInsets.only(left: 4),
+        child: Icon(Icons.check, size: 16, color: GonkaColors.success),
+      );
+    }
+    return GestureDetector(
+      onTap: _onTap,
+      child: const Padding(
+        padding: EdgeInsets.only(left: 4),
+        child: Icon(
+          Icons.person_add_alt_1,
+          size: 16,
+          color: GonkaColors.textMuted,
         ),
       ),
     );

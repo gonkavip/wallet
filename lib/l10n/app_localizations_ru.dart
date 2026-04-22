@@ -902,4 +902,175 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get widgetTxHash => 'Хэш транзакции';
+
+  @override
+  String get scanUnrecognized => 'Нераспознанный QR-код';
+
+  @override
+  String get addressbookTitle => 'Адресная книга';
+
+  @override
+  String get addressbookEmpty => 'Нет сохранённых адресов';
+
+  @override
+  String get addressbookAdd => 'Добавить адрес';
+
+  @override
+  String get addressbookNameLabel => 'Имя';
+
+  @override
+  String get addressbookAddressLabel => 'Адрес';
+
+  @override
+  String get addressbookDelete => 'Удалить';
+
+  @override
+  String get addressbookDeleteConfirm => 'Удалить этот адрес?';
+
+  @override
+  String get addressbookEdit => 'Редактировать';
+
+  @override
+  String get addressbookSave => 'Сохранить';
+
+  @override
+  String get addressbookInvalidAddress => 'Некорректный gonka адрес';
+
+  @override
+  String get addressbookDuplicate => 'Этот адрес уже сохранён';
+
+  @override
+  String get addressbookSelectTitle => 'Выберите получателя';
+
+  @override
+  String get wcConnectTitle => 'Подключить DApp';
+
+  @override
+  String get wcConnectScan => 'Сканировать QR';
+
+  @override
+  String get wcConnectPaste => 'Вставить URI';
+
+  @override
+  String get wcConnectContinue => 'Продолжить';
+
+  @override
+  String get wcConnectUriHint => 'wc:...';
+
+  @override
+  String get wcConnectInvalidUri => 'Некорректный WalletConnect URI';
+
+  @override
+  String get wcConnectExpiredUri => 'Срок действия запроса истёк';
+
+  @override
+  String get wcApproveTitle => 'Запрос подключения';
+
+  @override
+  String get wcApproveChooseWallet => 'Выберите кошелёк';
+
+  @override
+  String get wcApproveChainsLabel => 'Сети';
+
+  @override
+  String get wcApproveMethodsLabel => 'Методы';
+
+  @override
+  String get wcApproveApprove => 'Подтвердить';
+
+  @override
+  String get wcApproveReject => 'Отклонить';
+
+  @override
+  String get wcApproveUnsupportedChain =>
+      'DApp запрашивает неподдерживаемую сеть. Поддерживается только cosmos:gonka-mainnet.';
+
+  @override
+  String get wcApproveUnsupportedMethod =>
+      'DApp запрашивает неподдерживаемый метод.';
+
+  @override
+  String get wcSignTitle => 'Подписать транзакцию';
+
+  @override
+  String get wcSignDapp => 'DApp';
+
+  @override
+  String get wcSignSigner => 'Подписывающий';
+
+  @override
+  String get wcSignMemo => 'Заметка';
+
+  @override
+  String get wcSignApprove => 'Подтвердить и подписать';
+
+  @override
+  String get wcSignReject => 'Отклонить';
+
+  @override
+  String get wcSignUnknownMessage =>
+      'Неизвестный тип сообщения. Внимательно проверьте данные.';
+
+  @override
+  String get wcPermissionsTitle => 'Разрешения';
+
+  @override
+  String get wcPermissionsActive => 'Активные сессии';
+
+  @override
+  String get wcPermissionsNamespaces => 'Namespace';
+
+  @override
+  String get wcPermissionsDisconnect => 'Отключить';
+
+  @override
+  String get wcPermissionsDisconnectConfirm => 'Отключить этот DApp?';
+
+  @override
+  String get wcPermissionsAddSession => 'Добавить подключение';
+
+  @override
+  String get wcPermissionsEmpty => 'Нет подключённых DApp';
+
+  @override
+  String wcPermissionsApproved(String date) {
+    return 'Подключено $date';
+  }
+
+  @override
+  String get walletDetailPermissions => 'Разрешения';
+
+  @override
+  String get wcErrorNoWallets => 'Создайте кошелёк перед подключением DApp';
+
+  @override
+  String get wcErrorChainMismatch =>
+      'Несоответствие сети: ожидалось cosmos:gonka-mainnet';
+
+  @override
+  String get wcErrorSignerMismatch =>
+      'Адрес подписи не совпадает с подключённым кошельком';
+
+  @override
+  String wcErrorGeneric(String error) {
+    return 'Ошибка WalletConnect: $error';
+  }
+
+  @override
+  String get wcBiometricReason => 'Подтвердите личность для подписи';
+
+  @override
+  String get wcMsgSendFrom => 'Откуда';
+
+  @override
+  String get wcMsgSendTo => 'Куда';
+
+  @override
+  String get wcMsgSendAmount => 'Сумма';
+
+  @override
+  String get wcMsgRawTypeUrl => 'Тип';
+
+  @override
+  String get wcMsgRawValueHex => 'Сырые данные (hex)';
 }
