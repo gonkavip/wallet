@@ -23,9 +23,17 @@ class WcUriData {
 }
 
 class WcUriParser {
+
   static String? extractFromString(String input) {
     final trimmed = input.trim();
     if (trimmed.isEmpty) return null;
+
+    if (trimmed.startsWith('wc://')) {
+      final rest = trimmed.substring('wc://'.length);
+      final decoded = Uri.decodeComponent(rest);
+      if (decoded.startsWith('wc:')) return decoded;
+      return null;
+    }
 
     if (trimmed.startsWith('wc:')) {
       return trimmed;

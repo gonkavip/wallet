@@ -3,6 +3,7 @@ import '../../data/models/wc_proposal_view.dart';
 import 'wc_constants.dart';
 
 class WcNamespaceBuilder {
+
   static WcValidationResult validateProposal(ProposalData proposal) {
     final required = proposal.requiredNamespaces;
     if (required.isEmpty) {

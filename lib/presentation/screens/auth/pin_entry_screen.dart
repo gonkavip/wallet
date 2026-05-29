@@ -17,6 +17,7 @@ enum _PinErrorKind { cooldown, wrongPin }
 
 class PinEntryScreen extends ConsumerStatefulWidget {
   final PinMode mode;
+
   final VoidCallback? onSuccess;
   const PinEntryScreen({super.key, this.mode = PinMode.login, this.onSuccess});
 

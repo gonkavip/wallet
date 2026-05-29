@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../config/constants.dart';
 import '../../../config/design_tokens.dart';
+import '../../../core/governance/proposal_math.dart';
 import '../../../core/network/node_client.dart';
 import '../../../core/transaction/msg_vote.dart';
 import '../../../l10n/app_localizations.dart';
@@ -38,6 +44,18 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   bool _success = false;
   String _txhash = '';
   String _error = '';
+  final List<TapGestureRecognizer> _linkRecognizers = [];
+
+  String? _linkifiedSource;
+  List<InlineSpan>? _linkifiedSpans;
+
+  @override
+  void dispose() {
+    for (final r in _linkRecognizers) {
+      r.dispose();
+    }
+    super.dispose();
+  }
 
   Future<void> _authenticate() async {
     if (_selectedOption == null) return;
@@ -133,29 +151,34 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
               error: (e, _) => Center(
                 child: Text(l10n.proposalDetailErrorLoad(e.toString())),
               ),
-              data: (proposal) {
-                if (proposal == null) {
+              data: (detail) {
+                if (detail == null) {
                   return Center(child: Text(l10n.proposalDetailNotFound));
                 }
-                return _buildDetail(context, proposal);
+                return _buildDetail(context, detail);
               },
             )),
     );
   }
 
-  Widget _buildDetail(BuildContext context, ProposalItem proposal) {
+  Widget _buildDetail(BuildContext context, ProposalDetail detail) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final tally = proposal.tally;
-    final totalVotes = tally.totalVotes;
+    final proposal = detail.proposal;
+    final tally = detail.tally;
+    final outcome = computeTallyOutcome(
+      tally: tally,
+      params: detail.params,
+      totalBonded: detail.totalBonded,
+    );
 
     final Color badgeColor;
     final String badgeText;
     if (proposal.isVotingPeriod) {
-      badgeColor = GonkaColors.success;
+      badgeColor = GonkaColors.info;
       badgeText = l10n.governanceStatusActive;
     } else if (proposal.isPassed) {
-      badgeColor = GonkaColors.info;
+      badgeColor = GonkaColors.success;
       badgeText = l10n.governanceStatusPassed;
     } else if (proposal.isRejected) {
       badgeColor = GonkaColors.error;
@@ -189,6 +212,21 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         Row(
           children: [
             StatusPill(label: badgeText, color: badgeColor),
+            const Spacer(),
+            OutlinedButton.icon(
+              onPressed: () => launchUrl(
+                Uri.parse('https://vote.gonka.vip/governance/${proposal.id}'),
+                mode: LaunchMode.externalApplication,
+              ),
+              icon: const Icon(Icons.forum_outlined, size: 16),
+              label: Text(l10n.proposalDiscuss),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: GonkaColors.accentBlue,
+                side: const BorderSide(color: GonkaColors.borderSubtle),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 20),
@@ -202,11 +240,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 letterSpacing: 0.4,
               )),
           const SizedBox(height: 6),
-          Text(proposal.summary,
-              style: const TextStyle(
-                  fontSize: 14,
-                  color: GonkaColors.textPrimary,
-                  height: 1.5)),
+          _linkifiedText(proposal.summary),
           const SizedBox(height: 20),
         ],
 
@@ -236,6 +270,28 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           const SizedBox(height: 8),
         ],
 
+        if (proposal.isVotingPeriod && proposal.votingEndTime != null) ...[
+
+          _VotingCountdownRow(
+            label: l10n.proposalTimeRemaining,
+            endTime: proposal.votingEndTime!,
+            endedLabel: l10n.proposalVotingEnded,
+          ),
+          const SizedBox(height: 8),
+        ],
+
+        if (proposal.totalDeposit > BigInt.zero) ...[
+          _infoRow(l10n.proposalDetailDeposit,
+              '${formatGnk(proposal.totalDeposit)} ${GonkaConstants.displayDenom}'),
+          const SizedBox(height: 8),
+        ],
+
+        if (proposal.metadata.isNotEmpty &&
+            proposal.metadata.startsWith('http')) ...[
+          _linkRow(l10n.proposalDetailMetadata, proposal.metadata),
+          const SizedBox(height: 8),
+        ],
+
         const SizedBox(height: 16),
 
         Text(l10n.proposalDetailTally,
@@ -243,17 +299,41 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 color: GonkaColors.textPrimary,
                 fontWeight: FontWeight.w700)),
         const SizedBox(height: 14),
-        _tallyBar(l10n.proposalVoteYes, tally.yesCount, totalVotes,
+        _tallyBar(l10n.proposalVoteYes, tally.yesCount, outcome.yesFraction,
             GonkaColors.success),
         const SizedBox(height: 10),
-        _tallyBar(l10n.proposalVoteAbstain, tally.abstainCount, totalVotes,
-            GonkaColors.textMuted),
+        _tallyBar(l10n.proposalVoteAbstain, tally.abstainCount,
+            outcome.abstainFraction, GonkaColors.textMuted),
         const SizedBox(height: 10),
-        _tallyBar(l10n.proposalVoteNo, tally.noCount, totalVotes,
+        _tallyBar(l10n.proposalVoteNo, tally.noCount, outcome.noFraction,
             GonkaColors.error),
         const SizedBox(height: 10),
         _tallyBar(l10n.proposalVoteNoWithVeto, tally.noWithVetoCount,
-            totalVotes, GonkaColors.warning),
+            outcome.vetoFraction, GonkaColors.warning),
+
+        const SizedBox(height: 20),
+
+        if (outcome.hasBonded) ...[
+          _metricRow(
+            l10n.proposalQuorum,
+            '${outcome.turnoutPct.toStringAsFixed(1)}% / ${outcome.quorumPct.toStringAsFixed(0)}%',
+            outcome.quorumPassed ? GonkaColors.success : GonkaColors.error,
+          ),
+          const SizedBox(height: 8),
+          _metricRow(
+            l10n.proposalVotingPower,
+            '${formatWeightShort(outcome.totalVotes)} / ${formatWeightShort(detail.totalBonded)}',
+            GonkaColors.textPrimary,
+          ),
+          if (detail.bondedValidatorCount > 0) ...[
+            const SizedBox(height: 8),
+            _metricRow(
+              l10n.proposalVoters,
+              '${detail.voterCount} / ${detail.bondedValidatorCount}',
+              GonkaColors.textPrimary,
+            ),
+          ],
+        ],
 
         const SizedBox(height: 24),
         const Divider(),
@@ -320,12 +400,82 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
   }
 
-  Widget _tallyBar(String label, BigInt count, BigInt total, Color color) {
-    final percentage =
-        total > BigInt.zero ? (count * BigInt.from(100)) ~/ total : BigInt.zero;
-    final fraction = total > BigInt.zero
-        ? count.toDouble() / total.toDouble()
-        : 0.0;
+  Widget _linkifiedText(String text) {
+    const baseStyle = TextStyle(
+        fontSize: 14, color: GonkaColors.textPrimary, height: 1.5);
+
+    if (_linkifiedSource != text || _linkifiedSpans == null) {
+      for (final r in _linkRecognizers) {
+        r.dispose();
+      }
+      _linkRecognizers.clear();
+
+      final urlRe = RegExp(r'(https?:\/\/[^\s)]+)');
+      final spans = <InlineSpan>[];
+      var last = 0;
+      for (final m in urlRe.allMatches(text)) {
+        if (m.start > last) {
+          spans.add(TextSpan(text: text.substring(last, m.start)));
+        }
+        final url = m.group(0)!;
+        final recognizer = TapGestureRecognizer()
+          ..onTap = () =>
+              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+        _linkRecognizers.add(recognizer);
+        spans.add(TextSpan(
+          text: url,
+          style: const TextStyle(color: GonkaColors.accentBlue),
+          recognizer: recognizer,
+        ));
+        last = m.end;
+      }
+      if (last < text.length) {
+        spans.add(TextSpan(text: text.substring(last)));
+      }
+      _linkifiedSource = text;
+      _linkifiedSpans = spans;
+    }
+
+    return Text.rich(TextSpan(style: baseStyle, children: _linkifiedSpans));
+  }
+
+  Widget _linkRow(String label, String url) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(label,
+              style: const TextStyle(
+                  color: GonkaColors.textMuted,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12)),
+        ),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => launchUrl(Uri.parse(url),
+                mode: LaunchMode.externalApplication),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(url,
+                      style: const TextStyle(
+                          fontSize: 13, color: GonkaColors.accentBlue),
+                      overflow: TextOverflow.ellipsis),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.open_in_new,
+                    size: 14, color: GonkaColors.accentBlue),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tallyBar(String label, BigInt count, double fraction, Color color) {
+    final percentage = (fraction * 100).round();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,11 +488,19 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: GonkaColors.textPrimary)),
-            Text('$percentage%',
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: color)),
+            Row(
+              children: [
+                Text(formatWeightShort(count),
+                    style: const TextStyle(
+                        fontSize: 12, color: GonkaColors.textMuted)),
+                const SizedBox(width: 8),
+                Text('$percentage%',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: color)),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -355,6 +513,24 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             minHeight: 8,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _metricRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label,
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: GonkaColors.textPrimary)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: valueColor)),
       ],
     );
   }
@@ -445,5 +621,77 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     final local = dt.toLocal();
     return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year} '
         '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class _VotingCountdownRow extends StatefulWidget {
+  final String label;
+  final DateTime endTime;
+  final String endedLabel;
+
+  const _VotingCountdownRow({
+    required this.label,
+    required this.endTime,
+    required this.endedLabel,
+  });
+
+  @override
+  State<_VotingCountdownRow> createState() => _VotingCountdownRowState();
+}
+
+class _VotingCountdownRowState extends State<_VotingCountdownRow> {
+  Timer? _ticker;
+  late Duration _remaining;
+
+  @override
+  void initState() {
+    super.initState();
+    _remaining = widget.endTime.difference(DateTime.now());
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final r = widget.endTime.difference(DateTime.now());
+      setState(() => _remaining = r);
+      if (r.isNegative) _ticker?.cancel();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  String _format(Duration d) {
+    if (d.isNegative) return widget.endedLabel;
+    final days = d.inDays;
+    final hours = d.inHours % 24;
+    final minutes = d.inMinutes % 60;
+    final seconds = d.inSeconds % 60;
+    if (days > 0) return '${days}d ${hours}h ${minutes}m ${seconds}s';
+    if (hours > 0) return '${hours}h ${minutes}m ${seconds}s';
+    if (minutes > 0) return '${minutes}m ${seconds}s';
+    return '${seconds}s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(widget.label,
+              style: const TextStyle(
+                  color: GonkaColors.textMuted,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12)),
+        ),
+        Expanded(
+          child: Text(_format(_remaining),
+              style: const TextStyle(
+                  fontSize: 13, color: GonkaColors.textPrimary)),
+        ),
+      ],
+    );
   }
 }

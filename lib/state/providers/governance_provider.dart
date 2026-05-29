@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/crypto/address_service.dart';
 import '../../core/network/node_client.dart';
 import '../../core/network/node_manager.dart';
 import '../../core/transaction/broadcast_service.dart';
@@ -64,12 +65,62 @@ class ProposalsNotifier
   }
 }
 
+final govTallyParamsProvider = FutureProvider<GovTallyParams>((ref) async {
+  final client = ref.watch(nodeManagerProvider).client;
+  if (client == null) return GovTallyParams.defaults();
+  return client.getGovTallyParams();
+});
+
+final bondedInfoProvider = FutureProvider<BondedInfo>((ref) async {
+  final client = ref.watch(nodeManagerProvider).client;
+  if (client == null) return BondedInfo(total: BigInt.zero, operators: <String>{});
+  return client.getBondedInfo();
+});
+
 final proposalDetailProvider =
-    FutureProvider.family<ProposalItem?, String>((ref, proposalId) async {
-  final nodeManager = ref.watch(nodeManagerProvider);
-  final client = nodeManager.client;
+    FutureProvider.family<ProposalDetail?, String>((ref, proposalId) async {
+  final client = ref.watch(nodeManagerProvider).client;
   if (client == null) return null;
-  return client.getProposal(proposalId);
+
+  final paramsFuture = ref.watch(govTallyParamsProvider.future);
+  final bondedFuture = ref.watch(bondedInfoProvider.future);
+
+  final proposal = await client.getProposal(proposalId);
+  if (proposal == null) return null;
+
+  var tally = proposal.tally;
+  var totalBonded = BigInt.zero;
+  var bondedCount = 0;
+  var voterCount = 0;
+  var params = GovTallyParams.defaults();
+  if (proposal.isVotingPeriod) {
+    final live = await client.getProposalTally(proposalId);
+    if (live != null) tally = live;
+    final bonded = await bondedFuture;
+    totalBonded = bonded.total;
+    bondedCount = bonded.validatorCount;
+    params = await paramsFuture;
+
+    final voters = await client.getProposalVoters(proposalId);
+    for (final voter in voters) {
+      String valoper;
+      try {
+        valoper = AddressService.toValoperAddress(voter);
+      } catch (_) {
+        continue;
+      }
+      if (bonded.operators.contains(valoper)) voterCount++;
+    }
+  }
+
+  return ProposalDetail(
+    proposal: proposal,
+    tally: tally,
+    params: params,
+    totalBonded: totalBonded,
+    bondedValidatorCount: bondedCount,
+    voterCount: voterCount,
+  );
 });
 
 class VoteState {

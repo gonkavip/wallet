@@ -50,6 +50,7 @@ class WcSessionsNotifier extends StateNotifier<List<WcSession>> {
       state = fromHive;
       return;
     }
+
     final active = _wc.getActiveSessions();
     final reconciled =
         fromHive.where((s) => active.containsKey(s.topic)).toList();

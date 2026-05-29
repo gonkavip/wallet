@@ -440,6 +440,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sendContinue => 'Continuar';
 
   @override
+  String get sendMemoLabel => 'Memo (opcional)';
+
+  @override
+  String get sendMemoHint => 'Nota anexada à transação';
+
+  @override
   String get sendErrorEnterAddress => 'Digite o endereço do destinatário';
 
   @override
@@ -517,6 +523,74 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get minersUnjailSubtitle => 'Libere seu validador';
+
+  @override
+  String get minersPocDelegation => 'Delegar modelo';
+
+  @override
+  String get minersPocDelegationSubtitle =>
+      'Delegue o poder de voto PoC de um modelo';
+
+  @override
+  String get pocDelegationTitle => 'Delegar modelo';
+
+  @override
+  String get pocDelegationInfo =>
+      'Delegue o poder de voto de Prova de Computação de um modelo a outro participante. Deixe o destino vazio para limpar a delegação.';
+
+  @override
+  String get pocDelegationModelLabel => 'Modelo';
+
+  @override
+  String get pocDelegationModelHint => 'Selecione um modelo';
+
+  @override
+  String get pocDelegationModelError => 'Selecione um modelo';
+
+  @override
+  String get pocDelegationModelsError => 'Falha ao carregar os modelos';
+
+  @override
+  String get pocDelegationAddressLabel => 'Delegar para o endereço';
+
+  @override
+  String get pocDelegationAddressHint => 'gonka1...';
+
+  @override
+  String get pocDelegationDelegate => 'Delegar';
+
+  @override
+  String get pocDelegationClear => 'Limpar delegação';
+
+  @override
+  String get pocDelegationConfirmTitle => 'Confirmar delegação';
+
+  @override
+  String get pocDelegationConfirmClearTitle => 'Confirmar limpeza';
+
+  @override
+  String get pocDelegationResultSuccess => 'Delegação definida';
+
+  @override
+  String get pocDelegationResultFailed => 'Falha na delegação';
+
+  @override
+  String get pocDelegationResultClearSuccess => 'Delegação limpa';
+
+  @override
+  String get pocDelegationResultClearFailed => 'Falha ao limpar';
+
+  @override
+  String get pocDelegationSenderNotParticipant =>
+      'Esta carteira não é um participante registrado da rede, portanto não pode delegar um modelo.';
+
+  @override
+  String get pocDelegationErrorSenderNotParticipant =>
+      'Sua carteira não é um participante registrado da rede.';
+
+  @override
+  String get pocDelegationErrorDelegateNotParticipant =>
+      'O endereço do delegado não é um participante registrado da rede.';
 
   @override
   String get minersGovernance => 'Governança';
@@ -784,6 +858,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get proposalVotingEnded => 'A votação desta proposta foi encerrada.';
+
+  @override
+  String get proposalQuorum => 'Quórum (participação)';
+
+  @override
+  String get proposalVotingPower => 'Poder de voto';
+
+  @override
+  String get proposalTimeRemaining => 'Tempo restante';
+
+  @override
+  String get proposalVoters => 'Votantes';
+
+  @override
+  String get proposalDetailDeposit => 'Depósito total';
+
+  @override
+  String get proposalDetailMetadata => 'Detalhes';
+
+  @override
+  String get proposalDiscuss => 'Discutir';
 
   @override
   String get proposalVoteSubmitted => 'Voto enviado';

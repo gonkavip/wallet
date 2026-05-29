@@ -1,5 +1,5 @@
 class WcConstants {
-  static const String projectId = String.fromEnvironment('WC_PROJECT_ID');
+  static const String projectId = 'c4365e6c61d666a6987eca360b4fe886';
 
   static const String appName = 'Gonka Wallet';
   static const String appDescription = 'Gonka blockchain wallet';

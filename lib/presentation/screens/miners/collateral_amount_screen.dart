@@ -135,6 +135,7 @@ class _CollateralAmountScreenState
     final collateralState = ref.watch(collateralProvider);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(title),
         leading: IconButton(

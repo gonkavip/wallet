@@ -234,6 +234,33 @@ class NodeClient {
     }
   }
 
+  Future<bool> isParticipant(String address) async {
+    try {
+      final response = await _dio.get(
+        '$_restBase${ApiEndpoints.participant(address)}',
+      );
+      return response.data['participant'] != null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return false;
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getModels() async {
+    try {
+      final response = await _dio.get(
+        '$_restBase${ApiEndpoints.modelsAll}',
+      );
+      final models = response.data['model'] as List? ?? [];
+      return models
+          .map((m) => m['id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<List<ProposalItem>> getProposals({int? status}) async {
     try {
       final response = await _dio.get(
@@ -256,6 +283,74 @@ class NodeClient {
       return ProposalItem.fromJson(proposal);
     } catch (_) {
       return null;
+    }
+  }
+
+  Future<TallyResult?> getProposalTally(String proposalId) async {
+    try {
+      final response = await _dio.get(
+        '$_restBase${ApiEndpoints.proposalTally(proposalId)}',
+      );
+      final tally = response.data['tally'] as Map<String, dynamic>?;
+      if (tally == null) return null;
+      return TallyResult.fromJson(tally);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<GovTallyParams> getGovTallyParams() async {
+    try {
+      final response = await _dio.get(
+        '$_restBase${ApiEndpoints.govParamsTallying}',
+      );
+      return GovTallyParams.fromJson(response.data as Map<String, dynamic>);
+    } catch (_) {
+      return GovTallyParams.defaults();
+    }
+  }
+
+  Future<BondedInfo> getBondedInfo() async {
+    try {
+      var sum = BigInt.zero;
+      final operators = <String>{};
+      String? nextKey;
+      do {
+        final keyParam = nextKey != null && nextKey.isNotEmpty
+            ? '&pagination.key=${Uri.encodeQueryComponent(nextKey)}'
+            : '';
+        final url = '$_restBase${ApiEndpoints.bondedValidators()}$keyParam';
+        final response = await _dio.get(url);
+        final validators = response.data['validators'] as List? ?? [];
+        for (final v in validators) {
+          final tokens =
+              BigInt.tryParse(v['tokens']?.toString() ?? '0') ?? BigInt.zero;
+          if (tokens > BigInt.zero) {
+            sum += tokens;
+            final op = v['operator_address']?.toString();
+            if (op != null && op.isNotEmpty) operators.add(op);
+          }
+        }
+        nextKey = response.data['pagination']?['next_key']?.toString();
+      } while (nextKey != null && nextKey.isNotEmpty);
+      return BondedInfo(total: sum, operators: operators);
+    } catch (_) {
+      return BondedInfo(total: BigInt.zero, operators: <String>{});
+    }
+  }
+
+  Future<List<String>> getProposalVoters(String proposalId) async {
+    try {
+      final response = await _dio.get(
+        '$_restBase${ApiEndpoints.proposalVotes(proposalId)}',
+      );
+      final votes = response.data['votes'] as List? ?? [];
+      return votes
+          .map((v) => v['voter']?.toString() ?? '')
+          .where((s) => s.isNotEmpty)
+          .toList();
+    } catch (_) {
+      return [];
     }
   }
 
@@ -544,6 +639,8 @@ class ProposalItem {
   final String metadata;
   final String messageType;
 
+  final BigInt totalDeposit;
+
   ProposalItem({
     required this.id,
     required this.title,
@@ -556,7 +653,8 @@ class ProposalItem {
     required this.tally,
     this.metadata = '',
     this.messageType = '',
-  });
+    BigInt? totalDeposit,
+  }) : totalDeposit = totalDeposit ?? BigInt.zero;
 
   bool get isVotingPeriod => status == 'PROPOSAL_STATUS_VOTING_PERIOD';
   bool get isPassed => status == 'PROPOSAL_STATUS_PASSED';
@@ -570,6 +668,14 @@ class ProposalItem {
 
     final tallyJson = json['final_tally_result'] as Map<String, dynamic>? ?? {};
 
+    final deposits = json['total_deposit'] as List? ?? [];
+    var deposit = BigInt.zero;
+    for (final d in deposits) {
+      if (d['denom'] == 'ngonka') {
+        deposit += BigInt.tryParse(d['amount']?.toString() ?? '0') ?? BigInt.zero;
+      }
+    }
+
     return ProposalItem(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
@@ -582,6 +688,64 @@ class ProposalItem {
       tally: TallyResult.fromJson(tallyJson),
       metadata: json['metadata']?.toString() ?? '',
       messageType: messageType,
+      totalDeposit: deposit,
     );
   }
+}
+
+class BondedInfo {
+  final BigInt total;
+  final Set<String> operators;
+  BondedInfo({required this.total, required this.operators});
+  int get validatorCount => operators.length;
+}
+
+class GovTallyParams {
+  final double quorum;
+  final double threshold;
+  final double vetoThreshold;
+
+  GovTallyParams({
+    required this.quorum,
+    required this.threshold,
+    required this.vetoThreshold,
+  });
+
+  factory GovTallyParams.defaults() =>
+      GovTallyParams(quorum: 0.25, threshold: 0.5, vetoThreshold: 0.334);
+
+  factory GovTallyParams.fromJson(Map<String, dynamic> json) {
+
+    final src = (json['params'] as Map<String, dynamic>?) ??
+        (json['tally_params'] as Map<String, dynamic>?) ??
+        const {};
+    final d = GovTallyParams.defaults();
+    return GovTallyParams(
+      quorum: double.tryParse(src['quorum']?.toString() ?? '') ?? d.quorum,
+      threshold:
+          double.tryParse(src['threshold']?.toString() ?? '') ?? d.threshold,
+      vetoThreshold: double.tryParse(src['veto_threshold']?.toString() ?? '') ??
+          d.vetoThreshold,
+    );
+  }
+}
+
+class ProposalDetail {
+  final ProposalItem proposal;
+  final TallyResult tally;
+  final GovTallyParams params;
+  final BigInt totalBonded;
+
+  final int bondedValidatorCount;
+
+  final int voterCount;
+
+  ProposalDetail({
+    required this.proposal,
+    required this.tally,
+    required this.params,
+    required this.totalBonded,
+    this.bondedValidatorCount = 0,
+    this.voterCount = 0,
+  });
 }

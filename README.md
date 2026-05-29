@@ -30,6 +30,7 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 - QR code generation for receiving tokens
 - Address book picker in the recipient field
 - Amount input in GNK or ngonka with denomination toggle
+- Optional memo attached to outgoing transactions
 - Balance display mode cycles GNK → ngonka → USD (USD via live market price)
 - Thousands separator formatting for all amounts
 - Smart GNK display: 2 decimal digits for whole amounts, variable precision for fractional
@@ -48,7 +49,7 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 
 ### WalletConnect v2
 - Connect to DApps via wc: URI — QR scan on mobile, paste on desktop
-- Deep link support: gonka://wc?uri=... opens pairing directly
+- Deep link support: gonka://wc?uri=... and standard wc://... links open pairing directly
 - Per-wallet session binding (one session ↔ one wallet)
 - Supported namespace: cosmos:gonka-mainnet, method cosmos_signDirect
 - Approval screen decodes MsgSend into from / to / amount; unknown messages
@@ -65,8 +66,9 @@ Secure, self-custody wallet for the Gonka blockchain. Built with Flutter for iOS
 ### Host Operations
 - **Collateral** — deposit and withdraw collateral for node operators
 - **Grant Permissions** — grant 27 ML operation permissions to an operational key (authz MsgGrant)
+- **Delegate Model** — delegate a model's Proof-of-Compute voting power to another participant, or clear it (with pre-flight participant checks)
 - **Unjail** — unjail a validator with jail status detection
-- **Governance** — view proposals, tally results, and cast votes (Yes / No / Abstain / No with Veto)
+- **Governance** — view proposals, cast votes (Yes / No / Abstain / No with Veto), and inspect live tally detail: turnout vs quorum, per-option breakdown, voter count, total deposit, and voting-period countdown
 - **Tracker** — link to professional dashboard at tracker.gonka.vip
 
 ### Node Management
@@ -130,6 +132,7 @@ lib/
     crypto/          BIP39, BIP32, secp256k1, bech32, private key utilities
     network/         Node client, node manager, API endpoints
     transaction/     Protobuf encoding, tx builder, message types
+    governance/      Tally math (turnout, quorum, vote fractions)
     walletconnect/   WC v2 service, URI parser, namespace builder, SignDoc/MsgSend decoders
     platform_util    Platform detection (desktop vs mobile)
   data/

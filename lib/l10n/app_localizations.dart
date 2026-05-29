@@ -902,6 +902,18 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get sendContinue;
 
+  /// No description provided for @sendMemoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Memo (optional)'**
+  String get sendMemoLabel;
+
+  /// No description provided for @sendMemoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Note attached to the transaction'**
+  String get sendMemoHint;
+
   /// No description provided for @sendErrorEnterAddress.
   ///
   /// In en, this message translates to:
@@ -1057,6 +1069,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unjail your validator'**
   String get minersUnjailSubtitle;
+
+  /// No description provided for @minersPocDelegation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate Model'**
+  String get minersPocDelegation;
+
+  /// No description provided for @minersPocDelegationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate a model\'s PoC voting power'**
+  String get minersPocDelegationSubtitle;
+
+  /// No description provided for @pocDelegationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate Model'**
+  String get pocDelegationTitle;
+
+  /// No description provided for @pocDelegationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate the Proof-of-Compute voting power of a model to another participant. Leave the delegation empty to clear it.'**
+  String get pocDelegationInfo;
+
+  /// No description provided for @pocDelegationModelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get pocDelegationModelLabel;
+
+  /// No description provided for @pocDelegationModelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a model'**
+  String get pocDelegationModelHint;
+
+  /// No description provided for @pocDelegationModelError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a model'**
+  String get pocDelegationModelError;
+
+  /// No description provided for @pocDelegationModelsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load models'**
+  String get pocDelegationModelsError;
+
+  /// No description provided for @pocDelegationAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate to address'**
+  String get pocDelegationAddressLabel;
+
+  /// No description provided for @pocDelegationAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'gonka1...'**
+  String get pocDelegationAddressHint;
+
+  /// No description provided for @pocDelegationDelegate.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegate'**
+  String get pocDelegationDelegate;
+
+  /// No description provided for @pocDelegationClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear delegation'**
+  String get pocDelegationClear;
+
+  /// No description provided for @pocDelegationConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delegation'**
+  String get pocDelegationConfirmTitle;
+
+  /// No description provided for @pocDelegationConfirmClearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Clear'**
+  String get pocDelegationConfirmClearTitle;
+
+  /// No description provided for @pocDelegationResultSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegation set'**
+  String get pocDelegationResultSuccess;
+
+  /// No description provided for @pocDelegationResultFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegation failed'**
+  String get pocDelegationResultFailed;
+
+  /// No description provided for @pocDelegationResultClearSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegation cleared'**
+  String get pocDelegationResultClearSuccess;
+
+  /// No description provided for @pocDelegationResultClearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear failed'**
+  String get pocDelegationResultClearFailed;
+
+  /// No description provided for @pocDelegationSenderNotParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet is not a registered network participant, so it cannot delegate a model.'**
+  String get pocDelegationSenderNotParticipant;
+
+  /// No description provided for @pocDelegationErrorSenderNotParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'Your wallet is not a registered network participant.'**
+  String get pocDelegationErrorSenderNotParticipant;
+
+  /// No description provided for @pocDelegationErrorDelegateNotParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'The delegate address is not a registered network participant.'**
+  String get pocDelegationErrorDelegateNotParticipant;
 
   /// No description provided for @minersGovernance.
   ///
@@ -1543,6 +1681,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voting has ended for this proposal.'**
   String get proposalVotingEnded;
+
+  /// No description provided for @proposalQuorum.
+  ///
+  /// In en, this message translates to:
+  /// **'Quorum (turnout)'**
+  String get proposalQuorum;
+
+  /// No description provided for @proposalVotingPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting power'**
+  String get proposalVotingPower;
+
+  /// No description provided for @proposalTimeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining'**
+  String get proposalTimeRemaining;
+
+  /// No description provided for @proposalVoters.
+  ///
+  /// In en, this message translates to:
+  /// **'Voters'**
+  String get proposalVoters;
+
+  /// No description provided for @proposalDetailDeposit.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Deposit'**
+  String get proposalDetailDeposit;
+
+  /// No description provided for @proposalDetailMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get proposalDetailMetadata;
+
+  /// No description provided for @proposalDiscuss.
+  ///
+  /// In en, this message translates to:
+  /// **'Discuss'**
+  String get proposalDiscuss;
 
   /// No description provided for @proposalVoteSubmitted.
   ///

@@ -23,6 +23,12 @@ class ApiEndpoints {
   static const String collateralParams =
       '/productscience/inference/collateral/params';
 
+  static const String modelsAll =
+      '/productscience/inference/inference/models_all';
+
+  static String participant(String address) =>
+      '/productscience/inference/inference/participant/$address';
+
   static String validator(String valoperAddress) =>
       '/cosmos/staking/v1beta1/validators/$valoperAddress';
 
@@ -38,6 +44,11 @@ class ApiEndpoints {
       '/cosmos/gov/v1/proposals${status != null ? '?proposal_status=$status&pagination.limit=50&pagination.reverse=true' : '?pagination.limit=50&pagination.reverse=true'}';
   static String proposal(String id) => '/cosmos/gov/v1/proposals/$id';
   static String proposalTally(String id) => '/cosmos/gov/v1/proposals/$id/tally';
+  static String proposalVotes(String id) =>
+      '/cosmos/gov/v1/proposals/$id/votes?pagination.limit=500';
+  static const String govParamsTallying = '/cosmos/gov/v1/params/tallying';
+  static String bondedValidators() =>
+      '/cosmos/staking/v1beta1/validators?pagination.limit=2000&status=BOND_STATUS_BONDED';
 
   static const String participants = '/v1/epochs/current/participants';
   static const String epochsLatest = '/v1/epochs/latest';

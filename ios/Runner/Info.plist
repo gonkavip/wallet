@@ -65,10 +65,18 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>ai.gonka.wallet.wc</string>
+			<string>ai.gonka.wallet.gonka</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>gonka</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>ai.gonka.wallet.wc</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wc</string>
 			</array>
 		</dict>
 	</array>

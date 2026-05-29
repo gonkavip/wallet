@@ -21,6 +21,7 @@ final commaToDotInsertedFormatter = TextInputFormatter.withFunction((oldValue, n
   if (insertedEnd <= prefix) return newValue;
   final inserted = newText.substring(prefix, insertedEnd);
   if (!inserted.contains(',')) return newValue;
+
   if (inserted.contains('.')) return newValue;
   final fixed = inserted.replaceAll(',', '.');
   final result =

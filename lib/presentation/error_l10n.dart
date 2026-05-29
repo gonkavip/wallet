@@ -5,6 +5,12 @@ String localizeError(AppLocalizations l10n, String? raw) {
   final msg = raw.replaceFirst('Exception: ', '');
 
   if (msg.contains('No active node')) return l10n.errorNoActiveNode;
+  if (msg.contains('Sender is not a registered participant')) {
+    return l10n.pocDelegationErrorSenderNotParticipant;
+  }
+  if (msg.contains('Delegate is not a registered participant')) {
+    return l10n.pocDelegationErrorDelegateNotParticipant;
+  }
   if (msg.contains('Mnemonic not found')) return l10n.errorMnemonicNotFound;
   if (msg.contains('Invalid mnemonic')) return l10n.errorInvalidMnemonic;
 

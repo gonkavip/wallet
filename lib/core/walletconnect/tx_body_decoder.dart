@@ -26,6 +26,7 @@ class TxBodyDecoded {
 }
 
 class TxBodyDecoder {
+
   static TxBodyDecoded decode(Uint8List bodyBytes) {
     final reader = ProtobufReader(bodyBytes);
     final messages = <WcMessageDescription>[];

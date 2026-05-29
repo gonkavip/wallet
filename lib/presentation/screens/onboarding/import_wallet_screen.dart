@@ -145,6 +145,7 @@ class _ImportWalletScreenState extends State<ImportWalletScreen> {
         minimum: const EdgeInsets.only(bottom: 16),
         child: ResponsiveCenter(child: Column(
         children: [
+
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: SegmentedButton<_ImportMode>(

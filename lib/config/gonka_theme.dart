@@ -9,6 +9,7 @@ ThemeData buildGonkaDarkTheme() {
     onPrimary: Colors.white,
     primaryContainer: GonkaColors.accentBlue,
     onPrimaryContainer: Colors.white,
+
     secondary: GonkaColors.accentBlue,
     onSecondary: Colors.white,
     secondaryContainer: GonkaColors.accentBlue,

@@ -79,6 +79,7 @@ class _GrantScreenState extends ConsumerState<GrantScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(l10n.grantTitle),
         leading: IconButton(

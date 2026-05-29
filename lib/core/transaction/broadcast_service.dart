@@ -7,6 +7,7 @@ import '../network/node_manager.dart';
 import 'msg_collateral.dart';
 import 'msg_grant.dart';
 import 'msg_send.dart';
+import 'msg_set_poc_delegation.dart';
 import 'msg_unjail.dart';
 import 'msg_vote.dart';
 import 'tx_builder.dart';
@@ -102,6 +103,52 @@ class BroadcastService {
 
       final result = await client.broadcastTx(txBase64);
       _nodeManager.reportSuccess();
+      return result;
+    } catch (e) {
+      _nodeManager.reportError();
+      rethrow;
+    } finally {
+      HDKeyService.zeroKey(privateKey);
+    }
+  }
+
+  Future<BroadcastResult> setPocDelegation({
+    required String privateKeyHex,
+    required String fromAddress,
+    required String modelId,
+    required String delegateTo,
+  }) async {
+    final client = _nodeManager.client;
+    if (client == null) throw Exception('No active node');
+
+    final accountInfo = await client.getAccountInfo(fromAddress);
+    final kp = _keyPairFromHex(privateKeyHex);
+    final privateKey = kp.privateKey;
+    final publicKey = kp.publicKey;
+
+    try {
+      final msg = MsgSetPocDelegation(
+        sender: fromAddress,
+        modelId: modelId,
+        delegateTo: delegateTo,
+      );
+
+      final txBase64 = TxBuilder.buildAndSign(
+        msg: msg,
+        publicKey: publicKey,
+        privateKey: privateKey,
+        accountNumber: accountInfo.accountNumber,
+        sequence: accountInfo.sequence,
+      );
+
+      final result = await client.broadcastTx(txBase64);
+      _nodeManager.reportSuccess();
+
+      if (result.isSuccess && result.txhash.isNotEmpty) {
+        final confirmed = await _confirmTx(client, result.txhash);
+        if (confirmed != null) return confirmed;
+      }
+
       return result;
     } catch (e) {
       _nodeManager.reportError();

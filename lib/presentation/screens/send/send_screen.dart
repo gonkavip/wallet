@@ -26,6 +26,7 @@ class SendScreen extends ConsumerStatefulWidget {
 class _SendScreenState extends ConsumerState<SendScreen> {
   final _addressController = TextEditingController();
   final _amountController = TextEditingController();
+  final _memoController = TextEditingController();
   bool _useGnk = true;
   _AddressErr? _addressErr;
   _AmountErr? _amountErr;
@@ -34,6 +35,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
   void dispose() {
     _addressController.dispose();
     _amountController.dispose();
+    _memoController.dispose();
     super.dispose();
   }
 
@@ -153,6 +155,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
     context.push('/send/confirm', extra: {
       'toAddress': _addressController.text.trim(),
       'amountNgonka': ngonka.toString(),
+      'memo': _memoController.text.trim(),
     });
   }
 
@@ -160,6 +163,7 @@ class _SendScreenState extends ConsumerState<SendScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(l10n.sendTitle),
         leading: IconButton(
@@ -248,6 +252,19 @@ class _SendScreenState extends ConsumerState<SendScreen> {
                   onSelected: (_) => _switchDenom(false),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: _memoController,
+              maxLength: 256,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                labelText: l10n.sendMemoLabel,
+                hintText: l10n.sendMemoHint,
+                border: const OutlineInputBorder(),
+                counterText: '',
+              ),
             ),
 
             const Spacer(),

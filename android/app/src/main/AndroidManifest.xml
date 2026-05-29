@@ -32,6 +32,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="gonka" android:host="wc" />
             </intent-filter>
+            <!-- Standard WalletConnect deep link: wc://<urlencoded wc: uri>.
+                 No host constraint — the encoded URI sits in the authority. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="wc" />
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

@@ -442,6 +442,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sendContinue => 'Продолжить';
 
   @override
+  String get sendMemoLabel => 'Memo (необязательно)';
+
+  @override
+  String get sendMemoHint => 'Заметка к транзакции';
+
+  @override
   String get sendErrorEnterAddress => 'Введите адрес получателя';
 
   @override
@@ -518,6 +524,74 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get minersUnjailSubtitle => 'Разблокировать вашего валидатора';
+
+  @override
+  String get minersPocDelegation => 'Делегировать модель';
+
+  @override
+  String get minersPocDelegationSubtitle =>
+      'Делегировать право голоса PoC модели';
+
+  @override
+  String get pocDelegationTitle => 'Делегировать модель';
+
+  @override
+  String get pocDelegationInfo =>
+      'Делегируйте право голоса Proof-of-Compute модели другому участнику. Оставьте адрес пустым, чтобы очистить делегирование.';
+
+  @override
+  String get pocDelegationModelLabel => 'Модель';
+
+  @override
+  String get pocDelegationModelHint => 'Выберите модель';
+
+  @override
+  String get pocDelegationModelError => 'Выберите модель';
+
+  @override
+  String get pocDelegationModelsError => 'Не удалось загрузить модели';
+
+  @override
+  String get pocDelegationAddressLabel => 'Адрес делегата';
+
+  @override
+  String get pocDelegationAddressHint => 'gonka1...';
+
+  @override
+  String get pocDelegationDelegate => 'Делегировать';
+
+  @override
+  String get pocDelegationClear => 'Очистить делегирование';
+
+  @override
+  String get pocDelegationConfirmTitle => 'Подтвердите делегирование';
+
+  @override
+  String get pocDelegationConfirmClearTitle => 'Подтвердите очистку';
+
+  @override
+  String get pocDelegationResultSuccess => 'Делегирование установлено';
+
+  @override
+  String get pocDelegationResultFailed => 'Ошибка делегирования';
+
+  @override
+  String get pocDelegationResultClearSuccess => 'Делегирование очищено';
+
+  @override
+  String get pocDelegationResultClearFailed => 'Ошибка очистки';
+
+  @override
+  String get pocDelegationSenderNotParticipant =>
+      'Этот кошелёк не зарегистрирован как участник сети, поэтому не может делегировать модель.';
+
+  @override
+  String get pocDelegationErrorSenderNotParticipant =>
+      'Ваш кошелёк не зарегистрирован как участник сети.';
+
+  @override
+  String get pocDelegationErrorDelegateNotParticipant =>
+      'Адрес делегата не зарегистрирован как участник сети.';
 
   @override
   String get minersGovernance => 'Управление';
@@ -786,6 +860,27 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get proposalVotingEnded =>
       'Голосование по этому предложению завершено.';
+
+  @override
+  String get proposalQuorum => 'Кворум (явка)';
+
+  @override
+  String get proposalVotingPower => 'Сила голоса';
+
+  @override
+  String get proposalTimeRemaining => 'Осталось времени';
+
+  @override
+  String get proposalVoters => 'Проголосовали';
+
+  @override
+  String get proposalDetailDeposit => 'Общий депозит';
+
+  @override
+  String get proposalDetailMetadata => 'Подробнее';
+
+  @override
+  String get proposalDiscuss => 'Обсудить';
 
   @override
   String get proposalVoteSubmitted => 'Голос отправлен';

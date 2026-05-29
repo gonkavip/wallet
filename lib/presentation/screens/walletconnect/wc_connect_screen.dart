@@ -50,6 +50,7 @@ class _WcConnectScreenState extends ConsumerState<WcConnectScreen> {
     setState(() => _busy = true);
     try {
       await ref.read(wcConnectProvider.notifier).pair(raw);
+
     } on WcConnectError catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);

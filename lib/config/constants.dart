@@ -13,6 +13,8 @@ class GonkaConstants {
   static const String msgWithdrawCollateralTypeUrl =
       '/inference.collateral.MsgWithdrawCollateral';
   static const String msgGrantTypeUrl = '/cosmos.authz.v1beta1.MsgGrant';
+  static const String msgSetPocDelegationTypeUrl =
+      '/inference.inference.MsgSetPoCDelegation';
   static const String msgUnjailTypeUrl = '/cosmos.slashing.v1beta1.MsgUnjail';
   static const String msgVoteTypeUrl = '/cosmos.gov.v1.MsgVote';
   static const String signMode = 'SIGN_MODE_DIRECT';
@@ -50,13 +52,16 @@ String formatGnk(BigInt ngonka) {
   final wholeFormatted = _addCommas(whole.toString());
 
   if (whole.abs() >= BigInt.one) {
+
     final twoDigits = fractionStr.substring(0, 2);
     final trimmed = twoDigits.replaceAll(RegExp(r'0+$'), '');
     if (trimmed.isEmpty) return wholeFormatted;
     return '$wholeFormatted.$twoDigits';
   } else {
+
     final trimmedAll = fractionStr.replaceAll(RegExp(r'0+$'), '');
     if (trimmedAll.isEmpty) return '0';
+
     var firstNonZero = 0;
     while (firstNonZero < fractionStr.length && fractionStr[firstNonZero] == '0') {
       firstNonZero++;
@@ -71,9 +76,17 @@ String formatGnkShort(BigInt ngonka) {
   return formatGnk(ngonka);
 }
 
+String formatWeightShort(BigInt weight) {
+  final n = weight.toDouble();
+  if (n >= 1e6) return '${(n / 1e6).toStringAsFixed(2)}M';
+  if (n >= 1e3) return '${(n / 1e3).toStringAsFixed(1)}K';
+  return _addCommas(weight.toString());
+}
+
 String formatUsd(BigInt ngonka, double pricePerGnk) {
   final gnk = ngonka.toDouble() / denomMultiplier.toDouble();
   final usd = gnk * pricePerGnk;
+
   final whole = usd.truncate();
   final fraction = ((usd - whole) * 100).round().abs();
   final wholeStr = _addCommas(whole.toString());

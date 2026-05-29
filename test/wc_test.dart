@@ -49,6 +49,29 @@ void main() {
       const raw = 'wc:abc@2?relay-protocol=irn';
       expect(WcUriParser.extractFromString(raw), raw);
     });
+
+    test('extracts from standard wc:// deep link preserving case', () {
+      const inner =
+          'wc:749bdfd8f765e712ab598466583e524bde57c4aad5868634563dae1a35f19ea1@2?expiryTimestamp=1780074995&relay-protocol=irn&symKey=38f71d471594fcfc2d51320c9406758c489d19cb9ee9bff348bedec8589fdd60';
+      final link = 'wc://${Uri.encodeComponent(inner)}';
+      final extracted = WcUriParser.extractFromString(link);
+      expect(extracted, inner);
+
+      expect(extracted!.contains('symKey='), isTrue);
+      expect(extracted.contains('expiryTimestamp='), isTrue);
+
+      final parsed = WcUriParser.parse(extracted);
+      expect(parsed, isNotNull);
+      expect(parsed!.relayProtocol, 'irn');
+    });
+
+    test('wc:// is detected before the bare wc: branch', () {
+
+      const inner = 'wc:topic@2?relay-protocol=irn&symKey=AbCdEf';
+      final link = 'wc://${Uri.encodeComponent(inner)}';
+      expect(WcUriParser.extractFromString(link), inner);
+      expect(WcUriParser.extractFromString(link)!.startsWith('wc://'), isFalse);
+    });
   });
 
   group('MsgSendDecoder', () {
@@ -82,6 +105,7 @@ void main() {
         denom: 'ngonka',
         amount: '42',
       );
+
       final anyMsg = ProtobufWriter()
         ..writeString(1, msg.typeUrl)
         ..writeBytes(2, msg.encode());
@@ -152,6 +176,7 @@ void main() {
 
   group('TxBuilder.signDirectFromBytes', () {
     test('is deterministic with the same inputs', () {
+
       final priv = Uint8List.fromList(List.filled(32, 0x11));
       final bodyBytes = Uint8List.fromList(List.generate(10, (i) => i));
       final authInfoBytes =

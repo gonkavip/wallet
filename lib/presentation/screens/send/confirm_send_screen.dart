@@ -12,11 +12,13 @@ import '../../widgets/responsive_center.dart';
 class ConfirmSendScreen extends ConsumerStatefulWidget {
   final String toAddress;
   final String amountNgonka;
+  final String memo;
 
   const ConfirmSendScreen({
     super.key,
     required this.toAddress,
     required this.amountNgonka,
+    this.memo = '',
   });
 
   @override
@@ -63,6 +65,7 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
           fromAddress: wallet.address,
           toAddress: widget.toAddress,
           amountNgonka: widget.amountNgonka,
+          memo: widget.memo,
         );
 
     if (!mounted) return;
@@ -123,6 +126,16 @@ class _ConfirmSendScreenState extends ConsumerState<ConfirmSendScreen> {
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
+
+            if (widget.memo.isNotEmpty) ...[
+              Text(l10n.sendMemoLabel,
+                  style: Theme.of(context).textTheme.bodySmall),
+              Text(widget.memo,
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 16),
+            ],
 
             Text(l10n.commonFee,
                 style: Theme.of(context).textTheme.bodySmall),

@@ -117,6 +117,13 @@ class MinersScreen extends ConsumerWidget {
             onTap: () => context.push('/miners/grant'),
           ),
           ListTile(
+            leading: const Icon(Icons.hub_outlined),
+            title: Text(l10n.minersPocDelegation),
+            subtitle: Text(l10n.minersPocDelegationSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/miners/poc-delegation'),
+          ),
+          ListTile(
             leading: const Icon(Icons.lock_open_outlined),
             title: Text(l10n.minersUnjail),
             subtitle: Text(l10n.minersUnjailSubtitle),
@@ -135,8 +142,14 @@ class MinersScreen extends ConsumerWidget {
             title: Text(l10n.minersTracker),
             subtitle: Text(l10n.minersTrackerSubtitle),
             trailing: const Icon(Icons.open_in_new, size: 18),
-            onTap: () => launchUrl(Uri.parse('https://tracker.gonka.vip/'),
-                mode: LaunchMode.externalApplication),
+            onTap: () {
+              final address = ref.read(activeWalletProvider)?.address;
+              final url = address != null && address.isNotEmpty
+                  ? Uri.https('tracker.gonka.vip', '/',
+                      {'participant': address})
+                  : Uri.parse('https://tracker.gonka.vip/');
+              launchUrl(url, mode: LaunchMode.externalApplication);
+            },
           ),
         ],
       )),

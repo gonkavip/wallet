@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class GonkaColors {
+
   static const Color bgPrimary = Color(0xFF06060B);
   static const Color bgSecondary = Color(0xFF0E0E16);
   static const Color bgCard = Color(0xFF141420);
@@ -10,6 +11,7 @@ abstract class GonkaColors {
   static const Color textMuted = Color(0xFF8A8AA0);
 
   static const Color iconPrimary = Color(0xFFE1ECF7);
+
   static const Color iconMuted = Color(0xFF60A5FA);
 
   static const Color accentBlue = Color(0xFF3B82F6);
@@ -80,6 +82,7 @@ abstract class GonkaRadius {
 }
 
 abstract class GonkaShadows {
+
   static const List<BoxShadow> glowBlue = [
     BoxShadow(
       color: Color(0x4D1D4ED8),

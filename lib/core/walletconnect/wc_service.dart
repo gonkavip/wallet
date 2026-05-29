@@ -16,13 +16,6 @@ class WcService {
 
   Future<void> init() async {
     if (_walletKit != null) return;
-    if (WcConstants.projectId.isEmpty) {
-      throw StateError(
-        'WalletConnect projectId is not configured. Get one at '
-        'https://cloud.reown.com and pass it via '
-        '--dart-define=WC_PROJECT_ID=<your-id>',
-      );
-    }
     _walletKit = await ReownWalletKit.createInstance(
       projectId: WcConstants.projectId,
       metadata: const PairingMetadata(

@@ -158,10 +158,10 @@ class _ProposalCard extends StatelessWidget {
     final String badgeText;
 
     if (proposal.isVotingPeriod) {
-      badgeColor = GonkaColors.success;
+      badgeColor = GonkaColors.info;
       badgeText = l10n.governanceStatusActive;
     } else if (proposal.isPassed) {
-      badgeColor = GonkaColors.info;
+      badgeColor = GonkaColors.success;
       badgeText = l10n.governanceStatusPassed;
     } else if (proposal.isRejected) {
       badgeColor = GonkaColors.error;

@@ -385,6 +385,7 @@ class _WalletCard extends ConsumerWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(GonkaRadius.lg),
               gradient: GonkaGradients.walletCard,
+
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x263B82F6),

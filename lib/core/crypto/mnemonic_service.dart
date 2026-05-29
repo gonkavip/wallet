@@ -1,4 +1,3 @@
-// ignore_for_file: implementation_imports
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart' as english;
 

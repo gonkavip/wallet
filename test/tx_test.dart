@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gonka_wallet/core/transaction/protobuf_utils.dart';
 import 'package:gonka_wallet/core/transaction/msg_send.dart';
+import 'package:gonka_wallet/core/transaction/msg_set_poc_delegation.dart';
+import 'package:gonka_wallet/config/constants.dart';
 import 'package:gonka_wallet/core/transaction/tx_builder.dart';
 import 'package:gonka_wallet/core/crypto/mnemonic_service.dart';
 import 'package:gonka_wallet/core/crypto/hd_key_service.dart';
@@ -62,6 +65,61 @@ void main() {
 
       expect(utf8.decode(fields[1]), 'gonka1abc');
       expect(utf8.decode(fields[2]), 'gonka1def');
+    });
+  });
+
+  group('MsgSetPocDelegation', () {
+    Map<int, dynamic> decodeFields(List<int> bytes) {
+      final reader = ProtobufReader(Uint8List.fromList(bytes));
+      final fields = <int, dynamic>{};
+      while (reader.hasMore) {
+        final (fieldNumber, wireType) = reader.readTag();
+        if (wireType == 2) {
+          fields[fieldNumber] = reader.readBytes();
+        } else {
+          reader.skip(wireType);
+        }
+      }
+      return fields;
+    }
+
+    test('uses the correct type URL', () {
+      final msg = MsgSetPocDelegation(
+        sender: 'gonka1sender',
+        modelId: 'MiniMaxAI/MiniMax-M2.7',
+        delegateTo: 'gonka1delegate',
+      );
+      expect(msg.typeUrl, '/inference.inference.MsgSetPoCDelegation');
+      expect(msg.typeUrl, GonkaConstants.msgSetPocDelegationTypeUrl);
+    });
+
+    test('encodes sender, model_id and delegate_to', () {
+      final msg = MsgSetPocDelegation(
+        sender: 'gonka1sender',
+        modelId: 'MiniMaxAI/MiniMax-M2.7',
+        delegateTo: 'gonka1delegate',
+      );
+      final fields = decodeFields(msg.encode());
+
+      expect(fields.containsKey(1), true);
+      expect(fields.containsKey(2), true);
+      expect(fields.containsKey(3), true);
+      expect(utf8.decode(fields[1]), 'gonka1sender');
+      expect(utf8.decode(fields[2]), 'MiniMaxAI/MiniMax-M2.7');
+      expect(utf8.decode(fields[3]), 'gonka1delegate');
+    });
+
+    test('omits delegate_to (field 3) when cleared', () {
+      final msg = MsgSetPocDelegation(
+        sender: 'gonka1sender',
+        modelId: 'MiniMaxAI/MiniMax-M2.7',
+        delegateTo: '',
+      );
+      final fields = decodeFields(msg.encode());
+
+      expect(fields.containsKey(1), true);
+      expect(fields.containsKey(2), true);
+      expect(fields.containsKey(3), false);
     });
   });
 

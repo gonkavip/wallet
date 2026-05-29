@@ -20,6 +20,7 @@ class MsgSendDecoded {
 }
 
 class MsgSendDecoder {
+
   static MsgSendDecoded? tryDecode(Uint8List valueBytes) {
     try {
       final reader = ProtobufReader(valueBytes);

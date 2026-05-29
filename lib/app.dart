@@ -28,6 +28,9 @@ import 'presentation/screens/miners/collateral_result_screen.dart';
 import 'presentation/screens/miners/grant_screen.dart';
 import 'presentation/screens/miners/grant_confirm_screen.dart';
 import 'presentation/screens/miners/grant_result_screen.dart';
+import 'presentation/screens/miners/poc_delegation_screen.dart';
+import 'presentation/screens/miners/poc_delegation_confirm_screen.dart';
+import 'presentation/screens/miners/poc_delegation_result_screen.dart';
 import 'presentation/screens/miners/unjail_screen.dart';
 import 'presentation/screens/miners/governance_screen.dart';
 import 'presentation/screens/miners/proposal_detail_screen.dart';
@@ -42,6 +45,7 @@ late GoRouter appRouter;
 GoRouter _buildRouter(String initialRoute) {
   appRouter = GoRouter(
     initialLocation: initialRoute,
+
     redirect: (context, state) {
       final loc = state.uri.toString();
       if (loc.contains('wc?uri=') ||
@@ -120,6 +124,7 @@ GoRouter _buildRouter(String initialRoute) {
         return ConfirmSendScreen(
           toAddress: data['toAddress']!,
           amountNgonka: data['amountNgonka']!,
+          memo: data['memo'] ?? '',
         );
       },
     ),
@@ -200,6 +205,33 @@ GoRouter _buildRouter(String initialRoute) {
           success: data['success'] as bool,
           txhash: data['txhash'] as String? ?? '',
           error: data['error'] as String? ?? '',
+        );
+      },
+    ),
+
+    GoRoute(
+      path: '/miners/poc-delegation',
+      builder: (_, __) => const PocDelegationScreen(),
+    ),
+    GoRoute(
+      path: '/miners/poc-delegation/confirm',
+      builder: (_, state) {
+        final data = state.extra as Map<String, String>;
+        return PocDelegationConfirmScreen(
+          modelId: data['modelId']!,
+          delegateTo: data['delegateTo']!,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/miners/poc-delegation/result',
+      builder: (_, state) {
+        final data = state.extra as Map<String, dynamic>;
+        return PocDelegationResultScreen(
+          success: data['success'] as bool,
+          txhash: data['txhash'] as String? ?? '',
+          error: data['error'] as String? ?? '',
+          isClear: data['isClear'] as bool? ?? false,
         );
       },
     ),

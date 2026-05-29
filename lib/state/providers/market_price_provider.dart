@@ -26,6 +26,7 @@ class MarketPriceNotifier extends StateNotifier<AsyncValue<double?>> {
   }
 
   Future<void> fetch() async {
+
     if (_lastFetch != null &&
         _cachedPrice != null &&
         DateTime.now().difference(_lastFetch!) < _ttl) {

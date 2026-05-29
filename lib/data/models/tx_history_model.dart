@@ -43,6 +43,7 @@ class TxHistoryItem {
 
   factory TxHistoryItem.fromTxResponse(
       Map<String, dynamic> tx, Map<String, dynamic> txResponse) {
+
     try {
       final messages = tx['body']?['messages'] as List? ?? [];
       if (messages.isNotEmpty) {
@@ -355,6 +356,7 @@ class TxHistoryItem {
           final msgBody = msg['msg'];
           if (msgBody is Map) {
             action = msgBody.keys.first.toString();
+
             if (amount == BigInt.zero) {
               final actionBody = msgBody[action];
               if (actionBody is Map) {

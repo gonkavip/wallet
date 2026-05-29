@@ -18,6 +18,7 @@ class SignDirectPayload {
 }
 
 class SignDirectDecoder {
+
   static SignDirectPayload parse(dynamic rpcParams) {
     if (rpcParams is List && rpcParams.isNotEmpty) {
       rpcParams = rpcParams.first;

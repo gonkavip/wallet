@@ -7,6 +7,7 @@ import 'config/design_tokens.dart';
 import 'config/gonka_theme.dart';
 import 'core/platform_util.dart';
 import 'core/walletconnect/wc_service.dart';
+import 'core/walletconnect/wc_uri_parser.dart';
 import 'data/repositories/wallet_repository.dart';
 import 'data/repositories/node_repository.dart';
 import 'data/repositories/settings_repository.dart';
@@ -50,6 +51,7 @@ void main() async {
   try {
     await wcService.init();
   } catch (_) {
+
   }
 
   final wallets = walletRepo.getWallets();
@@ -100,7 +102,7 @@ class _AppInitializerState extends ConsumerState<_AppInitializer>
     with WidgetsBindingObserver {
   bool _wasPaused = false;
   late bool _isLocked = widget.needsInitialAuth;
-  StreamSubscription<Uri>? _deepLinkSub;
+  StreamSubscription<String>? _deepLinkSub;
 
   @override
   void initState() {
@@ -122,28 +124,28 @@ class _AppInitializerState extends ConsumerState<_AppInitializer>
     debugPrint('[WC] _initDeepLinks: wc init=${ref.read(wcServiceProvider).isInitialized}');
     if (!ref.read(wcServiceProvider).isInitialized) return;
     final appLinks = AppLinks();
+
     try {
-      final initial = await appLinks.getInitialLink();
+      final initial = await appLinks.getInitialLinkString();
       debugPrint('[WC] initial link: $initial');
       if (initial != null) _handleDeepLink(initial);
     } catch (e) {
       debugPrint('[WC] getInitialLink error: $e');
     }
-    _deepLinkSub = appLinks.uriLinkStream.listen(
-      (uri) {
-        debugPrint('[WC] stream link: $uri');
-        _handleDeepLink(uri);
+    _deepLinkSub = appLinks.stringLinkStream.listen(
+      (link) {
+        debugPrint('[WC] stream link: $link');
+        _handleDeepLink(link);
       },
       onError: (e) => debugPrint('[WC] stream error: $e'),
     );
   }
 
-  void _handleDeepLink(Uri uri) {
-    debugPrint('[WC] _handleDeepLink scheme=${uri.scheme} host=${uri.host} q=${uri.queryParameters}');
-    if (uri.scheme != 'gonka' || uri.host != 'wc') return;
-    final wcUri = uri.queryParameters['uri'];
+  void _handleDeepLink(String link) {
+    debugPrint('[WC] _handleDeepLink raw=$link');
+    final wcUri = WcUriParser.extractFromString(link);
     if (wcUri == null || wcUri.isEmpty) {
-      debugPrint('[WC] no uri param');
+      debugPrint('[WC] no wc uri in link');
       return;
     }
     Future.microtask(() async {

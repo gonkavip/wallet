@@ -76,6 +76,7 @@ class TxHistoryNotifier
 
       for (final raw in rawTransfers) {
         final item = TxHistoryItem.fromTxResponse(raw.tx, raw.txResponse);
+
         final type = item.type != TxType.send
             ? item.type
             : (item.toAddress == _address ? TxType.receive : TxType.send);

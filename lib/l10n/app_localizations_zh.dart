@@ -433,6 +433,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sendContinue => '继续';
 
   @override
+  String get sendMemoLabel => '备注（可选）';
+
+  @override
+  String get sendMemoHint => '附加到交易的备注';
+
+  @override
   String get sendErrorEnterAddress => '请输入收款地址';
 
   @override
@@ -509,6 +515,69 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get minersUnjailSubtitle => '解禁您的验证者';
+
+  @override
+  String get minersPocDelegation => '委托模型';
+
+  @override
+  String get minersPocDelegationSubtitle => '委托模型的 PoC 投票权';
+
+  @override
+  String get pocDelegationTitle => '委托模型';
+
+  @override
+  String get pocDelegationInfo => '将模型的计算证明（PoC）投票权委托给其他参与者。留空委托地址以清除委托。';
+
+  @override
+  String get pocDelegationModelLabel => '模型';
+
+  @override
+  String get pocDelegationModelHint => '选择一个模型';
+
+  @override
+  String get pocDelegationModelError => '请选择一个模型';
+
+  @override
+  String get pocDelegationModelsError => '加载模型失败';
+
+  @override
+  String get pocDelegationAddressLabel => '委托至地址';
+
+  @override
+  String get pocDelegationAddressHint => 'gonka1...';
+
+  @override
+  String get pocDelegationDelegate => '委托';
+
+  @override
+  String get pocDelegationClear => '清除委托';
+
+  @override
+  String get pocDelegationConfirmTitle => '确认委托';
+
+  @override
+  String get pocDelegationConfirmClearTitle => '确认清除';
+
+  @override
+  String get pocDelegationResultSuccess => '委托已设置';
+
+  @override
+  String get pocDelegationResultFailed => '委托失败';
+
+  @override
+  String get pocDelegationResultClearSuccess => '委托已清除';
+
+  @override
+  String get pocDelegationResultClearFailed => '清除失败';
+
+  @override
+  String get pocDelegationSenderNotParticipant => '此钱包不是已注册的网络参与者，无法委托模型。';
+
+  @override
+  String get pocDelegationErrorSenderNotParticipant => '您的钱包不是已注册的网络参与者。';
+
+  @override
+  String get pocDelegationErrorDelegateNotParticipant => '委托地址不是已注册的网络参与者。';
 
   @override
   String get minersGovernance => '治理';
@@ -772,6 +841,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get proposalVotingEnded => '此提案的投票已结束。';
+
+  @override
+  String get proposalQuorum => '法定人数（参与率）';
+
+  @override
+  String get proposalVotingPower => '投票权重';
+
+  @override
+  String get proposalTimeRemaining => '剩余时间';
+
+  @override
+  String get proposalVoters => '投票者';
+
+  @override
+  String get proposalDetailDeposit => '总押金';
+
+  @override
+  String get proposalDetailMetadata => '详情';
+
+  @override
+  String get proposalDiscuss => '讨论';
 
   @override
   String get proposalVoteSubmitted => '投票已提交';

@@ -39,6 +39,7 @@ class _NameWalletScreenState extends ConsumerState<NameWalletScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text(l10n.onboardingNameTitle)),
       body: SafeArea(
         top: false,

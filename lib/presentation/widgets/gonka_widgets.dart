@@ -103,6 +103,7 @@ class GlowBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final base = HSLColor.fromColor(color);
     return Stack(
       alignment: Alignment.center,
